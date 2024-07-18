@@ -602,7 +602,7 @@ def skt_layout():
                                                         'width': '100%',
                                                         'margin-top': '0'
                                                         }),
-                                                dcc.Markdown('Isabelle Boutron, Toshi Furukawa, Emily Karahalios, Tianjing li, Michael Mccaul, Adriani Nikolakopoulou, Haliton Oliveira, Thodoris Papakonstantiou, Georgia Salanti, Guido Schwarzer, Ian Saldanha, Nicky Welton, Sally Yaacoub',
+                                                dcc.Markdown('Toshi Furukawa, Isabelle Boutron, Emily Karahalios, Tianjing li, Michael Mccaul, Adriani Nikolakopoulou, Haliton Oliveira, Thodoris Papakonstantiou, Georgia Salanti, Guido Schwarzer, Ian Saldanha, Nicky Welton, Sally Yaacoub',
                                                                 className="markdown_style", style={"color": "black", 'font-size': 'large'}),
                                                 html.Br(),html.Br(),html.Br(),],style={ 'width': '95%', 'padding-left': '5%'}) 
                                                         ], style={'display':'block'}), 
