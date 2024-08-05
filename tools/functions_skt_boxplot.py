@@ -1,10 +1,9 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-def __update_boxplot(value, edges, net_data):
-    active, non_active = '#1B58E2', '#313539'  # '#4C5353'
+def __show_boxplot(value):
     if value:
-        net_data  = pd.read_json(net_data[0], orient='split')
+        net_data = pd.read_csv('db/psoriasis_wide_complete.csv')
         try:
             df = net_data[['treat1', 'treat2', value]].copy()
         except:
@@ -20,25 +19,12 @@ def __update_boxplot(value, edges, net_data):
         margin = (float(df[value].max()) - float(df[value].min())) * .1  # 10%
         range1 = float(df[value].min()) - margin
         range2 = float(df[value].max()) + margin
-        df['color'] = non_active
-        df['selected'] = 'nonactive'
-
-        slctd_comps = []
-        print(edge)
-        for edge in edges or []:
-            src, trgt = edge['source'], edge['target']
-            slctd_comps += [f'{src} vs {trgt}']
-
-        for ind, row in df.iterrows():
-            df.loc[ind, 'color'] = active if row.Comparison in slctd_comps else non_active
-            df.loc[ind, 'selected'] = 'active' if row.Comparison in slctd_comps else 'nonactive'
-
         unique_comparisons = df.Comparison.sort_values().unique()
         unique_comparisons = unique_comparisons[~pd.isna(unique_comparisons)]
         fig = go.Figure(data=[go.Box(y=df[df.Comparison == comp][value],
                                      visible=True,
                                      name=comp, # jitter=0.2, # width=0.6,
-                                     marker_color=active if comp in slctd_comps else non_active,
+                                     marker_color='#313539',
                                      )
                               for comp in unique_comparisons]
                         )

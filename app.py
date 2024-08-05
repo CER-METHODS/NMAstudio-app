@@ -31,6 +31,7 @@ from tools.functions_build_league_data_table import __update_output, __update_ou
 from tools.functions_generate_stylesheet import __generate_stylesheet
 from tools.functions_export import __generate_xlsx_netsplit, __generate_xlsx_league, __generate_csv_consistency
 from tools.functions_show_forest_plot import __show_forest_plot
+from tools.functions_skt_boxplot import __show_boxplot
 from tools.functions_skt_forestplot import __skt_all_forstplot, __skt_PI_forstplot, __skt_direct_forstplot, __skt_indirect_forstplot, __skt_PIdirect_forstplot, __skt_PIindirect_forstplot,__skt_directin_forstplot, __skt_mix_forstplot
 from dash import ctx, no_update
 # --------------------------------------------------------------------------------------------------------------------#
@@ -120,20 +121,20 @@ def display_page(pathname):
 
     else:  return RealHomepage
 
-@app.callback(
-    Output('pass_model','is_open'),
-    Output('skt_page_content','children'),
-    Input('password_ok','n_clicks'),
-    Input('password','value'),
-    State('pass_model','is_open'),
-    State('skt_page_content','children'),
-)
-def clear_treat(click, password, pass_model, children):
-    if password =='777' and click:
-        children = [Navbar(), skt_layout()]
-        return not pass_model, children
-    else:
-        return pass_model, children
+# @app.callback(
+#     Output('pass_model','is_open'),
+#     Output('skt_page_content','children'),
+#     Input('password_ok','n_clicks'),
+#     Input('password','value'),
+#     State('pass_model','is_open'),
+#     State('skt_page_content','children'),
+# )
+# def clear_treat(click, password, pass_model, children):
+#     if password =='777' and click:
+#         children = [Navbar(), skt_layout()]
+#         return not pass_model, children
+#     else:
+#         return pass_model, children
 
 # @app.callback(Output('results_page', 'children'),
 #               [Input('test_upload', 'n_clicks_timestamp'),
@@ -1990,6 +1991,7 @@ def results_display(selected):
 def selected(value_effect, value_change,lower,rowData):
     
     data = pd.read_csv('db/skt/final_all.csv')
+    p_score = pd.read_csv('db/ranking/rank.csv')
     df = pd.DataFrame(data)
     df['Certainty']= ''
     df['within_study'] = ''
@@ -2087,6 +2089,8 @@ def selected(value_effect, value_change,lower,rowData):
                     'Scale_upper': Scale_upper ,"Treatments": treatments})
 
     rowData_effect = pd.DataFrame(rowData_effect)
+    rowData_effect = rowData_effect.merge(p_score, left_on='Reference', right_on='treatment', how='left')
+
     dfc_2 = rowData_effect.copy()   
     
     rowData = pd.DataFrame(rowData)
@@ -2188,6 +2192,30 @@ def display_forestplot(cell, _):
 def show_forest_plot(cell, style_pair):
     # print(cell)
     return __show_forest_plot(cell, style_pair)
+
+
+
+
+@app.callback(
+    Output("modal_transitivity", "is_open"), 
+    Input("trans_button", "n_clicks"),
+    Input("close_trans", "n_clicks"),
+)
+
+def display_forestplot(cell, _):
+    if ctx.triggered_id == "close_trans":
+        return False
+    if ctx.triggered_id == "trans_button":
+        return True
+    return no_update
+
+
+@app.callback(Output('boxplot_skt', 'figure'),
+              Input('ddskt-trans', 'value'),)
+def update_boxplot(value):
+    return __show_boxplot(value)
+
+
 
 
 @app.callback(

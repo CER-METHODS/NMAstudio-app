@@ -646,11 +646,11 @@ h6 {margin-top: 0;}
 
 
 .ag-theme-alpine {
-    --ag-header-foreground-color: white;
-    --ag-header-background-color: #B85042;
-    --ag-header-column-resize-handle-color: #933f34;
-    --ag-font-size: 15px;
-    --ag-header-cell-hover-background-color: #d55f4f;
+    --ag-header-foreground-color: white!important;
+    --ag-header-background-color: #B85042 !important;
+    --ag-header-column-resize-handle-color: #933f34!important;
+    --ag-font-size: 15px!important;
+    --ag-header-cell-hover-background-color: #d55f4f!important;
 }
 
 /* .ag-theme-alpine .ag-header {
@@ -681,6 +681,9 @@ h6 {margin-top: 0;}
     display: grid;
     margin-left: 400px;
 }
+
+
+
 
 /* .modal-content{
     display: grid;
@@ -785,8 +788,14 @@ h6 {margin-top: 0;}
 }
 
 
+.bodytab2{
+    display: grid;
+}
 
-
+.sub-button:hover {
+    background-color:#A7BEAE!important;
+    color: white!important;
+}
 
   /* Here are just some visual styles. 🖌 */
   
@@ -1717,8 +1726,15 @@ li a {
 }
 
 #modal_transitivity{
-    display: grid;
+    /* display: grid; */
     justify-content: center;
+    margin-top: 10%;
+    /* width: 1000px */
+}
+
+.trans_conten{
+    width: 170%;
+    height: 70%;
 }
 
 #main_page{

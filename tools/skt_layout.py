@@ -14,6 +14,7 @@ import os
 
 data = pd.read_csv('db/skt/final_all.csv')
 pw_data = pd.read_csv('db/skt/forest_data_prws.csv')
+p_score = pd.read_csv('db/ranking/rank.csv')
 df = pd.DataFrame(data)
 
 cinima_dat = pd.read_csv('db/Cinema/cinema_report_PASI90.csv')
@@ -85,16 +86,13 @@ df['Scale_upper'] = 'Enter a value for upper'
 df['ab_effect'] = ''
 df['ab_difference'] = ''
 
+# p_score.rename(columns={'treatment': 'Treatment'}, inplace=True)
+# df = pd.merge(df, p_score, on='Treatment', how='left')
 
 
-# df_mix = __skt_mix_forstplot(df,0.8,1.25)
+
 df_all = __skt_all_forstplot(df,0.8,scale_lower=None, scale_upper=None, refer_name=None)
-# df_PI = __skt_PI_forstplot(df,0.8,1.25)
-# df_direct = __skt_direct_forstplot(df,0.8,1.25)
-# df_indirect = __skt_indirect_forstplot(df,0.8,1.25)
-# df_PIdirect = __skt_PIdirect_forstplot(df,0.8,1.25)
-# df_PIindirect = __skt_PIindirect_forstplot(df,0.8,1.25)
-# df_directin = __skt_directin_forstplot(df,0.8,1.25)
+
 df = df_all
 
 grouped = df.groupby(["Reference", "risk", 'Scale_lower', 'Scale_upper'])
@@ -118,9 +116,12 @@ for (ref, risk, Scale_lower, Scale_upper), group in grouped:
         treatments.append(treatment_data)
     rowData.append({"Reference": ref, "risk": risk,
                     'Scale_lower': Scale_lower ,
-                    'Scale_lower': Scale_upper ,"Treatments": treatments})
+                    'Scale_lower': Scale_upper ,
+                    "Treatments": treatments})
 
 row_data = pd.DataFrame(rowData)
+
+row_data = row_data.merge(p_score, left_on='Reference', right_on='treatment', how='left')
 
 
 row_data_default = []
@@ -143,9 +144,13 @@ for (ref, risk, Scale_lower, Scale_upper), group in grouped:
         treatments.append(treatment_data)
     row_data_default.append({"Reference": ref, "risk": risk,
                     'Scale_lower': Scale_lower ,
-                    'Scale_upper': Scale_upper ,"Treatments": treatments})
+                    'Scale_upper': Scale_upper ,
+                    "Treatments": treatments})
 
 row_data_default = pd.DataFrame(row_data_default)
+
+row_data_default = row_data_default.merge(p_score, left_on='Reference', right_on='treatment', how='left')
+
 
 for j in range(0, row_data_default.shape[0]):
     
@@ -173,6 +178,14 @@ masterColumnDefs = [
         #     'innerRenderer': "DCC_GraphClickData",
         # },
     },
+    
+    {"headerName": "P score\n(Ranking)", 
+     "field": "pscore",
+     "editable": True,
+     'cellStyle': {
+        'border-right': 'solid 0.8px'}
+     },
+
     {"headerName": "Risk per 1000", 
      "field": "risk",
      "editable": True,
@@ -369,6 +382,47 @@ grid = dag.AgGrid(
 
 ####################################################################################################################################################################
 ####################################################################################################################################################################
+OPTIONS = [{'label': '{}'.format(col), 'value': col} for col in ['age', 'male']]
+model_transitivity = dbc.Modal(
+                        [dbc.ModalHeader("Transitivity Check Boxplots"),
+                         dbc.ModalBody(html.Div([html.Div([dbc.Row([html.P("Choose effect modifier:", className="graph__title2",
+                                         style={'display': 'inline-block',
+                                                'verticalAlign':"top",
+                                                'font-size': '12px',
+                                                'margin-bottom': '-10px'}),
+                                  dcc.Dropdown(id='ddskt-trans', options=OPTIONS,
+                                               clearable=True, placeholder="",
+                                               className="tapEdgeData-fig-class",
+                                               style={'width': '150px', 'height': '30px',
+                                                      'display': 'inline-block', # 'background-color': '#40515e'
+                                                      })
+                                  ])], style={'margin-top':'4px'}),
+                                  html.Div([dcc.Graph(id='boxplot_skt',
+                                                      style={'height': '98%',
+                                                             'width': '-webkit-fill-available'},
+                                  config={'editable': True,
+                                          'edits': dict(annotationPosition=True,
+                                                    annotationTail=True,
+                                                    annotationText=True, axisTitleText=True,
+                                                    colorbarPosition=True,
+                                                    colorbarTitleText=True,
+                                                    titleText=False,
+                                                    legendPosition=True, legendText=True,
+                                                    shapePosition=True),
+                                          'modeBarButtonsToRemove': ['toggleSpikelines', "pan2d",
+                                                                 "select2d", "lasso2d",
+                                                                 "autoScale2d", 'resetScale2d',
+                                                                 "hoverCompareCartesian"],
+                                          'toImageButtonOptions': {'format': 'png', # one of png, svg,
+                                                               'filename': 'custom_image',
+                                                               'scale': 5
+                                                               },
+                                          'displaylogo': False})
+                    ], style={'margin-top':'-30px', 
+                              'height':'500px',
+                              })])),
+                         dbc.ModalFooter(dbc.Button( "Close", id="close_trans", className="ms-auto", n_clicks=0)),
+                    ],id="modal_transitivity", size='lg',is_open=False, scrollable=True,contentClassName="trans_content")
 
 model_skt_stand1 = dbc.Modal(
                         [dbc.ModalHeader("Pairwise Forest Plot",className='forest_head'),
@@ -462,9 +516,10 @@ options_effects = [
        {'label': 'Add indirect effects to forestplots', 'value': 'indirect'},
    ]
 
+# def Sktpage():
+#     return html.Div([Navbar(), model_password], id='skt_page_content')
 def Sktpage():
-    return html.Div([Navbar(), model_password], id='skt_page_content')
-
+    return html.Div([Navbar(), skt_layout()], id='skt_page_content')
 
 
 def skt_layout():
@@ -557,8 +612,16 @@ def skt_layout():
                                                                               html.Span('Potential effect modifires Info',className='skt_span1', style={'color': '#B85042', 'font-weight': 'bold'}),
                                                                               html.Span('Mean age: 45.3',className='skt_span1'),
                                                                               html.Span('Mean male percentage: 43.4%',className='skt_span1'),
-                                                                              ], className='skt_studyinfo',headerClassName='headtab1'), style={'width':'15%','margin-left': '1%'}),
-                                                                                              
+                                                                              html.Button('Transitivity check', id='trans_button',className='sub-button',
+                                                                                                            style={'color': 'rgb(118 135 123)',
+                                                                                                                   'background-color':'#dedecf',
+                                                                                                                    'display': 'inline-block',
+                                                                                                                    'justify-self':'center',
+                                                                                                                    'border': 'unset',
+                                                                                                                    'padding': '4px'}),
+                                                                              ], className='skt_studyinfo',headerClassName='headtab1', bodyClassName='bodytab2'), style={'width':'15%','margin-left': '1%'}),
+                                
+                                                            model_transitivity,                                  
                                                             dbc.Col(
                                                                     [dbc.Row(html.Span('Options', className='option_select'), style={'display':'grid', 'padding-top':'unset'}),
                                                                      dbc.Col([dbc.Toast([
@@ -579,9 +642,11 @@ def skt_layout():
                                                                                           id='checklist_effects', style={'display': 'grid', 'align-items': 'end'})],
                                                                                             style={'display': 'grid', 'grid-template-columns': '1fr 1fr'})
                                                                                                 ],
-                                                                    style={'width':'38%','margin-left': '1%', 'border': '1px dashed rgb(184, 80, 66)','display':'grid'})    
+                                                                    style={'width':'38%','margin-left': '1%', 'border': '1px dashed rgb(184, 80, 66)','display':'grid'}),
+                                                               
                                                                           
                                                                           ], className='row_skt'),
+                                                      
                                                       dbc.Row([
                                                                dbc.Col([grid, model_skt_stand1, model_skt_stand2],className='skt_col2', id = 'grid_type'),
                                                                               ],className='skt_rowtable'),
