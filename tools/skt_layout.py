@@ -1,7 +1,9 @@
 
 import dash_bootstrap_components as dbc, dash_html_components as html
 from dash import dcc
+import dash_cytoscape as cyto
 from tools.navbar import Navbar
+from tools.functions_skt_others import get_skt_elements, skt_stylesheet
 import dash_ag_grid as dag 
 import pandas as pd
 from assets.storage import DEFAULT_DATA
@@ -576,24 +578,43 @@ def skt_layout():
                                                                      dcc.Textarea(value ='Patients: patients with psoriasis\n'+
                                                                                 'Primary outcome: PASI90\n'+
                                                                                 'Study design: randomized control study'
-                                                                                ,className='skt_span1'),
+                                                                                ,className='skt_span1', style={'width':'160%'}),
                                                                             #   html.Span('Primary outcome: PASI90',className='skt_span1'), 
                                                                             #   html.Span('Study design: randomized control study', className='skt_span1'),
                                                                               ], className='tab1',headerClassName='headtab1',bodyClassName='bodytab1')
                                                                               ],className='tab1_col'),
 
+                                                                # dbc.Col([
+                                                                #          dbc.Row([html.Span('Interventions', className='inter_label'),
+                                                                #                 #  html.Span('Please tick to select the reference treatment', className='note_tick')
+                                                                #                  ], style={'padding-top': 0}),
+                                                                #          dbc.Toast(
+                                                                #                 display_treatment, 
+                                                                #                 bodyClassName='skt_interbody',
+                                                                #                 className='skt_intervention',
+                                                                #                 headerClassName='headtab1',
+                                                                #                 id='treatment_toast'
+                                                                #               )
+                                                                #               ], className='tab2_col'),
                                                                 dbc.Col([
-                                                                         dbc.Row([html.Span('Interventions', className='inter_label'),
+                                                                         dbc.Row([html.Span('Interventions Diagram', className='inter_label'),
                                                                                 #  html.Span('Please tick to select the reference treatment', className='note_tick')
                                                                                  ], style={'padding-top': 0}),
-                                                                         dbc.Toast(
-                                                                                display_treatment, 
-                                                                                bodyClassName='skt_interbody',
-                                                                                className='skt_intervention',
-                                                                                headerClassName='headtab1',
-                                                                                id='treatment_toast'
-                                                                              )
-                                                                              ], className='tab2_col')               
+                                                                         cyto.Cytoscape(id='cytoscape_skt', responsive=False, autoRefreshLayout=True,
+                                                                                        minZoom=0.6,  maxZoom=1.2,  panningEnabled=True,   
+                                                                                        elements=get_skt_elements(),
+                                                                                        style={ 
+                                                                                            'height': '40vh', 
+                                                                                            'width': '50%', 
+                                                                                            'margin-top': '-2%',
+                                                                                            'z-index': '999',
+                                                                                            'padding-left': '-10px', 
+                                                                                            'border-right': '3px solid #B85042'
+                                                                                                # 'max-width': 'calc(52vw)',
+                                                                                            },
+                                                                                layout={'name':'circle','animate': False, 'fit':True },
+                                                                                stylesheet=skt_stylesheet())
+                                                                              ], className='tab3_col')               
                                                                               ], className='row_skt'),
 
                                                       dbc.Row([

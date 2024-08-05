@@ -2241,15 +2241,15 @@ def display_sktinfo(cell, _):
 
 
 
-@app.callback(
-    [Output('grid_type', 'children'),
-     Output('treatment_toast', 'children')],
-    Input('toggle_grid_select','value')
-)
-def display_grid(value):
-    if value:
-        return [grid2],[checklist, button_clear]
-    return [grid, model_skt_stand1, model_skt_stand2],display_treatment
+# @app.callback(
+#     [Output('grid_type', 'children'),
+#      Output('treatment_toast', 'children')],
+#     Input('toggle_grid_select','value')
+# )
+# def display_grid(value):
+#     if value:
+#         return [grid2],[checklist, button_clear]
+#     return [grid, model_skt_stand1, model_skt_stand2],display_treatment
 
 
 @app.callback(
