@@ -76,9 +76,9 @@ def get_skt_elements():
 
 
 
-def skt_stylesheet(node_size=False, classes=False, edg_col= 'grey', nd_col='#07ABA0', edge_size=False,
+def skt_stylesheet(node_size=False, classes=False, edg_col= 'grey', nd_col='#50a37c', edge_size=False,
                    pie=False, edg_lbl=False, nodes_opacity=1, edges_opacity=0.77,label_size=False):
-    cmaps_class = ['#07ABA0']
+    cmaps_class = ['#50a37c']
     default_stylesheet = [
         {"selector": 'node',
          'style': {"opacity": nodes_opacity,
@@ -123,3 +123,52 @@ def skt_stylesheet(node_size=False, classes=False, edg_col= 'grey', nd_col='#07A
                                                'pie-3-background-size': 'mapData(pie1, 0, 1, 0, 100)',
          })
     return default_stylesheet
+
+
+def __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata):
+
+    nodes_color = '#50a37c'
+    edges_color = 'grey'
+   
+    label_size=None
+
+    FOLLOWER_COLOR, FOLLOWING_COLOR = '#50a37c', '#50a37c'
+    stylesheet = skt_stylesheet()
+    edgedata = [el['data'] for el in elements if 'target' in el['data'].keys()]
+    all_nodes_id = [el['data']['id'] for el in elements if 'target' not in el['data'].keys()]
+
+
+
+    if slct_nodesdata:
+        selected_nodes_id = [d['id'] for d in slct_nodesdata]
+        all_slct_src_trgt = list({e['source'] for e in edgedata if e['source'] in selected_nodes_id
+                                  or e['target'] in selected_nodes_id}
+                                 | {e['target'] for e in edgedata if e['source'] in selected_nodes_id
+                                    or e['target'] in selected_nodes_id})
+
+        stylesheet = skt_stylesheet(edg_col=edges_color,
+                                    nd_col=nodes_color,
+                                    nodes_opacity=0.2, edges_opacity=0.1) + [
+                         {"selector": 'node[id = "{}"]'.format(id),
+                          "style": {"border-color": "#751225", "border-width": 5, "border-opacity": 1,
+                                    "opacity": 1}}
+                         for id in selected_nodes_id] + [
+                         {"selector": 'edge[id= "{}"]'.format(edge['id']),
+                          "style": {'opacity': 1,  "line-color": edges_color,
+                                    'z-index': 5000}} for edge in edgedata if edge['source'] in selected_nodes_id
+                                                                              or edge['target'] in selected_nodes_id] + [
+                         {"selector": 'node[id = "{}"]'.format(id),
+                          "style": {"opacity": 1}}
+                         for id in all_nodes_id if id not in slct_nodesdata and id in all_slct_src_trgt]
+
+    if slct_edgedata:
+        selected_edge_id = [d['id'] for d in slct_edgedata]
+
+        stylesheet = skt_stylesheet(edg_col=edges_color,
+                                    nd_col=nodes_color, label_size=label_size) + [
+                            {"selector": 'edge[id= "{}"]'.format(id),
+                            "style": {'opacity': 1,  "line-color": 'rgb(165, 74, 97)',
+                                    'z-index': 5000}} for id in selected_edge_id]
+
+
+    return stylesheet

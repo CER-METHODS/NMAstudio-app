@@ -33,6 +33,7 @@ from tools.functions_export import __generate_xlsx_netsplit, __generate_xlsx_lea
 from tools.functions_show_forest_plot import __show_forest_plot
 from tools.functions_skt_boxplot import __show_boxplot
 from tools.functions_skt_forestplot import __skt_all_forstplot, __skt_PI_forstplot, __skt_direct_forstplot, __skt_indirect_forstplot, __skt_PIdirect_forstplot, __skt_PIindirect_forstplot,__skt_directin_forstplot, __skt_mix_forstplot
+from tools.functions_skt_others import __generate_skt_stylesheet
 from dash import ctx, no_update
 # --------------------------------------------------------------------------------------------------------------------#
 create_sessions_folders()
@@ -531,91 +532,7 @@ def get_image(net_download_activation, export):
             'scale': 3}}
 
 # ## ----- Update layout with slider ------ ###
-# @app.callback([Output('cytoscape', 'elements'),
-#                Output('modal-cytoscape', 'elements'),],
-#               [Input('net_data_STORAGE', 'data'),
-#                Input('slider-year', 'value'),
-#                Input('toggle_forest_outcome', 'value'),
-#                Input('toggle_forest_pair_outcome', 'value'),
-#                Input('toggle_consistency_direction', 'value'),
-#                Input('toggle_funnel_direction', 'value'),
-#                Input('reset_project', 'n_clicks'),
-#             #    Input('node_size_input', 'value'),
-#                ])
-# def update_layout_year_slider(net_data, slider_year, out2_nma, out2_pair, out2_cons, out2_fun, reset_btn,):
 
-#     YEARS_DEFAULT = np.array([1963, 1990, 1997, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2010,
-#                               2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021])
-#     years_dft_max = YEARS_DEFAULT.max()
-
-
-#     reset_btn_triggered = False
-#     triggered = [tr['prop_id'] for tr in dash.callback_context.triggered]
-#     if 'reset_project.n_clicks' in triggered: reset_btn_triggered = True
-
-#     try:
-#         net_datajs = pd.read_json(net_data, orient='split')
-#     except:
-#         net_datajs = pd.read_json(net_data, orient='split', encoding = 'utf-8')
-
-#     if out2_nma or out2_pair or out2_cons or out2_fun:
-#         net_data = pd.read_json(net_data, orient='split')
-#         net_data2 = net_data.drop(["TE", "seTE", "n1", "n2"], axis=1)
-#         net_data2 = net_data2.rename(columns={"TE2": "TE", "seTE2": "seTE", "n2.1": "n1", "n2.2": "n2"})
-#         net_datajs2 = pd.DataFrame(net_data2)
-#         net_datajs2 = net_datajs2.dropna(subset=['TE', 'seTE'])
-#         net_datajs2 = net_datajs2[net_datajs2.year <= slider_year] if not reset_btn_triggered else net_datajs2[net_datajs2.year <= years_dft_max]
-#         elements = get_network(df=net_datajs2)
-
-#     else:
-#         net_datajs = net_datajs.dropna(subset=['TE', 'seTE'])
-#         net_datajs = net_datajs[net_datajs.year <= slider_year] if not reset_btn_triggered else net_datajs[net_datajs.year <= years_dft_max]
-#         elements = get_network(df=net_datajs)
-
-#     return elements, elements
-
-
-# @app.callback([Output('cytoscape', 'elements'),
-#                Output('modal-cytoscape', 'elements'),],
-#               [
-#                Input('net_data_STORAGE', 'data'),
-#                Input('slider-year', 'value'),
-#                Input('forest_outcome_select', 'value'),
-#                Input('forestpaire_outcome_select', 'value'),
-#                Input('consistency_outcome_select', 'value'),
-#                Input('funnel_outcome_select', 'value'),
-#                Input("league_outcome_select", "value"),
-#                Input('reset_project', 'n_clicks'),
-#             #    Input('node_size_input', 'value'),
-#                ])
-# def update_layout_year_slider(net_data, slider_year, out_nma, out_pair, out_cons, out_fun, out_league,reset_btn,):
-    
-#     YEARS_DEFAULT = np.array([1963, 1990, 1997, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2010,
-#                               2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021])
-#     years_dft_max = YEARS_DEFAULT.max()
-
-
-#     reset_btn_triggered = False
-#     triggered = [tr['prop_id'] for tr in dash.callback_context.triggered]
-#     if 'reset_project.n_clicks' in triggered: reset_btn_triggered = True
-
-#     try:
-#         net_datajs = pd.read_json(net_data[0], orient='split')
-#     except:
-#         net_datajs = pd.read_json(net_data[0], orient='split', encoding = 'utf-8')
-    
-#     outcome = out_nma or out_pair or out_cons or out_fun or out_league
-#     if outcome:
-#         outcome = int(outcome)
-#         net_data = pd.read_json(net_data[0], orient='split')
-#         net_datajs2 = net_data[net_data.year <= slider_year] if not reset_btn_triggered else net_data[net_data.year <= years_dft_max]
-#         elements = get_network_new(df=net_datajs2, i = outcome )
-
-#     else:
-#         net_datajs = net_datajs[net_datajs.year <= slider_year] if not reset_btn_triggered else net_datajs[net_datajs.year <= years_dft_max]
-#         elements = get_network_new(df=net_datajs,i = 0)
-
-#     return elements, elements
 
 
 
@@ -784,84 +701,6 @@ def update_boxplot(value, edges, net_data):
 ### ----------------------------------  DATA TABLE, LEAGUE TABLE CALLBACKS ---------------------------------- ###
 
 
-# @app.callback([
-#                Output('datatable-upload-container', 'data'),
-#                Output('datatable-upload-container', 'columns'),
-#                Output('datatable-upload-container-expanded', 'data'),
-#                Output('datatable-upload-container-expanded', 'columns'),
-#                Output('league_table', 'children'),
-#                Output('modal_league_table_data', 'children'),
-#                Output('league_table_legend', 'children'),
-#                Output('modal_league_table_legend', 'children'),
-#                Output('rob_vs_cinema', 'value'),
-#                Output('rob_vs_cinema_modal', 'value'),
-#                Output('slider-year', 'min'),
-#                Output('slider-year', 'max'),
-#                Output('slider-year', 'marks'),
-#                Output('data_and_league_table_DATA', 'data')],
-#               [Input('cytoscape', 'selectedNodeData'),
-#                Input('net_data_STORAGE', 'data'),
-#                Input('cytoscape', 'selectedEdgeData'),
-#                Input('rob_vs_cinema', 'value'),
-#                Input('rob_vs_cinema_modal', 'value'),
-#                Input('slider-year', 'value'),
-#                #Input('datatable-secondfile-upload-2', 'contents')
-#                Input('league_table_data_STORAGE', 'data'),
-#                Input('cinema_net_data1_STORAGE', 'data'),
-#                Input('cinema_net_data2_STORAGE', 'data'),
-#                Input('data_and_league_table_DATA', 'data'),
-#                Input("forest_data_STORAGE", "data"),
-#                Input("forest_data_out2_STORAGE", "data"),
-#                Input('reset_project', 'n_clicks'),
-#                Input('ranking_data_STORAGE','data'),
-#                 ],
-#               [State('net_data_STORAGE', 'data'),
-#                State('net_data_STORAGE', 'modified_timestamp'),
-#                State('datatable-upload', 'filename'),
-#                State('league_table_data_STORAGE', 'modified_timestamp'),
-#                State('datatable-secondfile-upload', 'filename'),
-#                State('datatable-secondfile-upload-2', 'filename'),
-#                State('datatable-secondfile-upload-2','disabled')],
-#               prevent_initial_call=True)
-# def update_output(store_node, net_data, store_edge, toggle_cinema, toggle_cinema_modal, slider_value,
-#                   league_table_data, cinema_net_data1, cinema_net_data2, data_and_league_table_DATA,
-#                   forest_data, forest_data_out2, reset_btn, ranking_data, net_storage, net_data_STORAGE_TIMESTAMP,
-#                   data_filename, league_table_data_STORAGE_TIMESTAMP, filename_cinema1, filename_cinema2, filename_cinema2_disabled):
-#     return __update_output(store_node, net_data, store_edge, toggle_cinema, toggle_cinema_modal, slider_value,
-#                           league_table_data, cinema_net_data1, cinema_net_data2, data_and_league_table_DATA,
-#                           forest_data, forest_data_out2, reset_btn, ranking_data, net_storage, net_data_STORAGE_TIMESTAMP,
-#                           data_filename, league_table_data_STORAGE_TIMESTAMP, filename_cinema1, filename_cinema2, filename_cinema2_disabled)
-
-
-# @app.callback([
-#                Output('datatable-upload-container', 'data'),
-#                Output('datatable-upload-container', 'columns'),
-#                Output('datatable-upload-container-expanded', 'data'),
-#                Output('datatable-upload-container-expanded', 'columns'),
-#                Output('slider-year', 'min'),
-#                Output('slider-year', 'max'),
-#                Output('slider-year', 'marks'),
-#                Output('data_and_league_table_DATA', 'data')],
-#               [Input('cytoscape', 'selectedNodeData'),
-#                Input('net_data_STORAGE', 'data'),
-#                Input('cytoscape', 'selectedEdgeData'),
-#                Input('slider-year', 'value'),
-#                Input('reset_project', 'n_clicks'),
-#                Input('data_and_league_table_DATA', 'data')
-#                 ],
-#                 [State('net_data_STORAGE', 'data'),
-#                State('net_data_STORAGE', 'modified_timestamp'),
-#                State('datatable-upload', 'filename'),
-#                State('league_table_data_STORAGE', 'modified_timestamp'),
-#                State('datatable-secondfile-upload', 'filename')],
-#               prevent_initial_call=True)
-# def update_output(store_node, net_data, store_edge,slider_value,reset_btn, 
-#                   data_and_league_table_DATA, net_storage, net_data_STORAGE_TIMESTAMP,
-#                   data_filename, league_table_data_STORAGE_TIMESTAMP, filename_cinema1):
-#     return __update_output_new(store_node, net_data, store_edge,slider_value,reset_btn,data_and_league_table_DATA,
-#                                net_storage, net_data_STORAGE_TIMESTAMP,
-#                   data_filename, league_table_data_STORAGE_TIMESTAMP, filename_cinema1)
-
 @app.callback([Output('datatable-upload-container', 'data'),
                Output('datatable-upload-container', 'columns'),
                Output('datatable-upload-container-expanded', 'data'),
@@ -911,19 +750,6 @@ def update_output(slider_value, store_node,store_edge,net_data, raw_data,toggle_
 
 
 #### ----- consistency table and netsplit table ----- ####
-# @app.callback([Output('netsplit_table-container', 'data'),
-#               Output('netsplit_table-container', 'columns'),
-#                Output('consistency-table', 'data'),
-#                Output('consistency-table', 'columns')],
-#               [Input('cytoscape', 'selectedEdgeData'),
-#                Input("toggle_consistency_direction", "value"),
-#                Input('net_split_data_STORAGE', 'data'),
-#                Input('net_split_data_out2_STORAGE', 'data'),
-#                Input('consistency_data_STORAGE', 'data'),]
-#               )
-# def netsplit(edges, outcome, net_split_data, net_split_data_out2, consistency_data):
-#    return __netsplit(edges, outcome, net_split_data, net_split_data_out2, consistency_data)
-
 
 @app.callback([Output('netsplit_table-container', 'data'),
               Output('netsplit_table-container', 'columns'),
@@ -957,23 +783,6 @@ def get_new_data_cinema1(contents, cinema_net_data, filename):
     else:
         return [cinema_net_data.to_json(orient='split')], ''
 
-### ----- upload CINeMA data file 2 ------ ###
-# @app.callback([Output("cinema_net_data2_STORAGE", "data"),
-#                Output("file2-list-2", "children")],
-#               [Input('datatable-secondfile-upload-2', 'contents'),
-#                Input('cinema_net_data2_STORAGE', 'data'),],
-#               [State('datatable-secondfile-upload-2', 'filename')])
-# def get_new_data_cinema2(contents, cinema_net_data2, filename):
-#     if contents is None:
-#         cinema_net_data2 = pd.read_json(cinema_net_data2, orient='split')
-#     else:
-#         cinema_net_data2 = parse_contents(contents, filename)
-
-#     if filename is not None:
-#         return cinema_net_data2.to_json(orient='split'), 'loaded'
-#     else:
-#         return cinema_net_data2.to_json(orient='split'), ''
-
 
 ### ----- update node info on funnel plot  ------ ###
 @app.callback(Output('tapNodeData-info-funnel', 'children'),
@@ -994,12 +803,7 @@ def TapNodeData_info(data):
 def Tap_funnelplot(node, outcome_idx, funnel_data):
     return __Tap_funnelplot(node, outcome_idx, funnel_data)
 
-# @app.callback([Output('tab-rank1', 'figure'),
-#                Output('tab-rank2', 'figure')],
-#               Input('ranking_data_STORAGE', 'data'),
-#               State('net_data_STORAGE', 'data'))
-# def ranking_plot(ranking_data, net_data):
-#     return __ranking_plot(ranking_data, net_data)
+
 
 ############ - Ranking plots  - ###############
 @app.callback([Output('tab-rank1', 'figure'),
@@ -1122,53 +926,6 @@ def toggle_modal_edge(open_t, close):
 
 #---------------------------------- INITIAL DATA SELECTION and ALL NMA RUNS (in MODALS) ---------------------------------------#
 
-# @app.callback([
-#             #   Output("modal_data", "is_open"),
-#                Output("modal_transitivity", "is_open"),
-#                Output("modal_data_checks", "is_open"),
-#                Output("TEMP_net_data_STORAGE", "data"),
-#                Output("uploaded_datafile_to_disable_cinema", "data"),
-#                Output('Rconsole-error-data', 'children'),
-#                Output('R-alert-data', 'is_open'),
-#                Output('dropdown-intervention', 'options'),
-#                ],
-#               [
-#                 # Input("upload_your_data", "n_clicks_timestamp"),
-#                Input('trans_to_results', 'n_clicks_timestamp'),
-#                Input("upload_modal_data2", "n_clicks_timestamp"),
-#                Input("submit_modal_data", "n_clicks_timestamp"),
-#                Input('uploaded_datafile_to_disable_cinema','data')
-#                ],
-#               [State("radio-format", "value"),
-#                State("radio-outcome1", "value"),
-#                State("radio-outcome2", "value"),
-#                State("modal_transitivity", "is_open"),
-#                State("modal_data_checks", "is_open"),
-#                State('datatable-upload2', 'contents'),
-#                State('datatable-upload2', 'filename'),
-#                State({'type': 'dataselectors', 'index': ALL}, 'value'),
-#                State("TEMP_net_data_STORAGE", "data")
-#                ]
-#               )
-# def data_modal(
-#             #   open_modal_data, 
-#              trans_to_results,
-#               upload, submit, filename2,
-#                search_value_format, search_value_outcome1, search_value_outcome2,modal_transitivity_is_open,
-#             #    modal_data_is_open, 
-#                modal_data_checks_is_open,
-#                contents, filename, dataselectors, TEMP_net_data_STORAGE,
-#                ):
-#     return __data_modal(
-#         # open_modal_data, 
-#         trans_to_results,
-#         upload, submit, filename2,
-#                search_value_format, search_value_outcome1, search_value_outcome2,modal_transitivity_is_open,
-#             #    modal_data_is_open, 
-#                modal_data_checks_is_open,
-#                contents, filename, dataselectors, TEMP_net_data_STORAGE,
-#                )
-
 
 
 @app.callback([
@@ -1248,21 +1005,6 @@ def modal_ENABLE_UPLOAD_button(variableselectors):
 
 
 
-
-
-# @app.callback([Output("upload_modal_data2", "disabled"),
-#               Output("run_button", "style"),],
-#               Input({'type': 'dataselectors', 'index': ALL}, 'value'),
-#               )
-# def modal_ENABLE_UPLOAD_button(dataselectors):
-#     if len(dataselectors):
-#         return not all(dataselectors),  {'display':'grid', 'justify-content': 'center'}
-#     else:
-#         return True,  {'display':'none', 'justify-content': 'center'}
-
-
-    # return not all(dataselectors) if len(dataselectors) else True
-
 @app.callback([Output("upload_modal_data2", "disabled"),
                Output("run_button", "style"),
                Output("arrow_step4", "style")],
@@ -1282,62 +1024,7 @@ def modal_ENABLE_UPLOAD_button(effect_mod, no_effect_mod):
 
 from assets.storage import DEFAULT_DATA
 OUTPUTS_STORAGE_IDS = list(DEFAULT_DATA.keys())[:-1]
-# @app.callback([Output(id, 'data') for id in OUTPUTS_STORAGE_IDS] + [Output('token-not-found-alert','children')],
-#               [Input("submit_modal_data", "n_clicks"),
-#                Input('reset_project','n_clicks'),
-#                Input("username-token-upload", "data"),
-#                Input("button-token", "n_clicks"),
-#                Input("input-token-load", "value"),
-#                Input("load-project", "n_clicks"),
-#                Input("datatable-filename-upload", "data"),
-#                ],
-#               [State('TEMP_'+id, 'data') for id in OUTPUTS_STORAGE_IDS],
-#               prevent_initial_call=True
-#               )
-# def modal_SUBMIT_button(submit, reset_btn,
-#                         token_data, token_btn,
-#                         token_data_load, token_load_btn,
-#                         filename,
-#                         TEMP_net_data_STORAGE,
-#                         TEMP_net_data_out2_STORAGE,
-#                         TEMP_consistency_data_STORAGE,
-#                         TEMP_user_elements_STORAGE,
-#                         TEMP_user_elements_out2_STORAGE,
-#                         TEMP_forest_data_STORAGE,
-#                         TEMP_forest_data_out2_STORAGE,
-#                         TEMP_forest_data_prws_STORAGE,
-#                         TEMP_forest_data_prws_out2_STORAGE,
-#                         TEMP_ranking_data_STORAGE,
-#                         TEMP_funnel_data_STORAGE,
-#                         TEMP_funnel_data_out2_STORAGE,
-#                         TEMP_league_table_data_STORAGE,
-#                         TEMP_net_split_data_STORAGE,
-#                         TEMP_net_split_data_out2_STORAGE,
-#                         TEMP_net_split_ALL_data_STORAGE,
-#                         TEMP_net_split_ALL_data_out2_STORAGE,
-#                         ):
-#     return __modal_SUBMIT_button(submit, reset_btn,
-#                         token_data, token_btn,
-#                         token_data_load, token_load_btn,
-#                         filename,
-#                         TEMP_net_data_STORAGE,
-#                         TEMP_net_data_out2_STORAGE,
-#                         TEMP_consistency_data_STORAGE,
-#                         TEMP_user_elements_STORAGE,
-#                         TEMP_user_elements_out2_STORAGE,
-#                         TEMP_forest_data_STORAGE,
-#                         TEMP_forest_data_out2_STORAGE,
-#                         TEMP_forest_data_prws_STORAGE,
-#                         TEMP_forest_data_prws_out2_STORAGE,
-#                         TEMP_ranking_data_STORAGE,
-#                         TEMP_funnel_data_STORAGE,
-#                         TEMP_funnel_data_out2_STORAGE,
-#                         TEMP_league_table_data_STORAGE,
-#                         TEMP_net_split_data_STORAGE,
-#                         TEMP_net_split_data_out2_STORAGE,
-#                         TEMP_net_split_ALL_data_STORAGE,
-#                         TEMP_net_split_ALL_data_out2_STORAGE,
-#                         )
+
 
 @app.callback([Output(id, 'data') for id in OUTPUTS_STORAGE_IDS] + [Output('token-not-found-alert','children'),
                                                                     Output("output_username", "children"),
@@ -1426,18 +1113,6 @@ def modal_SUBMIT_button(
 
 
 
-# @app.callback(Output("dropdown-effectmod", "options"),
-#               Input("net_data_STORAGE", "data"),
-#               )
-# def update_dropdown_effect_mod(new_data):
-#     new_data = pd.read_json(new_data, orient='split')
-#     OPTIONS_VAR = [{'label': '{}'.format(col), 'value': col}
-#                    for col in new_data.columns] #new_data.select_dtypes(['number']).columns
-#     # options_intervention = [{'label': '{}'.format(treat), 'value': treat}
-#     #                for treat in new_data.columns]
-#     return OPTIONS_VAR
-
-
 @app.callback(Output("dropdown-effectmod", "options"),
               [Input("effect_modifier_checkbox", "value"),
               Input("no_effect_modifier", "value")],
@@ -1464,23 +1139,7 @@ def update_dropdown_effect_mod(effect_modifier, no_effect_modifier, origin_effct
 def modal_submit_checks_DATACHECKS(modal_data_checks_is_open, num_outcomes,TEMP_net_data_STORAGE):
     return __modal_submit_checks_DATACHECKS(modal_data_checks_is_open, num_outcomes,TEMP_net_data_STORAGE)
 
-# @app.callback([Output('R-alert-nma', 'is_open'),
-#                Output('Rconsole-error-nma', 'children'),
-#                Output("para-anls-data", "children"),
-#                Output('para-anls-data', 'data'),
-#                Output("TEMP_forest_data_STORAGE", "data"),
-#                Output("TEMP_forest_data_out2_STORAGE", "data"),
-#                Output("TEMP_user_elements_STORAGE", "data"),
-#                Output("TEMP_user_elements_out2_STORAGE", 'data')],
-#                Input("modal_data_checks", "is_open"),
-#                State("TEMP_net_data_STORAGE", "data"),
-#                State("TEMP_forest_data_STORAGE", "data"),
-#                State("TEMP_forest_data_out2_STORAGE", "data"),
-#               )
-# def modal_submit_checks_NMA(modal_data_checks_is_open, TEMP_net_data_STORAGE,
-#                             TEMP_forest_data_STORAGE, TEMP_forest_data_out2_STORAGE):
-#     return __modal_submit_checks_NMA(modal_data_checks_is_open, TEMP_net_data_STORAGE,
-#                             TEMP_forest_data_STORAGE, TEMP_forest_data_out2_STORAGE)
+
 
 @app.callback([Output('R-alert-nma', 'is_open'),
                Output('Rconsole-error-nma', 'children'),
@@ -1549,21 +1208,6 @@ def modal_submit_checks_LT(pw_data_ts, num_outcome,modal_data_checks_is_open,
                            netsplit_all)
 
 
-# @app.callback([Output('R-alert-funnel', 'is_open'),
-#                Output('Rconsole-error-funnel', 'children'),
-#                Output("para-FA-data", "children"),
-#                Output('para-FA-data', 'data'),
-#                Output('TEMP_funnel_data_STORAGE', 'data'),
-#                Output('TEMP_funnel_data_out2_STORAGE', 'data')],
-#                Input("TEMP_league_table_data_STORAGE", "modified_timestamp"),
-#                State("modal_data_checks", "is_open"),
-#                State("TEMP_net_data_STORAGE", "data"),
-#                State('TEMP_funnel_data_STORAGE', 'data'),
-#                State('TEMP_funnel_data_out2_STORAGE', 'data')
-
-#               )
-# def modal_submit_checks_FUNNEL(lt_data_ts, modal_data_checks_is_open, TEMP_net_data_STORAGE, FUNNEL_data, FUNNEL_data2):
-#     return __modal_submit_checks_FUNNEL(lt_data_ts, modal_data_checks_is_open, TEMP_net_data_STORAGE, FUNNEL_data, FUNNEL_data2)
 
 @app.callback([Output('R-alert-funnel', 'is_open'),
                Output('Rconsole-error-funnel', 'children'),
@@ -1595,16 +1239,7 @@ def modal_submit_button(para_check_data_DATA, para_anls_data_DATA, para_prw_data
 ### -------------------------------------------- EXPAND CALLBACKS ----------------------------------------------- ###
 
 # ----- data expand modal -----#
-# @app.callback(
-#     Output("modal_data_table", "is_open"),
-#     [Input("data-expand", "n_clicks"),
-#      Input("close-data-expanded", "n_clicks")],
-#     [State("modal_data_table", "is_open")],
-# )
-# def toggle_modal(open, close, is_open):
-#     if open or close:
-#         return not is_open
-#     return is_open
+
 
 @app.callback(
     Output("one-half-1", "style"),
@@ -1673,30 +1308,6 @@ def toggle_modal(expand, zoomout, expand1, zoomout1, expand_plot, zoomout_plot):
 
 
 
-# ----- league expand modal -----#
-# @app.callback(
-#     Output("modal_league_table", "is_open"),
-#     [Input("league-expand", "n_clicks"),
-#      Input("close-league-expanded", "n_clicks")],
-#     [State("modal_league_table", "is_open")],
-# )
-# def toggle_modal(open, close, is_open):
-#     if open or close:
-#         return not is_open
-#     return is_open
-
-# ----- network expand modal -----# #TODO: this needs fixing: eg. node coloring and options not working in expand mode
-# @app.callback(
-#     Output("modal_network", "is_open"),
-#     [Input("network-expand", "n_clicks"),
-#      Input("close-network-expanded", "n_clicks")],
-#     [State("modal_network", "is_open")],
-# )
-# def toggle_modal(open, close, is_open):
-#     if open or close:
-#         return not is_open
-#     return is_open
-
 
 @app.callback(
     Output("modal_info", "is_open"),
@@ -1752,28 +1363,6 @@ def generate_xlsx_league(n_clicks, leaguedata):
 #############################################################################
 
 
-### -------------- toggle switch forest outcome1/outcome2 ---------------- ###
-# @app.callback([Output("forestswitchlabel_outcome1", "style"),
-#                Output("forestswitchlabel_outcome2", "style")],
-#               [Input("toggle_forest_outcome", "value")])
-# def color_funnel_toggle(toggle_value):
-#     style1 = {'color': 'gray' if toggle_value else '#5a87c4',
-#               'display': 'inline-block', 'margin': 'auto', 'padding-left': '20px', 'font-size':'11px'}
-#     style2 = {'color': '#5a87c4' if toggle_value else 'gray',
-#               'display': 'inline-block', 'margin': 'auto', 'padding-right': '20px', 'font-size':'11px'}
-#     return style1, style2
-
-### -------------- toggle switch forest pairwise outcome1/outcome2 ---------------- ###
-# @app.callback([Output("forest_pair_switchlabel_outcome1", "style"),
-#                Output("forest_pair_switchlabel_outcome2", "style")],
-#               [Input("toggle_forest_pair_outcome", "value")])
-# def color_funnel_toggle(toggle_value):
-#     style1 = {'color': 'gray' if toggle_value else '#5a87c4',
-#               'display': 'inline-block', 'margin': 'auto', 'padding-left': '20px', 'font-size':'11px'}
-#     style2 = {'color': '#5a87c4' if toggle_value else 'gray',
-#               'display': 'inline-block', 'margin': 'auto', 'padding-right': '20px', 'font-size':'11px'}
-#     return style1, style2
-
 
 ### -------------- toggle switch league table ---------------- ###
 @app.callback([Output("cinemaswitchlabel1", "style"),
@@ -1826,21 +1415,7 @@ def disable_cinema_toggle(filename_cinema1, filename_data):
     else: return False, False
 
 
-## disable outcome 2 toggle if no outcome 2 is given in data
-# @app.callback([Output('toggle_funnel_direction', 'disabled'),
-#               Output('toggle_forest_outcome', 'disabled'),
-#               Output('toggle_forest_pair_outcome', 'disabled'),
-#               Output('toggle_consistency_direction', 'disabled'),
-#               Output('datatable-secondfile-upload-2','disabled')
-#               ],
-#               Input('ranking_data_STORAGE','data')
-#               )
-# def disable_out2_toggle(ranking_data):
-#     df_ranking = pd.read_json(ranking_data, orient='split')
-#     df_ranking = df_ranking.loc[:, ~df_ranking.columns.str.contains('^Unnamed')]  # Remove unnamed columns
-#     if "pscore2" not in df_ranking.columns:
-#         return True, True, True, True, True
-#     else: return False, False, False, False, False
+
 
 
 #### download pdfs ####
@@ -1879,35 +1454,6 @@ def toggle_modal(n1, n2, n2_close, is_open):
         return not is_open
     return is_open
 
-#### generate username and token
-# @app.callback(
-#     [Output("output_username", "children"),
-#      Output("output_token", "children"),
-#      Output('button-token','disabled'),
-#      Output("username-token-upload", "data"),
-#      ],
-#      State("input-username", "value"),
-#      Input("button-token", "n_clicks"),
-#      Input("number-outcomes", "value"),
-#      )
-# def save_project_user_token(input, n_clicks, num_out):
-#     token_btn_triggered = False
-#     triggered = [tr['prop_id'] for tr in dash.callback_context.triggered]
-#     num_out = int(num_out) if num_out else 1
-#     if 'button-token.n_clicks' in triggered: token_btn_triggered = True
-
-#     if input and token_btn_triggered:
-#             if len(input) >= 6:
-#                 password = secrets.token_urlsafe(8)
-#                 token = input + "-" + password + '_'+ str(num_out)
-#                 token_data = {'token': token}
-#                 if n_clicks > 0 :
-#                     return html.P(u"\u2713" + " Successfully generated user",style={"color": "#B1D27B", "font-size":"11px","font-weight": "530"}), f'{token}', True, token_data
-#             else:
-#                 return html.P(u"\u274C" + " Username must be at least 6 characters", style={"color": "red"}), None, False, None
-
-#     else:
-#         return None, None, False, None
 
 ###############overall information##################
 
@@ -2216,6 +1762,20 @@ def update_boxplot(value):
     return __show_boxplot(value)
 
 
+@app.callback(Output('cytoscape_skt', 'stylesheet'),
+              [Input('cytoscape_skt', 'tapNode'),
+               Input('cytoscape_skt', 'selectedNodeData'),
+               Input('cytoscape_skt', 'elements'),
+               Input('cytoscape_skt', 'selectedEdgeData')
+               ]
+              )
+def generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata ):
+    return __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata)
+
+
+
+
+
 
 
 @app.callback(
@@ -2233,9 +1793,6 @@ def display_sktinfo(cell, _):
         if ('colId' in cell and cell['colId'] == "Treatment" and cell['value']is not None):
             return True
     return no_update
-
-
-
 
 
 
