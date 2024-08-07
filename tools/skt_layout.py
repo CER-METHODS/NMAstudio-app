@@ -173,6 +173,7 @@ masterColumnDefs = [
     {
         "headerName": "Reference Treatment",
         "field": "Reference",
+        'headerTooltip': 'Click a treatment to open a nested table',
         "cellRenderer": "agGroupCellRenderer",
         'cellStyle': {'border-left': 'solid 0.8px',
                       'border-right': 'solid 0.8px'}
@@ -196,12 +197,14 @@ masterColumnDefs = [
      },
      {"headerName": "Scale lower\n(forestplots)", 
      "field": "Scale_lower",
+     'headerTooltip': 'This is for the forest plots in the nested table',
      "editable": True,
      'cellStyle': {
         'color': 'grey','border-right': 'solid 0.8px'}
      },
     {"headerName": "Scale upper\n(forestplots)", 
      "field": "Scale_upper",
+     'headerTooltip': 'This is for the forest plots in the nested table',
      "editable": True,
      'cellStyle': {
         'color': 'grey','border-right': 'solid 0.8px'}}
@@ -214,7 +217,7 @@ detailColumnDefs = [
      "sortable": False,
      "filter": True,
      "width": 130,
-     'headerTooltip': 'Treatment',
+     'headerTooltip': 'Click a cell to see the details of the corresponding comparison',
       "resizable": True ,
       'cellStyle': {
         'display': 'grid',
@@ -241,6 +244,7 @@ detailColumnDefs = [
 
     {"field": "ab_effect", 
      "headerName": "Absolute Effect",
+     'headerTooltip': 'Specify a value for the reference treatment in \'Risk per 1000\'',
      "width": 180,
      "resizable": True,
      'cellStyle': {'border-left': 'solid 0.8px',
@@ -256,6 +260,7 @@ detailColumnDefs = [
 
        {"field": "ab_difference", 
      "headerName": "Absolute Difference",
+     'headerTooltip': 'Specify a value for the reference treatment in \'Risk per 1000\'',
      "width": 180,
      "resizable": True,
      'cellStyle': {'border-left': 'solid 0.8px',
@@ -281,6 +286,7 @@ detailColumnDefs = [
     },
     {"field": "direct",
      "headerName": "Direct effect\n(95%CI)",
+     'headerTooltip': 'Click a cell to open the pairwise forest plot',
       "width": 170,
       "resizable": True,
       'cellStyle': {'color': '#707B7C', "text-align":'center', 'display': 'grid',
@@ -300,6 +306,7 @@ detailColumnDefs = [
       },
     {"field": "Certainty", 
      "headerName": "Certainty",
+    #  'headerTooltip': 'Hover the mouse on each cell to see the details',
      "width": 110,
      "resizable": True,
      "tooltipField": 'Certainty',
@@ -311,7 +318,9 @@ detailColumnDefs = [
         {"condition": "params.value == 'Low'", "style": {"backgroundColor": "#B85042", **style_certainty}},
         {"condition": "params.value == 'Moderate'", "style": {"backgroundColor": "rgb(248, 212, 157)", **style_certainty}},       
     ]}},
-    {"field": "Comments", "width": 120, "resizable": True,
+    {"field": "Comments", "width": 120,
+     'headerTooltip': 'Editable for adding comments', 
+     "resizable": True,
      'editable': True,
      'cellStyle': {'border-left': 'solid 0.5px',"text-align":'center', 'display': 'grid','border-right': 'solid 0.8px'}},
     
@@ -521,13 +530,44 @@ options_effects = [
 # def Sktpage():
 #     return html.Div([Navbar(), model_password], id='skt_page_content')
 def Sktpage():
-    return html.Div([Navbar(), skt_layout()], id='skt_page_content')
+    return html.Div([Navbar(), skt_home()], id='skt_page_content')
+
+def skt_nonexpert():
+    return html.Div()
+
+def skt_home():
+    return html.Div([
+        html.Div(id='skt_profile', 
+                 children=[html.Br(), html.Br(),html.Br(), html.Br(),
+                     dcc.Markdown('Select your profile',
+                                                className="markdown_style_main",
+                                                style={
+                                                    "font-size": '40px',
+                                                    'text-align': 'center',
+                                                    'color':'#5c7780',
+                                                       }),
+                           html.Br(), html.Br(),
+                           dbc.Row([html.A([html.Img(src="/assets/icons/expert.png",
+                                        style={'width': '200px'}),
+                                    html.Span('Methodologists',className='profile_text'),
+                                        ],
+                                        id="expert_profile"),
+                                    html.A([html.Img(src="/assets/icons/nonexpert.png",
+                                        style={'width': '200px'}),
+                                        html.Span('Others',className='profile_text'),
+                                        ],
+                                        id="nonexpert_profile")    
+                                        ], id='profile_row'),
+                                        ])
+    ])
+
+
+
 
 
 def skt_layout():
     return html.Div([
-        # model_password,
-    html.Div(id='skt_all',children=[dcc.Markdown('Scalable Knowledge Translation Tool',
+            html.Div(id='skt_all',children=[dcc.Markdown('Scalable Knowledge Translation Tool',
                                                 className="markdown_style_main",
                                                 style={
                                                     "font-size": '30px',
@@ -567,6 +607,15 @@ def skt_layout():
                                                         'font-size': '0.8em', 'margin-top': '2%'},
                                                 ),
                                             html.Br(),html.Br(),
+                                            dcc.Markdown('Instruction: Hover your mouse over the table header to see how you can interact with it.',
+                                                className="markdown_style_main",
+                                                style={
+                                                    "font-size": '20px',
+                                                    'text-align': 'start',
+                                                    'font-family': 'math',
+                                                    'color':'rgb(184 80 66)',
+                                                    'width': '90%'
+                                                       }),
                                             html.Div([dbc.Row([dbc.Col(html.Span('Project Title', className='title_first'),className='title_col1'), 
                                                               dbc.Col(dcc.Input(id='title_skt',
                                                                             value='Systematic pharmacological treatments for chronic plaque psoriasis: a network meta-analysis', 
@@ -644,7 +693,7 @@ def skt_layout():
                                 
                                                             model_transitivity,                                  
                                                             dbc.Col(
-                                                                    [dbc.Row(html.Span('Options', className='option_select'), style={'display':'grid', 'padding-top':'unset'}),
+                                                                    [dbc.Row(html.Span('Options (For the forest plots in the table)', className='option_select'), style={'display':'grid', 'padding-top':'unset'}),
                                                                      dbc.Col([dbc.Toast([
                                                                             html.Span('Enter the minimum clinical difference value:',className='select_outcome'),
                                                                             dcc.Input(id="range_lower",

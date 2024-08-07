@@ -122,6 +122,26 @@ def display_page(pathname):
 
     else:  return RealHomepage
 
+
+@app.callback(
+    Output('skt_page_content','children'),
+    Input('expert_profile','n_clicks'),
+    Input('nonexpert_profile','n_clicks'),
+    State('skt_page_content','children'),
+)
+def clear_treat(click_expert,click_nonexpert,children):
+    if click_expert:
+        children = [Navbar(), skt_layout()]
+        return children
+    elif click_nonexpert:
+        children = [Navbar(), skt_nonexpert()]
+        return children
+    else:
+        return children
+
+
+
+
 # @app.callback(
 #     Output('pass_model','is_open'),
 #     Output('skt_page_content','children'),
@@ -146,6 +166,9 @@ def display_page(pathname):
 #         return [Navbar(), upload_data()]
 #     else:
 #         return children
+
+
+
 
 @app.callback([Output('result_page', 'style'),
               Output('upload_page', 'style'),],

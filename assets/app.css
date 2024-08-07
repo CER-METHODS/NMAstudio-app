@@ -454,7 +454,7 @@ Self Clearing Goodness */
 .row:after,
 .u-cf {
     content: "";
-    display: table;
+    display: none;
     clear: both;
 }
 

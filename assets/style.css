@@ -804,6 +804,56 @@ h6 {margin-top: 0;}
     color: white!important;
 }
 
+#profile_row{
+    width: 80%;
+    justify-content: space-evenly;
+    justify-self: center;
+    
+}
+
+#skt_profile{
+    display: grid;
+}
+
+
+.profile_text{
+    font-size: x-large;
+    font-weight: bold;
+    color: aliceblue;
+    text-decoration-line: none !important
+}
+
+#expert_profile{
+    display: grid; 
+    justify-items: center;
+    background-color: darkcyan;
+    width: 20%;
+    height: 120%;
+    align-content: space-around;
+    text-decoration: none;
+
+}
+
+#expert_profile:hover {
+    background-color:#A7BEAE!important;
+    color: white!important;
+}
+
+#nonexpert_profile{
+    display: grid; 
+    justify-items: center;
+    align-content: space-around;
+    background-color: chocolate;
+    width: 20%;
+    height: 120%;
+    text-decoration: none;
+}
+
+#nonexpert_profile:hover {
+    background-color:#A7BEAE!important;
+    color: white!important;
+}
+
   /* Here are just some visual styles. 🖌 */
   
   .container {
