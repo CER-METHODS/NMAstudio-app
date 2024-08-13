@@ -24,7 +24,6 @@ def __update_boxplot(value, edges, net_data):
         df['selected'] = 'nonactive'
 
         slctd_comps = []
-        print(edge)
         for edge in edges or []:
             src, trgt = edge['source'], edge['target']
             slctd_comps += [f'{src} vs {trgt}']
