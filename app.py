@@ -1785,7 +1785,9 @@ def update_boxplot(value):
     return __show_boxplot(value)
 
 
-@app.callback(Output('cytoscape_skt', 'stylesheet'),
+@app.callback([Output('cytoscape_skt', 'stylesheet'),
+               Output('trigger_info', 'children'),
+               ],
               [Input('cytoscape_skt', 'tapNode'),
                Input('cytoscape_skt', 'selectedNodeData'),
                Input('cytoscape_skt', 'elements'),

@@ -1,6 +1,7 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import numpy as np
+import dash_bootstrap_components as dbc, dash_html_components as html
 
 def get_skt_elements():
     df = pd.read_csv('db/psoriasis_wide_complete.csv')
@@ -136,11 +137,24 @@ def __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata):
     stylesheet = skt_stylesheet()
     edgedata = [el['data'] for el in elements if 'target' in el['data'].keys()]
     all_nodes_id = [el['data']['id'] for el in elements if 'target' not in el['data'].keys()]
-
+    text = dbc.Toast([
+        html.Span('Click a node to get the information of the corresponding treatment')],
+        style={'justify-items': 'center', 'aligin-items': 'center','text-align':'center'}
+        )
 
 
     if slct_nodesdata:
         selected_nodes_id = [d['id'] for d in slct_nodesdata]
+        # print(selected_nodes_id)
+        treat_select = selected_nodes_id[0]
+        treat_info = html.Span(treat_select, 
+                               style={'display': 'grid', 
+                                      'text-align': 'center',
+                                      'font-weight': 'bold'})
+        treat_describ = html.Span("ETA (Efalizumab) was a medication for moderate to severe plaque psoriasis, withdrawn in 2009 due to risks like progressive multifocal leukoencephalopathy (PML). It was contraindicated for patients with weakened immune systems or active infections and was administered via weekly injections. ETA is no longer prescribed due to these severe risks.",
+                                  style={'display': 'grid', 'margin':'2%'}
+                                  )
+        text = dbc.Toast([treat_info, treat_describ])
         all_slct_src_trgt = list({e['source'] for e in edgedata if e['source'] in selected_nodes_id
                                   or e['target'] in selected_nodes_id}
                                  | {e['target'] for e in edgedata if e['source'] in selected_nodes_id
@@ -171,4 +185,4 @@ def __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata):
                                     'z-index': 5000}} for id in selected_edge_id]
 
 
-    return stylesheet
+    return stylesheet, text

@@ -649,20 +649,24 @@ def skt_layout():
                                                                          dbc.Row([html.Span('Interventions Diagram', className='inter_label'),
                                                                                 #  html.Span('Please tick to select the reference treatment', className='note_tick')
                                                                                  ], style={'padding-top': 0}),
-                                                                         cyto.Cytoscape(id='cytoscape_skt', responsive=False, autoRefreshLayout=True,
+                                                                         dbc.Row([dbc.Col(cyto.Cytoscape(id='cytoscape_skt', responsive=False, autoRefreshLayout=True,
                                                                                         minZoom=0.6,  maxZoom=1.2,  panningEnabled=True,   
                                                                                         elements=get_skt_elements(),
                                                                                         style={ 
                                                                                             'height': '40vh', 
-                                                                                            'width': '50%', 
+                                                                                            'width': '100%', 
                                                                                             'margin-top': '-2%',
                                                                                             'z-index': '999',
                                                                                             'padding-left': '-10px', 
-                                                                                            'border-right': '3px solid #B85042'
                                                                                                 # 'max-width': 'calc(52vw)',
                                                                                             },
                                                                                 layout={'name':'circle','animate': False, 'fit':True },
-                                                                                stylesheet=skt_stylesheet())
+                                                                                stylesheet=skt_stylesheet()), 
+                                                                                style={'border-right': '3px solid #B85042',
+                                                                                       'width': '50%'}),
+                                                                                dbc.Col(html.Span(id='trigger_info'),
+                                                                                        style={'width': '50%','align-items': 'center', 'display': 'grid'})
+                                                                                  ]),
                                                                               ], className='tab3_col')               
                                                                               ], className='row_skt'),
 
