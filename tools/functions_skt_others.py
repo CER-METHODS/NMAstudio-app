@@ -90,8 +90,8 @@ def skt_stylesheet(node_size=False, classes=False, edg_col= 'grey', nd_col='#50a
                    'shape':'circle',
                    'color': "black", #"#1b242b"
                    'font-size': label_size,
-                   'width':25,
-                   'height':25
+                   'width':30,
+                   'height':30
                 #    'position':'data(position)'
 
                    },
@@ -142,10 +142,8 @@ def __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata):
         style={'justify-items': 'center', 'aligin-items': 'center','text-align':'center'}
         )
 
-
     if slct_nodesdata:
         selected_nodes_id = [d['id'] for d in slct_nodesdata]
-        # print(selected_nodes_id)
         treat_select = selected_nodes_id[0]
         treat_info = html.Span(treat_select, 
                                style={'display': 'grid', 
@@ -185,4 +183,69 @@ def __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata):
                                     'z-index': 5000}} for id in selected_edge_id]
 
 
-    return stylesheet, text
+    return stylesheet,text
+
+
+
+
+
+
+
+def __generate_skt_stylesheet2(node, slct_nodesdata, elements, slct_edgedata):
+
+    nodes_color = '#50a37c'
+    edges_color = 'grey'
+   
+    label_size=None
+
+    FOLLOWER_COLOR, FOLLOWING_COLOR = '#50a37c', '#50a37c'
+    stylesheet = skt_stylesheet()
+    edgedata = [el['data'] for el in elements if 'target' in el['data'].keys()]
+    all_nodes_id = [el['data']['id'] for el in elements if 'target' not in el['data'].keys()]
+    # text = dbc.Toast([
+    #     html.Span('Click a node to get the information of the corresponding treatment')],
+    #     style={'justify-items': 'center', 'aligin-items': 'center','text-align':'center'}
+    #     )
+
+    if slct_nodesdata:
+        selected_nodes_id = [d['id'] for d in slct_nodesdata]
+        # treat_select = selected_nodes_id[0]
+        # treat_info = html.Span(treat_select, 
+        #                        style={'display': 'grid', 
+        #                               'text-align': 'center',
+        #                               'font-weight': 'bold'})
+        # treat_describ = html.Span("ETA (Efalizumab) was a medication for moderate to severe plaque psoriasis, withdrawn in 2009 due to risks like progressive multifocal leukoencephalopathy (PML). It was contraindicated for patients with weakened immune systems or active infections and was administered via weekly injections. ETA is no longer prescribed due to these severe risks.",
+        #                           style={'display': 'grid', 'margin':'2%'}
+        #                           )
+        # text = dbc.Toast([treat_info, treat_describ])
+        all_slct_src_trgt = list({e['source'] for e in edgedata if e['source'] in selected_nodes_id
+                                  or e['target'] in selected_nodes_id}
+                                 | {e['target'] for e in edgedata if e['source'] in selected_nodes_id
+                                    or e['target'] in selected_nodes_id})
+
+        stylesheet = skt_stylesheet(edg_col=edges_color,
+                                    nd_col=nodes_color,
+                                    nodes_opacity=0.2, edges_opacity=0.1) + [
+                         {"selector": 'node[id = "{}"]'.format(id),
+                          "style": {"border-color": "#751225", "border-width": 5, "border-opacity": 1,
+                                    "opacity": 1}}
+                         for id in selected_nodes_id] + [
+                         {"selector": 'edge[id= "{}"]'.format(edge['id']),
+                          "style": {'opacity': 1,  "line-color": edges_color,
+                                    'z-index': 5000}} for edge in edgedata if edge['source'] in selected_nodes_id
+                                                                              or edge['target'] in selected_nodes_id] + [
+                         {"selector": 'node[id = "{}"]'.format(id),
+                          "style": {"opacity": 1}}
+                         for id in all_nodes_id if id not in slct_nodesdata and id in all_slct_src_trgt]
+
+    if slct_edgedata:
+        selected_edge_id = [d['id'] for d in slct_edgedata]
+
+        stylesheet = skt_stylesheet(edg_col=edges_color,
+                                    nd_col=nodes_color, label_size=label_size) + [
+                            {"selector": 'edge[id= "{}"]'.format(id),
+                            "style": {'opacity': 1,  "line-color": 'rgb(165, 74, 97)',
+                                    'z-index': 5000}} for id in selected_edge_id]
+
+
+    return stylesheet

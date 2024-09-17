@@ -172,6 +172,7 @@ style_certainty = {'white-space': 'pre','display': 'grid','text-align': 'center'
 masterColumnDefs = [
     {
         "headerName": "Reference Treatment",
+        "filter": True,
         "field": "Reference",
         'headerTooltip': 'Click a treatment to open a nested table',
         "cellRenderer": "agGroupCellRenderer",
@@ -307,6 +308,7 @@ detailColumnDefs = [
     {"field": "Certainty", 
      "headerName": "Certainty",
     #  'headerTooltip': 'Hover the mouse on each cell to see the details',
+    "filter": True,
      "width": 110,
      "resizable": True,
      "tooltipField": 'Certainty',
@@ -336,6 +338,28 @@ getRowStyle = {
     ]
 }
 
+
+# sideBar={
+#     "toolPanels": [
+#         {
+#             "id": "columns",
+#             "labelDefault": "Columns",
+#             "labelKey": "columns",
+#             "iconKey": "columns",
+#             "toolPanel": "agColumnsToolPanel",
+#         },
+#         {
+#             "id": "filters",
+#             "labelDefault": "Filters",
+#             "labelKey": "filters",
+#             "iconKey": "menu",
+#             "toolPanel": "agFiltersToolPanel",
+#         },
+#     ],
+#     "position": "left",
+#     "defaultToolPanel": "filters",
+# }
+
 grid = dag.AgGrid(
     id="quickstart-grid",
     className="ag-theme-alpine color-fonts",
@@ -348,6 +372,7 @@ grid = dag.AgGrid(
     detailCellRendererParams={
                 "detailGridOptions": {
                 "columnDefs": detailColumnDefs,
+                # "sideBar": sideBar,
                 "rowHeight": 60,
                 "rowDragManaged": True,
                 "rowDragMultiRow": True,
@@ -364,6 +389,9 @@ grid = dag.AgGrid(
                 #    "sortable": False, "filter": True,
                     "wrapText": True, 
                     'autoHeight': True,
+                    "enableRowGroup": False,
+                    "enableValue": False,
+                    "enablePivot": False,
                     'cellStyle': {'white-space': 'pre',
                                   'display': 'grid',
                                   'text-align': 'center',
@@ -532,8 +560,6 @@ options_effects = [
 def Sktpage():
     return html.Div([Navbar(), skt_home()], id='skt_page_content')
 
-def skt_nonexpert():
-    return html.Div()
 
 def skt_home():
     return html.Div([
@@ -560,7 +586,6 @@ def skt_home():
                                         ], id='profile_row'),
                                         ])
     ])
-
 
 
 
@@ -747,6 +772,187 @@ def skt_layout():
                                                         ], style={'display':'block'}), 
                                                                               ])
 
+#############################################SKT Non-experts####################################################################################################
+ROUTINE = '/assets/icons/routine.png'
+SIDE = '/assets/icons/side_effect.png'
+CONT = '/assets/icons/contrain.png'
+VISIT = '/assets/icons/visit.png'
+COST = '/assets/icons/cost.png'
+
+
+
+
+def skt_nonexpert():
+    return html.Div([
+            html.Div(id='skt_all',children=[dcc.Markdown('Scalable Knowledge Translation Tool',
+                                                className="markdown_style_main",
+                                                style={
+                                                    "font-size": '30px',
+                                                    'text-align': 'center',
+                                                    'color':'#5c7780',
+                                                       }),
+                                            dbc.Col([
+                                                html.P(
+                                                "Standard skt",
+                                                id='skttable_1',
+                                                style={'display': 'inline-block',
+                                                        'margin': 'auto',
+                                                        'font-size': '10px',
+                                                        'padding-left': '0px'}),
+                                                daq.ToggleSwitch(
+                                                    id='toggle_grid_select',
+                                                    value = False,
+                                                    color='green', size=30, vertical=False,
+                                                    label={'label': "",
+                                                            'style': dict(color='white', font='0.5em')},
+                                                    labelPosition="top",
+                                                    style={'display': 'inline-block',
+                                                            'margin': 'auto', 'font-size': '10px',
+                                                            'padding-left': '2px',
+                                                            'padding-right': '2px'}),
+                                                html.P('league table',
+                                                        id='skttable_2',
+                                                        style={'display': 'inline-block',
+                                                            'margin': 'auto',
+                                                            'font-size': '10px',
+                                                            'padding-right': '0px'})],
+                                                style={'justify-content': 'flex-end',
+                                                        'margin-left': '70%',
+                                                        'font-size': '0.8em', 'margin-top': '2%'},
+                                                ),
+                                            html.Br(),html.Br(),
+                                            dcc.Markdown('Instruction: Hover your mouse over the table header to see how you can interact with it.',
+                                                className="markdown_style_main",
+                                                style={
+                                                    "font-size": '20px',
+                                                    'text-align': 'start',
+                                                    'font-family': 'math',
+                                                    'color':'rgb(184 80 66)',
+                                                    'width': '90%'
+                                                       }),
+                                            html.Div([dbc.Row([dbc.Col(html.Span('Project Title', className='title_first'),className='title_col1'), 
+                                                              dbc.Col(dcc.Input(id='title_skt',
+                                                                            value='Systematic pharmacological treatments for chronic plaque psoriasis: a network meta-analysis', 
+                                                                            style={'width':'800px'}
+                                                                            ),className='title_col2')],
+                                                                       className='row_skt'),
+                                                      dbc.Row([dbc.Col([
+                                                          dbc.Toast([html.Span('PICOS', className='study_design'),
+                                                                     dcc.Textarea(value ='Patients: patients with psoriasis\n'+
+                                                                                'Primary outcome: PASI90\n'+
+                                                                                'Study design: randomized control study'
+                                                                                ,className='skt_span1', style={'width':'200%'}),
+                                                                            #   html.Span('Primary outcome: PASI90',className='skt_span1'), 
+                                                                            #   html.Span('Study design: randomized control study', className='skt_span1'),
+                                                                              ], className='tab1',headerClassName='headtab1',bodyClassName='bodytab1')
+                                                                              ],className='tab1_col2'),
+                                                           dbc.Col(dbc.Toast(
+                                                                              [html.Span('Overall Info', className='study_design'),
+                                                                              html.Span('Number of studies: 96',className='skt_span1'),
+                                                                              html.Span('Number of interventions', className='skt_span1'),
+                                                                              html.Span('Number of participents: 1020',className='skt_span1'), 
+                                                                              html.Span('Number of comparisions: 21', className='skt_span1'),
+                                                                              ], className='skt_studyinfo',headerClassName='headtab1'), style={'width':'25%'}),
+                                                            dbc.Col(dbc.Toast(
+                                                                              [
+                                                                              html.Span('Potential effect modifires Info',className='skt_span1', style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                              html.Span('Mean age: 45.3',className='skt_span1'),
+                                                                              html.Span('Mean male percentage: 43.4%',className='skt_span1'),
+                                                                              html.Button('Distribution of modifiers', id='trans_button',className='sub-button',
+                                                                                                            style={'color': 'rgb(118 135 123)',
+                                                                                                                   'background-color':'#dedecf',
+                                                                                                                    'display': 'inline-block',
+                                                                                                                    'justify-self':'center',
+                                                                                                                    'border': 'unset',
+                                                                                                                    'padding': '4px'}),
+                                                                              ], className='skt_studyinfo',headerClassName='headtab1', bodyClassName='bodytab2'), style={'width':'25%','margin-left': '1%'}),
+                                
+                                                            model_transitivity,             
+                                                                              ], className='row_skt'),
+
+                                                      dbc.Row([
+                                                            dbc.Col([
+                                                                        dbc.Row([
+                                                                            html.Span('Interventions Diagram', className='inter_label'),
+                                                                            html.Span('Interventions practical issues',className='skt_span1', 
+                                                                                              style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                            #  html.Span('Please tick to select the reference treatment', className='note_tick')
+                                                                                ], style={'padding-top': 0, 'display':'grid', 'grid-template-columns': '1fr 1fr'}),
+                                                                        dbc.Row([dbc.Col(cyto.Cytoscape(id='cytoscape_skt2', responsive=False, autoRefreshLayout=True,
+                                                                                    minZoom=0.6,  maxZoom=1.5,  panningEnabled=True,   
+                                                                                    elements=get_skt_elements(),
+                                                                                    style={ 
+                                                                                        'height': '50vh', 
+                                                                                        'width': '100%', 
+                                                                                        'margin-top': '-2%',
+                                                                                        'z-index': '999',
+                                                                                        'padding-left': '-10px', 
+                                                                                            # 'max-width': 'calc(52vw)',
+                                                                                        },
+                                                                            layout={'name':'circle','animate': False, 'fit':True },
+                                                                            stylesheet=skt_stylesheet()), 
+                                                                            style={'border-right': '3px solid #B85042',
+                                                                                    'width': '50%'}),
+                                                                            dbc.Col([
+                                                                                # html.Span('Interventions practical issues',className='skt_span1', 
+                                                                                #               style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                                    dbc.Row([
+                                                                                            dbc.Col([html.Img(src=ROUTINE,
+                                                                                            width="45px", style={'justify-self':'center'},
+                                                                                            className='medpractice', id='routine'),
+                                                                                            html.Span('Medical routine',className= 'main_results1')], 
+                                                                                            className='col_results1'),
+                                                                                            dbc.Col([html.Img(src=CONT,
+                                                                                            width="45px", style={'justify-self':'center'},
+                                                                                            className='medpractice', id='cont'),
+                                                                                            html.Span('Contraindications', className= 'main_results1')],
+                                                                                            className='col_results1'),
+                                                                                            dbc.Col([html.Img(src=SIDE,
+                                                                                            width="45px", style={'justify-self':'center'},
+                                                                                            className='medpractice', id='side'),
+                                                                                            html.Span('Side effects', className= 'main_results1')],
+                                                                                            className='col_results1'),
+                                                                                            dbc.Col([html.Img(src=VISIT, n_clicks=0,
+                                                                                            width="45px", style={'justify-self':'center'},
+                                                                                            className='medpractice', id='visit'),
+                                                                                            html.Span('Visit and test', className= 'main_results1')],
+                                                                                            className='col_results1'),
+                                                                                            dbc.Col([html.Img(src=COST,
+                                                                                            width="45px", style={'justify-self':'center'},
+                                                                                            className='medpractice', id='cost'),
+                                                                                            html.Span('Cost', className= 'main_results1')],
+                                                                                            className='col_results1'),
+                                                                                            ],
+                                                                                            style={'width' : '-webkit-fill-available',
+                                                                                                        'justify-content': 'center',}
+                                                                                                        ),
+                                                                                    dbc.Row(html.Span(id='trigger_info2'),
+                                                                                        style={'align-items': 'center','margin-bottom': '50%',
+                                                                                               'display': 'grid','background-color':'burlywood', 'height': '95%'})
+                                                                                                        ],style={'width':'50%', 'justify-content': 'center','display': 'grid'})
+                                                                                                        ]),], className='tab3_col2')], className='row_skt'),
+                                                      html.Br(), html.Br(),
+                                                      dbc.Row()
+                                                        ]),
+                                                      dbc.Col([
+                                                dcc.Markdown('Expert Committee Members',
+                                                className="markdown_style_main",
+                                                style={
+                                                        "font-size": '20px',
+                                                        'text-align': 'center',
+                                                        'color':'orange',
+                                                        'border-bottom': '2px solid',
+                                                        'font-weight': 'bold',
+                                                        'height': 'fit-content',
+                                                        # 'margin-left': '20px',
+                                                        'width': '100%',
+                                                        'margin-top': '0'
+                                                        }),
+                                                dcc.Markdown('Toshi Furukawa, Isabelle Boutron, Emily Karahalios, Tianjing li, Michael Mccaul, Adriani Nikolakopoulou, Haliton Oliveira, Thodoris Papakonstantiou, Georgia Salanti, Guido Schwarzer, Ian Saldanha, Nicky Welton, Sally Yaacoub',
+                                                                className="markdown_style", style={"color": "black", 'font-size': 'large'}),
+                                                html.Br(),html.Br(),html.Br(),],style={ 'width': '95%', 'padding-left': '5%'}) 
+                                                        ], style={'display':'block'}), 
+                                                                              ])
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 

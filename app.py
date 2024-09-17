@@ -9,6 +9,7 @@ import warnings
 warnings.filterwarnings("ignore")
 # --------------------------------------------------------------------------------------------------------------------#
 import dash
+import time
 import itertools
 import json
 from dash import clientside_callback
@@ -33,7 +34,7 @@ from tools.functions_export import __generate_xlsx_netsplit, __generate_xlsx_lea
 from tools.functions_show_forest_plot import __show_forest_plot
 from tools.functions_skt_boxplot import __show_boxplot
 from tools.functions_skt_forestplot import __skt_all_forstplot, __skt_PI_forstplot, __skt_direct_forstplot, __skt_indirect_forstplot, __skt_PIdirect_forstplot, __skt_PIindirect_forstplot,__skt_directin_forstplot, __skt_mix_forstplot
-from tools.functions_skt_others import __generate_skt_stylesheet
+from tools.functions_skt_others import __generate_skt_stylesheet, __generate_skt_stylesheet2
 from dash import ctx, no_update
 # --------------------------------------------------------------------------------------------------------------------#
 create_sessions_folders()
@@ -1786,8 +1787,7 @@ def update_boxplot(value):
 
 
 @app.callback([Output('cytoscape_skt', 'stylesheet'),
-               Output('trigger_info', 'children'),
-               ],
+               Output('trigger_info', 'children')],
               [Input('cytoscape_skt', 'tapNode'),
                Input('cytoscape_skt', 'selectedNodeData'),
                Input('cytoscape_skt', 'elements'),
@@ -1798,6 +1798,17 @@ def generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata ):
     return __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata)
 
 
+
+
+@app.callback(Output('cytoscape_skt2', 'stylesheet'),
+              [Input('cytoscape_skt2', 'tapNode'),
+               Input('cytoscape_skt2', 'selectedNodeData'),
+               Input('cytoscape_skt2', 'elements'),
+               Input('cytoscape_skt2', 'selectedEdgeData')
+               ]
+              )
+def generate_skt_stylesheet2(node, slct_nodesdata, elements, slct_edgedata ):
+    return __generate_skt_stylesheet2(node, slct_nodesdata, elements, slct_edgedata)
 
 
 
@@ -1819,6 +1830,44 @@ def display_sktinfo(cell, _):
             return True
     return no_update
 
+
+@app.callback([Output('routine', 'style'),
+               Output('cont', 'style'),
+               Output('side', 'style'),
+               Output('visit', 'style'),
+               Output('cost', 'style'),],
+              [
+            #    Input('routine', 'style'),
+            #    Input('cont', 'style'),
+            #    Input('side', 'style'),
+            #    Input('visit', 'style'),
+            #    Input('cost', 'style'),
+               Input('routine', 'n_clicks'),
+               Input('cont', 'n_clicks'),
+               Input('side', 'n_clicks'),
+               Input('visit', 'n_clicks'),
+               Input('cost', 'n_clicks'),
+               ]
+              )
+def image_color_change(style_routine, style_count,style_side,style_visit,style_cost):
+    style_selected = {'justify-self':'center', "filter":'drop-shadow(2px 4px 6px red)'}
+    style_unselected = {'justify-self':'center', "filter":'grayscale(1)'}
+    defalut_style = {'justify-self':'center'}
+    if ctx.triggered_id == "routine":
+        return [style_selected]+[style_unselected]*4
+    if ctx.triggered_id == "cont":
+        return [style_unselected]+[style_selected]+[style_unselected]*3
+    if ctx.triggered_id == "side":
+        return [style_unselected]*2+[style_selected]+[style_unselected]*2
+    if ctx.triggered_id == "visit":
+        return [style_unselected]*3+[style_selected]+[style_unselected]
+    if ctx.triggered_id == "cost":
+        return [style_unselected]*4+[style_selected]
+    else:
+        return [defalut_style]*5
+
+
+ 
 
 
 
@@ -1984,7 +2033,14 @@ clientside_callback(
 #     return  options
 
 
-
+# @app.callback(
+#     Output("quickstart-grid", "getDetailResponse"),
+#     Input("quickstart-grid", "getDetailRequest"),
+#     prevent_initial_call=True,
+# )
+# def handle_request(request):
+#     time.sleep(1)
+#     return request["data"]["Treatments"]
 
 
 
