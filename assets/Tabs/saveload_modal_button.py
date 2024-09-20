@@ -3,7 +3,8 @@ from dash import html, dcc
 
 saveload_modal = html.Div(
         [
-            dbc.Button("Save/Load Project", id="open_saveload", n_clicks=0, style={'margin-top':'-8.5px', 'padding-top':'0px', 'background-color': '#00ab9c'}),
+            dbc.Button("Save/Load Project", id="open_saveload", n_clicks=0, disabled=True,
+                       style={'margin-top':'-8.5px', 'padding-top':'0px', 'background-color': '#00ab9c', 'filter':'grayscale(1)'}),
             dbc.Modal(dcc.Tabs(id='all-tabs-saveload', persistence=True, children=[
 
                             dcc.Tab(style={'color':'grey','display': 'flex', 'justify-content':'center', 'align-items':'center'},

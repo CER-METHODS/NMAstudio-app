@@ -90,7 +90,7 @@ tab_league = html.Div([
                style={'display': 'inline-block', 'font-size': '12px', 'padding-left': '45px'})],
                style={'display': 'inline-block'}),
               dbc.Col([html.Ul(id="file2-list", style={'margin-left': '15px', 'color':'#dae8e8',
-                                                 'font-size':'11px'})],
+                                                 'font-size':'11px','width':'0'})],
             style={'display': 'inline-block'}
             ),
             dbc.Col([dcc.Upload(html.A('Upload CINeMA report 2 for outcome 2',
@@ -101,8 +101,25 @@ tab_league = html.Div([
                 style={'display': 'inline-block'}),
             dbc.Col([html.Ul(id="file2-list-2", style={'margin-left': '15px', 'color': '#dae8e8',
                                                        'font-size': '11px', 'vertical-alignment':'middle'})],
-                style={'display': 'inline-block', 'margin-top': '0px', 'margin-bottom': '0px'}
-                )
+                style={'display': 'inline-block', 'margin-top': '0px', 'margin-bottom': '0px','width':'0'}
+                ),
+            dbc.Col(dbc.Row([
+                            html.P(f"Select outcome 2",className="selectbox", 
+                                   style={'display': 'flex', 
+                                          "text-align": 'right',
+                                          'align-items': 'center',
+                                          'margin-left': '10px', 'font-size': '12px'}),
+                            dcc.Dropdown(id='league_outcome_select2', searchable=True, placeholder="...", className="box", value=0,
+                                          clearable=False, 
+                                          style={'width': '80px',  # 'height': '30px',
+                                                 "height": '30px',
+                                                 'vertical-align': 'middle',
+                                                 "font-family": "sans-serif",
+                                                 'margin-bottom': '2px',
+                                                 'display': 'inline-block',
+                                                 'color': 'black',
+                                                 'font-size': '10px','margin-left':'-7px'})], className='slect-out-row'),
+                                                 style={'display': 'inline-block', 'width': '200px'}),
               # dbc.Col(
               #        [html.P(f"Select outcomes",className="selectbox", style={'display': 'inline-block', "text-align": 'right',
               #                                                  'margin-left': '0px', 'font-size': '12px'}),
@@ -117,7 +134,7 @@ tab_league = html.Div([
               #                      'color': 'black',
               #                      'font-size': '10px','margin-left':'-7px'})]
               #                      )
-            ]),
+            ], style={'grid-template-columns': '0.8fr 3fr 0.2fr 3fr 0.3fr 1fr','display': 'grid'}),
        # dbc.Col(dbc.Row(
        #        [html.P(f"Select outcomes",className="selectbox", style={'display': 'inline-block', "text-align": 'right',
        #                                                         'margin-left': '0px', 'font-size': '12px'}),

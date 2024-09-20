@@ -277,7 +277,7 @@ league_rank <- function(dat, outcome2=FALSE){
 
 
 
-league_rank_new <- function(dat, i){
+league_new <- function(dat, i, j){
     sm <- dat[[paste0("effect_size", i+1)]][1] 
     TE_col <- paste0("TE", i+1)  # Generating the column name dynamically
     seTE_col <- paste0("seTE", i+1)  
@@ -301,9 +301,112 @@ league_rank_new <- function(dat, i){
                                 seq=sortedseq,
                                 bracket="(",
                                 backtransf=TRUE, ci=TRUE, separator=',')
-    lt <- netleague_table$random
-    colnames(lt) <- sortedseq
-    rownames(lt) <- sortedseq
+    lt1 <- netleague_table$random
+    colnames(lt1) <- sortedseq
+    rownames(lt1) <- sortedseq
+    lt <- lt1
+    if (i != j){
+        sm2 <- dat[[paste0("effect_size", j+1)]][1] 
+        TE_col2 <- paste0("TE", j+1)  # Generating the column name dynamically
+        seTE_col2 <- paste0("seTE", j+1)  
+        dat2 <- dat[, c("studlab", "treat1", "treat2", TE_col2, seTE_col2)]
+        # Filtering and updating 'dat' using the dynamically generated column names
+        dat2 <- dat2 %>%
+            filter_at(vars(!!as.name(TE_col2), !!as.name(seTE_col2)), all_vars(!is.na(.))) %>%
+            filter(!!as.name(seTE_col2) != 0)
+        tabnarms <- table(dat2$studlab)
+        sel.narms <- !iswhole((1 + sqrt(8 * tabnarms + 1)) / 2)
+        if (sum(sel.narms) >= 1){dat2 <- dat2 %>% filter(!studlab %in% names(tabnarms)[sel.narms])}
+        sm2 <- dat[[paste0("effect_size", j+1)]][1]
+        nma_secondary <- netmeta(dat2[[paste0("TE", j+1)]], dat2[[paste0("seTE", j+1)]],
+                            treat1=dat2$treat1, treat2=dat2$treat2,
+                            studlab=dat2$studlab,
+                            sm =sm2,
+                            random=TRUE, backtransf=TRUE,
+                            reference.group=dat2$treat2[1])
+        sortedseq <- sort(nma_secondary$trts)
+        netleague_table2 <- netleague(nma_secondary, digits = 2,
+                                    seq=sortedseq,
+                                    bracket="(",
+                                    backtransf=TRUE, ci=TRUE, separator=',')
+        lt2 <- netleague_table2$random
+        # lt1 <- netleague_table1$random
+
+        l1_treats <- sort(nma_primary$trts)
+        l2_treats <- sort(nma_secondary$trts)
+        lt1[upper.tri(lt1)] <- NA
+        lt2[upper.tri(lt2)] <- NA
+        df_1 <-  as_tibble(lt1)
+        df_2 <-  as_tibble(t(lt2))
+        if(length(lt1)>length(lt2)){
+            which_trts <- which(!(l1_treats %in% l2_treats))
+            df_2 <- df_2 %>% add_column(NA,  .before = colnames(df_2)[which_trts], .name_repair = "universal")
+            colnames <- paste0("V", 1:dim(df_2)[1])
+            colnames(df_2) <- colnames
+            df_2 <- df_2 %>% add_row( .before = as.numeric(rownames(df_2)[which_trts] ))
+            for(x in which_trts){
+                df_2[x, colnames[which_trts]] <- l1_treats[x]}
+            lt <- matrix(NA, nrow = length(df_1), ncol = length(df_1))
+            lt[upper.tri(lt, diag=T)] <- df_2[upper.tri(df_2, diag=T)]
+            lt[lower.tri(lt, diag=T)] <- df_1[lower.tri(df_1, diag=T)]
+            lt <- data.frame(lt)
+            sortedseq <- l1_treats
+            }else if (length(lt1)==length(lt2)){
+            l1_treats <- sort(nma_primary$trts)
+            df_1 <-  as_tibble(lt1)
+            df_2 <-  as_tibble(t(lt2))
+            lt <- matrix(NA, nrow = length(df_1), ncol = length(df_1))
+            lt[upper.tri(lt, diag=T)] <- df_2[upper.tri(df_2, diag=T)]
+            lt[lower.tri(lt, diag=T)] <- df_1[lower.tri(df_1, diag=T)]
+            lt <- data.frame(lt)
+            sortedseq <- l1_treats
+            }else{
+            is.empty <- function(x, mode = NULL){
+                if (is.null(mode)) mode <- class(x)
+                identical(vector(mode, 1), c(x, vector(class(x), 1)))}
+                which_trts <- which(!(l2_treats %in% l1_treats))
+            if(!is.empty(which_trts,"integer")){
+                df_1 <- df_1 %>% add_column(NA,  .before = colnames(df_1)[which_trts], .name_repair = "universal")
+                colnames <- paste0("V", 1:dim(df_1)[1])
+                colnames(df_1) <- colnames
+                df_1 <- df_1 %>% add_row( .before = as.numeric(rownames(df_1)[which_trts] ))
+                for(x in which_trts){
+                df_1[x, colnames[which_trts]] <- l2_treats[x]}
+            }
+            lt <- matrix(NA, nrow = length(df_2), ncol = length(df_2))
+            lt[upper.tri(lt, diag=T)] <- df_2[upper.tri(df_2, diag=T)]
+            lt[lower.tri(lt, diag=T)] <- df_1[lower.tri(df_1, diag=T)]
+            lt <- data.frame(lt)
+            sortedseq <- l2_treats
+
+            }
+            colnames(lt) <- sortedseq
+            rownames(lt) <- sortedseq
+    }
+  
+    return(lt)
+}
+###########################rank consistency###################################
+rank_consist_new <- function(dat, i){
+    sm <- dat[[paste0("effect_size", i+1)]][1] 
+    TE_col <- paste0("TE", i+1)  # Generating the column name dynamically
+    seTE_col <- paste0("seTE", i+1)  
+    dat1 <- dat[, c("studlab", "treat1", "treat2", TE_col, seTE_col)]
+    # Filtering and updating 'dat' using the dynamically generated column names
+    dat1 <- dat1 %>%
+        filter_at(vars(!!as.name(TE_col), !!as.name(seTE_col)), all_vars(!is.na(.))) %>%
+        filter(!!as.name(seTE_col) != 0)
+    tabnarms <- table(dat1$studlab)
+    sel.narms <- !iswhole((1 + sqrt(8 * tabnarms + 1)) / 2)
+    if (sum(sel.narms) >= 1){dat1 <- dat1 %>% filter(!studlab %in% names(tabnarms)[sel.narms])}
+    sm1 <- dat[[paste0("effect_size", i+1)]][1]
+    nma_primary <- netmeta(dat1[[paste0("TE", i+1)]], dat1[[paste0("seTE", i+1)]],
+                         treat1=dat1$treat1, treat2=dat1$treat2,
+                         studlab=dat1$studlab,
+                         sm =sm1,
+                         random=TRUE, backtransf=TRUE,
+                         reference.group=dat1$treat2[1])
+  
     #p-scores
     rank1 <- netrank(nma_primary, small.values = "bad")
     rank <- data.frame(names(rank1$Pscore.random), as.numeric(round(rank1$Pscore.random,2)))
@@ -332,11 +435,8 @@ league_rank_new <- function(dat, i){
         colnames(df_cons) <- c("comparison", "direct", "indirect", "p-value")
         }
   
-    return(list(lt, rank, consistency, df_cons, netsplit_all))
+    return(list(rank, consistency, df_cons, netsplit_all))
 }
-
-
-
 
 
 

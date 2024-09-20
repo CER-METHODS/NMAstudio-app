@@ -471,6 +471,7 @@ def is_data_file_uploaded(filename):
               Output("biforest_outcome_select2", "options"),
             #   Output("ranking_outcome_select1", "options"),
               Output("ranking_outcome_select2", "options"),
+              Output("league_outcome_select2", "options"),
               Input("number-outcomes", "value"),
               Input({'type': 'nameoutcomes', 'index': ALL}, "value"),
               State("_outcome_select", "options")
@@ -482,17 +483,17 @@ def update_options(number_outcomes, nameoutcomes, options_var):
         if number_outcomes:
             number_outcomes = int(number_outcomes)
             options_var = [{'label': f'outcome{i+1}', 'value': i} for i in range(number_outcomes)]
-            return (options_var,) * 3
+            return (options_var,) * 4
         options_var = [{'label': f'{out_names[i]}', 'value': i} for i in range(2)]
-        return (options_var,) * 3
+        return (options_var,) * 4
     
     if number_outcomes:
         number_outcomes = int(number_outcomes)
         options_var = [{'label': f'{nameoutcomes[i]}', 'value': i} for i in range(number_outcomes)]
-        return (options_var,) * 3
+        return (options_var,) * 4
     
     options_var = [{'label': f'{out_names[i]}', 'value': i} for i in range(2)]
-    return (options_var,) * 3
+    return (options_var,) * 4
 
 
 ### --- update graph layout with dropdown: graph layout --- ###
@@ -751,22 +752,30 @@ def update_boxplot(value, edges, net_data):
                Input('rob_vs_cinema', 'value'),
                Input('rob_vs_cinema_modal', 'value'),
                Input('league_table_data_STORAGE', 'data'),
-               Input('cinema_net_data_STORAGE', 'data'),
+               Input('cinema_net_data1_STORAGE', 'data'),
+               Input('cinema_net_data2_STORAGE', 'data'),
                Input('data_and_league_table_DATA', 'data'),
                Input("forest_data_STORAGE", "data"),
                Input('reset_project', 'n_clicks'),
             #    Input('ranking_data_STORAGE','data'),
                Input('_outcome_select','value'),
+               Input('league_outcome_select2','value'),
+               Input("number-outcomes", "value"),
                 ],
                State('net_data_STORAGE', 'data'),
                State('raw_data_STORAGE', 'data'),
+               State('datatable-secondfile-upload', 'filename'),
+               State('datatable-secondfile-upload-2', 'filename'),
+               State('datatable-secondfile-upload-2','disabled'),
               prevent_initial_call=True)
 def update_output(slider_value, store_node,store_edge,net_data, raw_data,toggle_cinema, toggle_cinema_modal,
-                  league_table_data, cinema_net_data, data_and_league_table_DATA,
-                  forest_data,  reset_btn,  outcome_idx, net_storage, raw_storage):
+                  league_table_data, cinema_net_data1,cinema_net_data2, data_and_league_table_DATA,
+                  forest_data,  reset_btn,  outcome_idx,outcome_idx2, num_out,net_storage, raw_storage,filename_cinema1, 
+                  filename_cinema2, filename_cinema2_disabled):
     return __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, toggle_cinema, toggle_cinema_modal,
-                  league_table_data, cinema_net_data, data_and_league_table_DATA,
-                  forest_data,  reset_btn,  outcome_idx, net_storage,raw_storage)
+                  league_table_data, cinema_net_data1,cinema_net_data2, data_and_league_table_DATA,
+                  forest_data,  reset_btn,  outcome_idx,outcome_idx2, num_out,net_storage,raw_storage,
+                  filename_cinema1, filename_cinema2, filename_cinema2_disabled)
 
 
 
@@ -791,11 +800,29 @@ def netsplit(edges, outcome_idx, net_split_data, consistency_data):
 
 
 ### ----- upload CINeMA data file 1 ------ ###
-@app.callback([Output("cinema_net_data_STORAGE", "data"),
+# @app.callback([Output("cinema_net_data_STORAGE1", "data"),
+#                Output('cinema_net_data_STORAGE2', 'data'),
+#                Output("file2-list", "children"),
+#                ],
+#               [Input('datatable-secondfile-upload', 'contents'),
+#                Input('cinema_net_data_STORAGE1', 'data'),
+#                Input('cinema_net_data_STORAGE2', 'data')],
+#               [State('datatable-secondfile-upload', 'filename')])
+# def get_new_data_cinema1(contents, cinema_net_data1, cinema_net_data2,filename):
+#     if contents is None:
+#         cinema_net_data = pd.read_json(cinema_net_data[0], orient='split')
+#     else:
+#         cinema_net_data = parse_contents(contents, filename)
+#     if filename is not None:
+#         return [cinema_net_data.to_json(orient='split')], 'loaded'
+#     else:
+#         return [cinema_net_data.to_json(orient='split')], ''
+    
+@app.callback([Output("cinema_net_data1_STORAGE", "data"),
                Output("file2-list", "children"),
                ],
               [Input('datatable-secondfile-upload', 'contents'),
-               Input('cinema_net_data_STORAGE', 'data')],
+               Input('cinema_net_data1_STORAGE', 'data')],
               [State('datatable-secondfile-upload', 'filename')])
 def get_new_data_cinema1(contents, cinema_net_data, filename):
     if contents is None:
@@ -806,6 +833,43 @@ def get_new_data_cinema1(contents, cinema_net_data, filename):
         return [cinema_net_data.to_json(orient='split')], 'loaded'
     else:
         return [cinema_net_data.to_json(orient='split')], ''
+
+
+@app.callback(
+    [Output("cinema_net_data2_STORAGE", "data"),
+     Output("file2-list-2", "children")],
+    [Input('datatable-secondfile-upload-2', 'contents'),
+     Input('cinema_net_data2_STORAGE', 'data')],
+    [State('datatable-secondfile-upload-2', 'filename')]
+)
+def get_new_data_cinema2(contents, cinema_net_data2, filename):
+    try:
+        if contents is None:
+            # Check if cinema_net_data2 is a list and extract the first element
+            if isinstance(cinema_net_data2, list) and len(cinema_net_data2) > 0:
+                json_str = cinema_net_data2[0]
+            elif isinstance(cinema_net_data2, str):
+                json_str = cinema_net_data2
+            else:
+                raise ValueError("Unexpected data format for cinema_net_data2.")
+            
+            # Parse the JSON string into a DataFrame
+            cinema_net_data2_df = pd.read_json(json_str, orient='split')
+        else:
+            # Parse the uploaded contents
+            cinema_net_data2_df = parse_contents(contents, filename)
+        
+        if filename is not None:
+            # Convert the DataFrame back to JSON and wrap it in a list
+            return [cinema_net_data2_df.to_json(orient='split')], 'loaded'
+        else:
+            return [cinema_net_data2_df.to_json(orient='split')], ''
+    except Exception as e:
+        # Handle exceptions and provide feedback
+        return cinema_net_data2, 'Error loading file'
+
+
+
 
 
 ### ----- update node info on funnel plot  ------ ###
@@ -1047,8 +1111,8 @@ def modal_ENABLE_UPLOAD_button(effect_mod, no_effect_mod):
 
 
 from assets.storage import DEFAULT_DATA
-OUTPUTS_STORAGE_IDS = list(DEFAULT_DATA.keys())[:-1]
-
+OUTPUTS_STORAGE_IDS = list(DEFAULT_DATA.keys())[:-2]
+# print(OUTPUTS_STORAGE_IDS)
 
 @app.callback([Output(id, 'data') for id in OUTPUTS_STORAGE_IDS] + [Output('token-not-found-alert','children'),
                                                                     Output("output_username", "children"),
@@ -1400,15 +1464,15 @@ def color_leaguetable_toggle(toggle_value):
     return style1, style2
 
 ### -------------- toggle switch funnel plot ---------------- ###
-@app.callback([Output("funnelswitchlabel1", "style"),
-               Output("funnelswitchlabel2", "style")],
-              [Input("toggle_funnel_direction", "value")])
-def color_funnel_toggle(toggle_value):
-    style1 = {'color': 'gray' if toggle_value else '#5a87c4',
-              'display': 'inline-block', 'margin': 'auto', 'padding-left': '20px', 'font-size':'11px'}
-    style2 = {'color': '#5a87c4' if toggle_value else 'gray',
-              'display': 'inline-block', 'margin': 'auto', 'padding-right': '20px', 'font-size':'11px'}
-    return style1, style2
+# @app.callback([Output("funnelswitchlabel1", "style"),
+#                Output("funnelswitchlabel2", "style")],
+#               [Input("toggle_funnel_direction", "value")])
+# def color_funnel_toggle(toggle_value):
+#     style1 = {'color': 'gray' if toggle_value else '#5a87c4',
+#               'display': 'inline-block', 'margin': 'auto', 'padding-left': '20px', 'font-size':'11px'}
+#     style2 = {'color': '#5a87c4' if toggle_value else 'gray',
+#               'display': 'inline-block', 'margin': 'auto', 'padding-right': '20px', 'font-size':'11px'}
+#     return style1, style2
 
 ### -------------- toggle switch consistency ---------------- ###
 @app.callback([Output("consistencyswitchlabel1", "style"),
@@ -1439,7 +1503,21 @@ def disable_cinema_toggle(filename_cinema1, filename_data):
     else: return False, False
 
 
-
+# disable outcome 2 toggle if no outcome 2 is given in data
+# @app.callback([
+#             #   Output('toggle_funnel_direction', 'disabled'),
+#               Output('toggle_forest_outcome', 'disabled'),
+#               Output('toggle_forest_pair_outcome', 'disabled'),
+#               Output('toggle_consistency_direction', 'disabled'),
+#               Output('datatable-secondfile-upload-2','disabled')
+#               ],
+#                Input('_outcome_select','value'),
+#                Input('league_outcome_select2','value'),
+#               )
+# def disable_out2_toggle(out_idx1, out_inx2):
+#     if out_idx1 == out_inx2:
+#         return True, True, True, True
+#     else: return False, False, False, False
 
 
 #### download pdfs ####

@@ -133,19 +133,24 @@ def __modal_submit_checks_LT_new(pw_data_ts, num_outcome, modal_data_checks_is_o
         num_outcome = int(num_outcome)
 
         try:
-            LEAGUETABLE_OUTS = [[] for _ in range(num_outcome)]
-            LEAGUETABLE_data = [[] for _ in range(num_outcome)]
+            RANKCON_OUTS = [[] for _ in range(num_outcome)]
+            LEAGUETABLE_data = [[[]for _ in range(num_outcome)] for _ in range(num_outcome)]
             ranking_data = [[] for _ in range(num_outcome)]
             consistency_data = [[] for _ in range(num_outcome)]
             net_split_data=[[] for _ in range(num_outcome)]
             netsplit_all=[[] for _ in range(num_outcome)]
-            
-
+                        
             for i in range(num_outcome): 
-                LEAGUETABLE_OUTS[i] = generate_league_table(data, i)
-                LEAGUETABLE_data[i],ranking_data[i],consistency_data[i],net_split_data[i],netsplit_all[i] = [f.to_json( orient='split') for f in LEAGUETABLE_OUTS[i]]
+                RANKCON_OUTS[i] = generate_rank_consist(data, i)
+                ranking_data[i],consistency_data[i],net_split_data[i],netsplit_all[i] = [f.to_json( orient='split') for f in RANKCON_OUTS[i]]
             
+            for i in range(num_outcome): 
+                for j in range(num_outcome):
+                    
+                    LEAGUETABLE_data[i][j] = generate_league_table(data, i,j).to_json( orient='split')
             
+            LEAGUETABLE_data = sum(LEAGUETABLE_data, [])
+           
             # merged_ranking_data = pd.read_json(ranking_data[0], orient='split')
             # for i, json_path in enumerate(ranking_data[1:], start=2):
             #     df = pd.read_json(json_path, orient='split')

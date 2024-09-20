@@ -3,6 +3,7 @@ import dash, dash_html_components as html
 import dash_table
 from tools.utils import set_slider_marks
 from assets.COLORS import *
+import json
 
 def __update_output(store_node, net_data, store_edge, toggle_cinema, toggle_cinema_modal, slider_value,
                    league_table_data, cinema_net_data1, cinema_net_data2, data_and_league_table_DATA,
@@ -322,20 +323,31 @@ def __update_output(store_node, net_data, store_edge, toggle_cinema, toggle_cine
 
 #     return [data_output, data_cols] * 2 + _out_slider + [data_and_league_table_DATA]
 
+def split_list(lista, num_out):
+    list_length = len(lista)
+    listB = []
 
+    for i in range(num_out):
+        chunk = [lista[(i + j) % list_length] for j in range(list_length)]
+        listB.append(chunk[:num_out])
+
+    return listB
 
 
 def __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, toggle_cinema, toggle_cinema_modal,
-                  league_table_data, cinema_net_data, data_and_league_table_DATA,
-                  forest_data,  reset_btn,  outcome_idx, net_storage, raw_storage):
+                  league_table_data, cinema_net_data1,cinema_net_data2, data_and_league_table_DATA,
+                  forest_data,  reset_btn,  outcome_idx,outcome_idx2, num_out, net_storage, raw_storage,filename_cinema1, filename_cinema2, filename_cinema2_disabled):
     # if outcome_idx:
     #     outcome_idx = outcome_idx
     # else:
     #     outcome_idx = 0
-
+    # print(store_node)
+    if num_out:
+        num_outcomes = int(num_out)
+    else:
+        num_outcomes = 2
     YEARS_DEFAULT = np.array([1963, 1990, 1997, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2010,
                               2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021])
-
     reset_btn_triggered = False
     triggered = [tr['prop_id'] for tr in dash.callback_context.triggered]
     if 'reset_project.n_clicks' in triggered: reset_btn_triggered = True
@@ -362,10 +374,18 @@ def __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, t
         _output = [data_output] + [_OUTPUT0[1]] + [data_output] + _OUTPUT0[3: ]
         return _output + _out_slider + [data_and_league_table_DATA]
 
-
-
+    # group_num = len(league_table_data)
+    league_table_data_list = split_list(league_table_data,num_outcomes)
+    # print("Type of stored_data:", type(league_table_data))
     # ranking_data = pd.read_json(ranking_data, orient='split')
-    leaguetable = pd.read_json(league_table_data[outcome_idx], orient='split')
+    # league_table_data = json.loads(league_table_data)
+    # print(league_table_data_list[0][0])
+    dat = league_table_data_list[outcome_idx][outcome_idx2]
+    # print(dat)
+    # print(dat[0])
+    dat = json.loads(dat)
+    # print(leaguetable_extract)
+    leaguetable = pd.DataFrame(dat['data'],  columns=dat['columns'], index=dat['index'])
     confidence_map = {k : n for n, k in enumerate(['low', 'medium', 'high'])}
     treatments = np.unique(net_data[['treat1', 'treat2']].dropna().values.flatten())
 
@@ -394,35 +414,40 @@ def __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, t
 
 
     if toggle_cinema:
-
-        cinema_net_data = pd.read_json(cinema_net_data[outcome_idx], orient='split')
-        # cinema_net_data2 = pd.read_json(cinema_net_data2, orient='split')
+        
+        cinema_net_data1 = pd.read_json(cinema_net_data1[0], orient='split')
+        cinema_net_data2 = pd.read_json(cinema_net_data2[0], orient='split')
         confidence_map = {k : n for n, k in enumerate(['very low', 'low', 'moderate', 'high'])}
-        comparisons1 = cinema_net_data.Comparison.str.split(':', expand=True)
-        confidence1 = cinema_net_data['Confidence rating'].str.lower().map(confidence_map)
-
-        confidence2 = pd.Series(np.array([np.nan]*len(confidence1)), copy=False)
-        comparisons2 = comparisons1
+        comparisons1 = cinema_net_data1.Comparison.str.split(':', expand=True)
+        confidence1 = cinema_net_data1['Confidence rating'].str.lower().map(confidence_map)
+        if filename_cinema2 is not None or (filename_cinema2 is None and "Default_data" in cinema_net_data2.columns):
+            confidence2 = cinema_net_data2['Confidence rating'].str.lower().map(confidence_map)
+        else:
+            confidence2 = pd.Series(np.array([np.nan]*len(confidence1)), copy=False)
+        comparisons2 = cinema_net_data2.Comparison.str.split(':', expand=True) if filename_cinema2 is not None or (filename_cinema2 is None and "Default_data" not in cinema_net_data2.columns) else comparisons1
         comprs_conf_ut = comparisons2.copy()  # Upper triangle
         comparisons1.columns = [1, 0]  # To get lower triangle
         comprs_conf_lt = comparisons1  # Lower triangle
         comprs_downgrade_lt = comprs_conf_lt
         comprs_downgrade_ut = comprs_conf_ut
-        if "Reason(s) for downgrading" in cinema_net_data.columns:
-            downgrading1 = cinema_net_data["Reason(s) for downgrading"]
+        if "Reason(s) for downgrading" in cinema_net_data1.columns:
+            downgrading1 = cinema_net_data1["Reason(s) for downgrading"]
             comprs_downgrade_lt['Downgrading'] = downgrading1
-
-            downgrading2 = pd.Series(np.array([np.nan]*len(downgrading1)), copy=False)
+            if (filename_cinema2 is not None) or (filename_cinema2 is None and "Default_data" in cinema_net_data2.columns) and ("Reason(s) for downgrading" in cinema_net_data2.columns):
+                downgrading2 = cinema_net_data2["Reason(s) for downgrading"]
+            else:
+                downgrading2 = pd.Series(np.array([np.nan]*len(downgrading1)), copy=False)
             comprs_downgrade_ut['Downgrading'] = downgrading2
             comprs_downgrade = pd.concat([comprs_downgrade_ut, comprs_downgrade_lt])
             comprs_downgrade = comprs_downgrade.pivot(index=0, columns=1, values='Downgrading')
         comprs_conf_lt['Confidence'] = confidence1
         comprs_conf_ut['Confidence'] = confidence2
         comprs_conf = pd.concat([comprs_conf_ut, comprs_conf_lt])
-        comprs_conf = comprs_conf.pivot(index=0, columns=1, values='Confidence')
+        comprs_conf = comprs_conf.pivot_table(index=0, columns=1, values='Confidence')
 
-        ut = np.triu(np.ones(comprs_conf.shape), 1).astype(bool)
-        comprs_conf = comprs_conf.where(ut == False, np.nan)
+        if filename_cinema2 is None and outcome_idx== outcome_idx2:
+            ut = np.triu(np.ones(comprs_conf.shape), 1).astype(bool)
+            comprs_conf = comprs_conf.where(ut == False, np.nan)
 
         robs = comprs_conf
     # Filter according to cytoscape selection
@@ -430,13 +455,15 @@ def __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, t
     if store_node and any('id' in nd for nd in store_node):
         slctd_trmnts = [nd['id'] for nd in store_node]
         if len(slctd_trmnts) > 0:
-            forest_data = pd.read_json(forest_data[outcome_idx], orient='split')
+            forest_data1 = pd.read_json(forest_data[outcome_idx], orient='split')
+            # print(forest_data)
+            forest_data2 = pd.read_json(forest_data[outcome_idx2], orient='split')
             net_data = pd.read_json(net_storage[0], orient='split')
             # forest_data_out2 =  None
             dataselectors = []
-            dataselectors += [forest_data.columns[1], net_data["outcome1_direction"].iloc[1]]
-            # if 'pscore2' in ranking_data.columns:
-            #     dataselectors += [forest_data_out2.columns[1], net_data["outcome2_direction"].iloc[1]]
+            dataselectors += [forest_data1.columns[1], net_data["outcome1_direction"].iloc[1]]
+            if outcome_idx!= outcome_idx2:
+                dataselectors += [forest_data2.columns[1], net_data[f"outcome{outcome_idx2}_direction"].iloc[1]]
 
             leaguetable = leaguetable.loc[slctd_trmnts, slctd_trmnts]
             robs_slct = robs.loc[slctd_trmnts, slctd_trmnts]
@@ -449,28 +476,47 @@ def __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, t
                 for treat_r in slctd_trmnts:
                     if treat_c != treat_r:
                         if not leaguetable_bool.loc[treat_r][treat_c]:
-                            effcsze = round(forest_data[dataselectors[0]][(forest_data.Treatment == treat_c) & (forest_data.Reference == treat_r)].values[0], 2)
-                            ci_lower = round(forest_data['CI_lower'][(forest_data.Treatment == treat_c) & (forest_data.Reference == treat_r)].values[0], 2)
-                            ci_upper = round(forest_data['CI_upper'][(forest_data.Treatment == treat_c) & (forest_data.Reference == treat_r)].values[0], 2)
+                            effcsze = round(forest_data1[dataselectors[0]][(forest_data1.Treatment == treat_c) & (forest_data1.Reference == treat_r)].values[0], 2)
+                            ci_lower = round(forest_data1['CI_lower'][(forest_data1.Treatment == treat_c) & (forest_data1.Reference == treat_r)].values[0], 2)
+                            ci_upper = round(forest_data1['CI_upper'][(forest_data1.Treatment == treat_c) & (forest_data1.Reference == treat_r)].values[0], 2)
                             leaguetable.loc[treat_r][treat_c] = f'{effcsze}\n{ci_lower, ci_upper}'
                         else:
                             pass
+                        if outcome_idx!= outcome_idx2:
+                            effcsze2 = round(forest_data2[dataselectors[2]][(forest_data2.Treatment == treat_r) & (forest_data2.Reference == treat_c)].values[0], 2)
+                            ci_lower2 = round(forest_data2['CI_lower'][(forest_data2.Treatment == treat_r) & (forest_data2.Reference == treat_c)].values[0], 2)
+                            ci_upper2 = round(forest_data2['CI_upper'][(forest_data2.Treatment == treat_r) & (forest_data2.Reference == treat_c)].values[0], 2)
+                
+                            if leaguetable_bool.loc[treat_r][treat_c]:
+                                leaguetable.loc[treat_r][treat_c] = f'{effcsze2}\n{ci_lower2, ci_upper2}'
+                                if toggle_cinema: robs_slct.loc[treat_r][treat_c] = comprs_conf_ut['Confidence'][(comprs_conf_ut[0] == treat_c) & (comprs_conf_ut[1] == treat_r) |
+                                                                                    (comprs_conf_ut[0] == treat_r) & (comprs_conf_ut[1] == treat_c)].values[0]
+                                else:
+                                    robs_slct.loc[treat_r][treat_c] = robs_slct[treat_r][treat_c] if not np.isnan(robs_slct[treat_r][treat_c]) else robs_slct[treat_c][treat_r]
 
-                        if toggle_cinema:
-                            robs_slct.loc[treat_r][treat_c] = comprs_conf_lt['Confidence'][
-                                (comprs_conf_lt[0] == treat_c) & (comprs_conf_lt[1] == treat_r) |
-                                (comprs_conf_lt[0] == treat_r) & (comprs_conf_lt[1] == treat_c)].values[0]
+                            else:
+                                if toggle_cinema: robs_slct.loc[treat_r][treat_c] = comprs_conf_lt['Confidence'][(comprs_conf_lt[0] == treat_c) & (comprs_conf_lt[1] == treat_r) |
+                                                                                    (comprs_conf_lt[0] == treat_r) & (comprs_conf_lt[1] == treat_c)].values[0]
+                                else:
+                                    robs_slct.loc[treat_r][treat_c] = robs_slct[treat_r][treat_c] if not np.isnan(robs_slct[treat_r][treat_c]) else robs_slct[treat_c][treat_r]
                         else:
-                            robs_slct.loc[treat_r][treat_c] = robs_slct[treat_r][treat_c] if not np.isnan(
-                                robs_slct[treat_r][treat_c]) else robs_slct[treat_c][treat_r]
-
+                            if toggle_cinema:
+                                # print(comprs_conf_lt['Confidence'])
+                                robs_slct.loc[treat_r][treat_c] = comprs_conf_lt['Confidence'][
+                                    (comprs_conf_lt[0] == treat_c) & (comprs_conf_lt[1] == treat_r) |
+                                    (comprs_conf_lt[0] == treat_r) & (comprs_conf_lt[1] == treat_c)].values[0]
+                            else:
+                                robs_slct.loc[treat_r][treat_c] = robs_slct[treat_r][treat_c] if not np.isnan(
+                                    robs_slct[treat_r][treat_c]) else robs_slct[treat_c][treat_r]
             
-            if not toggle_cinema:
-                robs_slct = robs_slct[leaguetable_bool.T]
-                leaguetable = leaguetable[leaguetable_bool.T]
-            else:
-                robs_slct = robs_slct[leaguetable_bool.T]
-                leaguetable = leaguetable[leaguetable_bool.T]
+            if outcome_idx== outcome_idx2:
+            
+                if not toggle_cinema:
+                    robs_slct = robs_slct[leaguetable_bool.T]
+                    leaguetable = leaguetable[leaguetable_bool.T]
+                else:
+                    robs_slct = robs_slct[leaguetable_bool.T]
+                    leaguetable = leaguetable[leaguetable_bool.T]
 
 
             leaguetable.replace(0, np.nan) #inplace
@@ -488,6 +534,8 @@ def __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, t
             robs = pd.DataFrame(robs_values,
                                 columns=robs.columns,
                                 index=robs.columns)
+            
+            robs = robs.T if outcome_idx== outcome_idx2 else robs
 
             
 
@@ -548,7 +596,7 @@ def __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, t
                                    'type': 'markdown'} if col['id'] != 'Treatment' else None
                            for col in leaguetable_cols} for rn, (_, tip) in enumerate(tips.iterrows())]
     if toggle_cinema:
-        tooltip_values = [{col['id']: {'value': f"**Reason for Downgrading:**{tip[col['id']]}" if not comprs_downgrade.empty and not store_node else f"**Reason for Downgrading:**",
+        tooltip_values = [{col['id']: {'value': f"**Reason for Downgrading:**{tip[col['id']]}" if not comprs_downgrade.empty  else f"**Reason for Downgrading:**",
                                        'type': 'markdown'} if col['id'] != 'Treatment' else None
                        for col in leaguetable_cols} for rn, (_, tip) in enumerate(comprs_downgrade.iterrows())]
     

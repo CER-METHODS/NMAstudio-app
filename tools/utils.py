@@ -16,7 +16,8 @@ from rpy2.robjects.conversion import localconverter
 r = ro.r
 r['source']('R_Codes/all_R_functions.R')  # Loading the function we have defined in R.
 run_NetMeta_r = ro.globalenv['run_NetMeta_new']  # Get run_NetMeta from R
-league_table_r = ro.globalenv['league_rank_new']  # Get league_table from R
+league_table_r = ro.globalenv['league_new']  # Get league_table from R
+rank_consist_r = ro.globalenv['rank_consist_new']  # Get league_table from R
 pairwise_forest_r = ro.globalenv['pairwise_forest_new']  # Get pairwise_forest from R
 funnel_plot_r = ro.globalenv['funnel_funct_new']  # Get pairwise_forest from R
 run_pairwise_data_long_r = ro.globalenv['get_pairwise_data_long_new']  # Get pairwise data from long format from R
@@ -66,8 +67,26 @@ def apply_r_func_new(func, df, i):
 
     if isinstance(r_result, ro.vectors.ListVector):
         with localconverter(ro.default_converter + pandas2ri.converter):
-            leaguetable, pscores, consist, netsplit, netsplit_all  = (ro.conversion.rpy2py(rf) for rf in r_result)
-        return leaguetable, pscores, consist, netsplit, netsplit_all
+            pscores, consist, netsplit, netsplit_all  = (ro.conversion.rpy2py(rf) for rf in r_result)
+        return pscores, consist, netsplit, netsplit_all
+    else:
+        df_result = r_result.reset_index(drop=True)  # Convert back to a pandas.DataFrame.
+        return df_result
+
+def apply_r_func_new_lt(func, df, i, j):
+    df['rob'] = df['rob'].astype("string")
+    df['rob'] = (df['rob'].str.lower()
+                        .str.strip()
+                        .replace({'low': 'l', 'medium': 'm', 'high': 'h'})
+                        .replace({'l': 1, 'm': 2, 'h': 3}))
+    with localconverter(ro.default_converter + pandas2ri.converter):
+        df_r = ro.conversion.py2rpy(df.reset_index(drop=True))
+    func_r_res = func(dat=df_r, i=i, j=j)
+    r_result = pandas2ri.rpy2py(func_r_res)
+    if isinstance(r_result, ro.vectors.ListVector):
+        with localconverter(ro.default_converter + pandas2ri.converter):
+            leaguetable = (ro.conversion.rpy2py(rf) for rf in r_result)
+        return leaguetable
     else:
         df_result = r_result.reset_index(drop=True)  # Convert back to a pandas.DataFrame.
         return df_result
@@ -470,10 +489,9 @@ def run_pairwise_MA(df,i):
 #         return leaguetable, pscores, consist, netsplit, netsplit2, netsplit_all, netsplit_all2
 #     else:
 #         return leaguetable, pscores, consist, netsplit, netsplit_all
-def generate_league_table(df, i):
+def generate_league_table(df,i,j):
     
-    leaguetable, pscores, consist, netsplit, netsplit_all = apply_r_func_new(func=league_table_r, df=df, i =i)
-
+    leaguetable = apply_r_func_new_lt(func=league_table_r, df=df, i =i, j=j)
     replace_and_strip = lambda x: x.replace(' (', '\n(').strip()
 
     leaguetable = leaguetable.fillna('')
@@ -485,7 +503,19 @@ def generate_league_table(df, i):
     leaguetable.columns = leaguetable.index = leaguetable.values.diagonal()
 
     
-    return leaguetable, pscores, consist, netsplit, netsplit_all
+    return leaguetable
+
+#############generate rank consistency############
+
+def generate_rank_consist(df, i):
+    print("check_11")
+    
+    pscores, consist, netsplit, netsplit_all = apply_r_func_new(func=rank_consist_r, df=df, i =i)
+    print("check_22")
+    return  pscores, consist, netsplit, netsplit_all
+
+
+
 
 ## run netmeta for funnel plots
 def generate_funnel_data(df,i):

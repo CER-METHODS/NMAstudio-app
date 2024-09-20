@@ -8,7 +8,6 @@ def __update_forest_pairwise(edge, outcome_idx, forest_data_prws, style_pair,net
     slctd_compsinv = []
     outcome_idx = 0 if not outcome_idx else outcome_idx
         
-        
     if edge:
         src, trgt = edge[0]['source'], edge[0]['target']
         slctd_comps += [f'{src} vs {trgt}']
