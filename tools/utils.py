@@ -508,10 +508,9 @@ def generate_league_table(df,i,j):
 #############generate rank consistency############
 
 def generate_rank_consist(df, i):
-    print("check_11")
     
     pscores, consist, netsplit, netsplit_all = apply_r_func_new(func=rank_consist_r, df=df, i =i)
-    print("check_22")
+    
     return  pscores, consist, netsplit, netsplit_all
 
 

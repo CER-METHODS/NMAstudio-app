@@ -25,10 +25,16 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
         df['CI_width'] = (df.CI_upper - df.CI_lower)/2
         df['lower_error'] = df[effect_size] - df.CI_lower
         df['CI_width_hf'] = df.CI_upper - df[effect_size] 
+
+        df['pre_width'] = (df.pre_upper - df.pre_lower)/2
+        df['lower_error_pre'] = df[effect_size] - df.pre_lower
+        df['pre_width_hf'] = df.pre_upper - df[effect_size]
         # df['CI_width_hf'] = df['CI_width'] / 2
         df['WEIGHT'] = round(df['WEIGHT'], 3)
         CI_lower, CI_upper = df["CI_lower"].map('{:,.2f}'.format), df["CI_upper"].map('{:,.2f}'.format),
         df['CI'] = '(' + CI_lower.astype(str) + ', ' + CI_upper.astype(str) + ')'
+        pre_lower, pre_upper = df["pre_lower"].map('{:,.2f}'.format), df["pre_upper"].map('{:,.2f}'.format)
+        df['PI'] = '(' + pre_lower.astype(str) + ', ' + pre_upper.astype(str) + ')'
         df = df.sort_values(by=effect_size, ascending=False)
         n = len(df)
         FOREST_ANNOTATION = ('<b>RE model:</b>'
@@ -39,8 +45,8 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
     else:
         effect_size = ''
         outcome_direction = False
-        df = pd.DataFrame([[0] * 7], columns=['Treatment', effect_size, 'CI_lower', 'CI_upper', 'WEIGHT',
-                                              'CI_width', 'CI_width_hf'])
+        df = pd.DataFrame([[0] * 9], columns=['Treatment', effect_size, 'CI_lower', 'CI_upper', 'WEIGHT',
+                                              'CI_width', 'CI_width_hf','pre_width', 'pre_width_hf'])
         FOREST_ANNOTATION = ''
         LEN_FOREST_ANNOT = 0
         style.update({'height': '100%'})
@@ -50,27 +56,51 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
     up_rng, low_rng = df.CI_upper.max(), df.CI_lower.min()
     up_rng = 10**np.floor(np.log10(up_rng)) if xlog else None
     low_rng = 10 ** np.floor(np.log10(low_rng)) if xlog else None
-    fig = px.scatter(df, x=effect_size, y="Treatment",
-                     error_x_minus='lower_error' if xlog else None,
-                     error_x='CI_width_hf' if xlog else 'CI_width' if data else None,
-                     log_x=xlog,
-                     size_max=5,
-                     range_x=[min(low_rng, 0.1), max([up_rng, 10])] if xlog else None,
-                     range_y=[-1, len(df.Treatment)],
-                     size=df.WEIGHT if data else None)
+
+    if data:
+        fig=px.scatter(df, x=effect_size, y="Treatment",
+                        # error_x_minus=dict(type='data',color = colors[i],array='lower_error',visible=True),
+                    error_x_minus='lower_error_pre' if xlog else None,
+                    error_x='pre_width_hf' if xlog else 'pre_width',
+                    log_x=xlog,
+                    size_max=5,
+                    range_x=[min(low_rng, 0.1), max([up_rng, 10])] if xlog else None,
+                    range_y=[-1, len(df.Treatment)],
+                    size=df.WEIGHT)
+        fig.update_traces(marker=dict(color='red'),  # Set points to black
+                    error_x=dict(color='red'))
+
+        fig.add_trace(go.Scatter(
+            x=df[effect_size],  # All RR values from the dataframe
+            y=df['Treatment'],  # All Treatment values from the dataframe
+            error_x=dict(
+                type='data',
+                color='#313539',
+                array=df['CI_width_hf'] if xlog else df['CI_width'],  # Apply pre_width_hf or pre_width to all points
+                arrayminus=df['lower_error'] if xlog else None,  # Apply lower_error_pre if xlog is True
+                visible=True
+            ),
+            marker=dict(color='green',opacity=0.8 if data else 0, size=8),  # Red marker with size 8 for all points
+            mode='markers',  # Ensures it's a scatter plot with points
+            showlegend=False
+        ))
+
+        if xlog:
+            fig.add_shape(type='line', yref='paper', y0=0, y1=1, xref='x', x0=1, x1=1,
+                        line=dict(color="black", width=1), layer='below')
+    
+    else:
+        fig = go.Figure()
 
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',  # transparent bg
-                      plot_bgcolor='rgba(0,0,0,0)')
-    if xlog:
-        fig.add_shape(type='line', yref='paper', y0=0, y1=1, xref='x', x0=1, x1=1,
-                      line=dict(color="black", width=1), layer='below')
+                        plot_bgcolor='rgba(0,0,0,0)')
 
-    fig.update_traces(marker=dict(symbol='circle',
-                                  opacity=0.8 if data else 0,
-                                  line=dict(color='DarkSlateGrey'),
-                                  color='green'),
-                      error_x=dict(thickness=2.1, color='#313539')  # '#ef563b' nice orange trace
-                      )
+    # fig.update_traces(marker=dict(symbol='circle',
+    #                               opacity=0.8 if data else 0,
+    #                             #   line=dict(color='DarkSlateGrey'),
+    #                               color='green'),
+    #                   error_x=dict(thickness=2.1, color='#313539')  # '#ef563b' nice orange trace
+    #                   )
     fig.update_xaxes(ticks="outside", tickwidth=2, tickcolor='black',
                      ticklen=5,
                      categoryorder='category descending' if outcome_direction else 'category ascending',
@@ -84,7 +114,7 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
                           font_color="black",
                           modebar= dict(orientation = 'v', bgcolor = 'rgba(0,0,0,0.5)'),
                           autosize=True,
-                          #width=500,
+                        #   width=1500,
                           margin=dict(l=5, r=10, t=12, b=80),
                           xaxis=dict(showgrid=False, autorange=True,
                                      #tick0=0, # TODO: JUST EXPLAIN IT!!!
@@ -130,9 +160,10 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
 
         fig.update_layout(
             autosize=True,
+            width=1500,
             yaxis2=dict(tickvals = [*range(df.shape[0])],
-                        ticktext=[' '*8 + '{:.2f}   {:<17}'.format(x,y)
-                                  for x, y in zip(df[effect_size].values, df['CI'].values)],
+                        ticktext=[' ' + '{:.2f}   {:<17} {:<17}'.format(x,y,z)
+                                  for x, y, z in zip(df[effect_size].values, df['CI'].values, df['PI'].values)],
                         showgrid=False,  zeroline=False,
                         titlefont=dict(color='black'),
                         tickfont=dict(color='black'),
@@ -150,9 +181,14 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
              showarrow=False)
 
 
-        fig.add_annotation(x=1.44, y=1, align='center',
+        fig.add_annotation(x=1.22, y=1, align='center',
                            xref='paper', yref='y2 domain',
                            text='<b>95% CI</b>',
+                           showarrow=False)
+        
+        fig.add_annotation(x=1.32, y=1, align='center',
+                           xref='paper', yref='y2 domain',
+                           text='<b>95% PI</b>',
                            showarrow=False)
 
     else:
