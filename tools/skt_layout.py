@@ -556,7 +556,7 @@ options_effects = [
    ]
 
 # def Sktpage():
-#     return html.Div([Navbar(), model_password], id='skt_page_content')
+#     return html.Div([html.Div([Navbar()],id='skt_page_content_sub'),model_password], id='skt_page_content')
 def Sktpage():
     return html.Div([Navbar(), skt_home()], id='skt_page_content')
 

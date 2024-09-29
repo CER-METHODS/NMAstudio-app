@@ -117,7 +117,7 @@ SKTPAGE = Sktpage()
 def display_page(pathname):
     if pathname == '/home':  return RealHomepage
     elif pathname == '/results':  return HOMEPAGE
-    elif pathname == '/skt': return SKTPAGE,
+    # elif pathname == '/skt': return SKTPAGE,
     # elif pathname == '/doc': return doc_layout
     # elif pathname == '/news': return news_layout
 
@@ -142,7 +142,6 @@ def clear_treat(click_expert,click_nonexpert,children):
 
 
 
-
 # @app.callback(
 #     Output('pass_model','is_open'),
 #     Output('skt_page_content','children'),
@@ -153,10 +152,11 @@ def clear_treat(click_expert,click_nonexpert,children):
 # )
 # def clear_treat(click, password, pass_model, children):
 #     if password =='777' and click:
-#         children = [Navbar(), skt_layout()]
+#         children = [html.Div([Navbar()],id='skt_page_content_sub')]
 #         return not pass_model, children
 #     else:
 #         return pass_model, children
+
 
 # @app.callback(Output('results_page', 'children'),
 #               [Input('test_upload', 'n_clicks_timestamp'),
