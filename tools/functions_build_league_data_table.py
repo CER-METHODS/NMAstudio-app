@@ -328,7 +328,8 @@ def split_list(lista, num_out):
     listB = []
 
     for i in range(num_out):
-        chunk = [lista[(i + j) % list_length] for j in range(list_length)]
+        start = i * num_out
+        chunk = [lista[(start + j) % list_length] for j in range(num_out)]
         listB.append(chunk[:num_out])
 
     return listB
@@ -379,10 +380,10 @@ def __update_output_new(slider_value, store_node,store_edge,net_data,raw_data, t
     # print("Type of stored_data:", type(league_table_data))
     # ranking_data = pd.read_json(ranking_data, orient='split')
     # league_table_data = json.loads(league_table_data)
-    # print(league_table_data_list[0][0])
+    
     dat = league_table_data_list[outcome_idx][outcome_idx2]
+    # print(league_table_data_list[1][1])
     # print(dat)
-    # print(dat[0])
     dat = json.loads(dat)
     # print(leaguetable_extract)
     leaguetable = pd.DataFrame(dat['data'],  columns=dat['columns'], index=dat['index'])

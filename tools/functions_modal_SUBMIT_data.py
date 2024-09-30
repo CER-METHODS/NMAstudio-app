@@ -375,9 +375,10 @@ def __data_trans(
         
         try:
             data = adjust_data(data_user, search_value_format, number_outcomes)
-
+            if 'rob1' in data.columns:
+                data = data.rename(columns={'rob1': 'rob'})
             TEMP_net_data_STORAGE = [data.to_json(orient='split')]
-            # data.to_csv('db/test_dat2.csv', encoding='utf-8')
+            # data.to_csv('db/test_dat_lela.csv', encoding='utf-8')
      
         #except:
                 #TEMP_net_data_STORAGE = {}
