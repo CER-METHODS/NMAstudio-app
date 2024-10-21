@@ -125,16 +125,28 @@ def __modal_submit_checks_LT(pw_data_ts, modal_data_checks_is_open,
 def __modal_submit_checks_LT_new(pw_data_ts, num_outcome, modal_data_checks_is_open,
                            TEMP_net_data_STORAGE, LEAGUETABLE_data,
                            ranking_data, consistency_data, net_split_data,
-                           netsplit_all):
+                           netsplit_all, outcome_idx):
     """ produce new league table from R """
     if modal_data_checks_is_open:
 
+        if len(outcome_idx)==0:
+        # If outcome_idx is None, set default values
+            outcome_idx1 = 0
+            outcome_idx2 = 1
+        elif len(outcome_idx) > 0 and outcome_idx[0] is not None and len(outcome_idx[0]) == 2:
+            # If outcome_idx exists, is non-empty, and contains two values in its first element
+            outcome_idx1 = outcome_idx[0][0]
+            outcome_idx2 = outcome_idx[0][1]
+        else:
+            outcome_idx1 = 0
+            outcome_idx2 = 0
+        
         data = pd.read_json(TEMP_net_data_STORAGE[0], orient='split')
         num_outcome = int(num_outcome)
 
         try:
             LEAGUETABLE_OUTS = [[] for _ in range(num_outcome)]
-            LEAGUETABLE_data = [[] for _ in range(num_outcome)]
+            LEAGUETABLE_data = [[] for _ in range(num_outcome)]+[]
             ranking_data = [[] for _ in range(num_outcome)]
             consistency_data = [[] for _ in range(num_outcome)]
             net_split_data=[[] for _ in range(num_outcome)]
@@ -145,7 +157,8 @@ def __modal_submit_checks_LT_new(pw_data_ts, num_outcome, modal_data_checks_is_o
                 LEAGUETABLE_OUTS[i] = generate_league_table(data, i)
                 LEAGUETABLE_data[i],ranking_data[i],consistency_data[i],net_split_data[i],netsplit_all[i] = [f.to_json( orient='split') for f in LEAGUETABLE_OUTS[i]]
             
-            
+            LEAGUETABLE_both = generate_league_table_both(data, outcome_idx1, outcome_idx2) if outcome_idx1 != outcome_idx2 else []
+            LEAGUETABLE_data[-1] = LEAGUETABLE_both.to_json( orient='split')
             # merged_ranking_data = pd.read_json(ranking_data[0], orient='split')
             # for i, json_path in enumerate(ranking_data[1:], start=2):
             #     df = pd.read_json(json_path, orient='split')

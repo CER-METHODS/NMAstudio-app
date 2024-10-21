@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc, dash_html_components as html
 from assets.Tabs.tabdata import tab_data, raw_data
 from assets.Tabs.tabtransitivity import tab_trstvty
 from assets.Tabs.tabforests import tab_forests
-from assets.Tabs.tableaguetable import tab_league
+from assets.Tabs.tableaguetable import tab_league, tab_league_both
 from assets.Tabs.tabfunnel import tab_funnel
 from assets.Tabs.tabranking import tab_ranking
 from assets.Tabs.tabconsistency import tab_consistency
@@ -747,6 +747,16 @@ def home_layout():
 
                                              ),
                                          ]),
+                            dcc.Tab(id='league_tab_both',value= 'league_tab_both',style={'color':'grey', 'display': 'none', 'justify-content':'center', 'align-items':'center'},
+                                    selected_style={'color': 'grey', 'display': 'flex', 'justify-content': 'center','background-color': '#f5c198',
+                                                    'align-items': 'center'},
+                                    label='League Tables for two outcomes',
+                                    children=html.Div(className='control-tab', children=[tab_league_both],  
+                                                                                style={'overflowX': 'unset',
+                                                                                        'overflowY': 'unset',
+                                                                                        'height': '99%',
+                                                                                                })
+                            ),
                             dcc.Tab(id='trans_tab', value= 'trans_tab', style={'color':'grey', 'display': 'none', 'justify-content':'center', 'align-items':'center'},
                                     selected_style={'color': 'grey', 'display': 'flex', 'justify-content': 'center','background-color': '#f5c198',
                                                     'align-items': 'center'},
@@ -858,30 +868,39 @@ def upload_data():
                 style={'width': '60px'}), 
                 style={'display':'none', 'justify-content': 'center'}, id='arrow_step_4'),
         html.Br(),
+
+
+        html.Div(dbc.Row([dbc.Col(id='outcomes_primary'),
+                dbc.Col(html.Div(html.Span('*Select two primary outcomes for league table. Select "skip" if not applicable',className='upload_instuspan',
+                            )), className='upload_instrucol')   
+                          ], className= 'upload_row')
+        , style={'display':'none', 'justify-content': 'center'}, id='select-out-primary'),
+        html.Br(),
+        
+        dbc.Row( html.Img(src="/assets/icons/arrow.png",
+                style={'width': '60px'}), 
+                style={'display':'none', 'justify-content': 'center'}, id='arrow_step_primary'),
+
+        html.Br(),
+
         html.Div(dbc.Row([dbc.Col(id='outcomes_type'),
                 dbc.Col(html.Div(html.Span('*Select binary or continuous and enter the corresponding name for each outcome',className='upload_instuspan',
                             )), className='upload_instrucol')   
                           ], className= 'upload_row')
         , style={'display':'none', 'justify-content': 'center'}, id='select-out-type'),
+        
         html.Br(),
-
         dbc.Row( html.Img(src="/assets/icons/arrow.png",
                 style={'width': '60px'}), 
                 style={'display':'none', 'justify-content': 'center'}, id='arrow_step_5'),
         html.Br(),
+        
         html.Div(dbc.Row([dbc.Col(id='variable_selection'),
                           dbc.Col(html.Div(html.Span('* In this box, each variable should refer to a unique coulum in your dataset. For example, if you have two outcomes and the number of participants are the same in each study for two outcomes. The number of participants refer to column "N" in your dataset. Do not select "N" for both outcome 1 and 2. In this case, you need to create another column "N2" for outcome 2. ',className='upload_instuspan',
                             )), className='upload_instrucol') 
                           ],  className= 'upload_row')
         , style={'display':'none', 'justify-content': 'center'}, id='select_variables'),
         html.Br(),
-
-        # dbc.Row( html.Img(src="/assets/icons/arrow.png",
-        #         style={'width': '60px'}), 
-        #         style={'display':'none', 'justify-content': 'center'}, id='arrow_step2'),
-        # html.Br(),
-        # html.Div(id='upload_selection_second', style={'display':'grid', 'justify-content': 'center'}),
-        # html.Br(),
         dbc.Row( html.Img(src="/assets/icons/arrow.png",
                 style={'width': '60px'}), 
                 style={'display':'none', 'justify-content': 'center'}, id='arrow_step3'),

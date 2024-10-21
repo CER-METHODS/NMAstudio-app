@@ -17,6 +17,7 @@ r = ro.r
 r['source']('R_Codes/all_R_functions.R')  # Loading the function we have defined in R.
 run_NetMeta_r = ro.globalenv['run_NetMeta_new']  # Get run_NetMeta from R
 league_table_r = ro.globalenv['league_rank_new']  # Get league_table from R
+league_table_r_both = ro.globalenv['league_both']  # Get league_table_both from R
 pairwise_forest_r = ro.globalenv['pairwise_forest_new']  # Get pairwise_forest from R
 funnel_plot_r = ro.globalenv['funnel_funct_new']  # Get pairwise_forest from R
 run_pairwise_data_long_r = ro.globalenv['get_pairwise_data_long_new']  # Get pairwise data from long format from R
@@ -72,6 +73,24 @@ def apply_r_func_new(func, df, i):
         df_result = r_result.reset_index(drop=True)  # Convert back to a pandas.DataFrame.
         return df_result
 
+
+def apply_r_func_new_lt(func, df, i, j):
+    df['rob'] = df['rob'].astype("string")
+    df['rob'] = (df['rob'].str.lower()
+                        .str.strip()
+                        .replace({'low': 'l', 'medium': 'm', 'high': 'h'})
+                        .replace({'l': 1, 'm': 2, 'h': 3}))
+    with localconverter(ro.default_converter + pandas2ri.converter):
+        df_r = ro.conversion.py2rpy(df.reset_index(drop=True))
+    func_r_res = func(dat=df_r, i=i, j=j)
+    r_result = pandas2ri.rpy2py(func_r_res)
+    if isinstance(r_result, ro.vectors.ListVector):
+        with localconverter(ro.default_converter + pandas2ri.converter):
+            leaguetable = (ro.conversion.rpy2py(rf) for rf in r_result)
+        return leaguetable
+    else:
+        df_result = r_result.reset_index(drop=True)  # Convert back to a pandas.DataFrame.
+        return df_result
 # def apply_r_func_two_outcomes(func, df):
 #     df['rob'] = df['rob'].astype("string")
 #     df['rob'] = (df['rob'].str.lower()
@@ -486,6 +505,26 @@ def generate_league_table(df, i):
 
     
     return leaguetable, pscores, consist, netsplit, netsplit_all
+
+
+def generate_league_table_both(df, i, j):
+    
+    leaguetable = apply_r_func_new_lt(func=league_table_r_both, df=df, i =i, j=j)
+    replace_and_strip = lambda x: x.replace(' (', '\n(').strip()
+
+    leaguetable = leaguetable.fillna('')
+
+    leaguetable = pd.DataFrame([[replace_and_strip(col) for col in list(row)] for idx, row in leaguetable.iterrows()],
+                               columns=leaguetable.columns,
+                               index=leaguetable.index)
+
+    leaguetable.columns = leaguetable.index = leaguetable.values.diagonal()
+
+    
+    return leaguetable
+
+
+
 
 ## run netmeta for funnel plots
 def generate_funnel_data(df,i):

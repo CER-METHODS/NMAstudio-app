@@ -324,8 +324,10 @@ def __selectbox1_options(search_value_format, contents, filename):
     return selectors_ef, {'display':'grid', 'justify-content': 'center'}, {'display':'grid', 'justify-content': 'center'}
 
 
-def __outcomes_type(number_outcomes, click):
-    if click:
+def __outcomes_type(number_outcomes, primary_out, noprimary):
+    # print(primary_out)
+    # print(noprimary)
+    if (len(primary_out) > 0 and primary_out[0] is not None and len(primary_out[0]) == 2) or ( len(primary_out) > 0 and noprimary[0] is not None and noprimary[0][0] == 'no'):
         number_outcomes = int(number_outcomes)
         outcomes_type_selection = [
             html.Div(
@@ -363,6 +365,42 @@ def __outcomes_type(number_outcomes, click):
         return outcomes_type_selection, {'display': 'grid', 'justify-content': 'center'}, {'display': 'grid', 'justify-content': 'center'}
     
     return None, {'display': 'none', 'justify-content': 'center'}, {'display': 'none', 'justify-content': 'center'}
+
+
+
+def __primaryout_selection(number_outcomes,click):
+
+    if click:
+        number_outcomes = int(number_outcomes)
+        options_outcomes = [
+        {"label": f"outcome {i+1}", "value": i} for i in range(number_outcomes)]
+        outcomes_primary_selection = html.Div([
+            html.Div(
+            dbc.Row([dbc.Col(dbc.Row(
+                    [html.P("Select two outcomes for league table", className="selcect_title", style={'text-align': 'center'}),
+                        dcc.Checklist(id={'type': 'outcomeprimary', 'index': "0"},
+                                    options=options_outcomes, className="",
+                                    style={'display': 'grid', 
+                                            'grid-template-columns': '1fr 1fr 1fr', 
+                                            'width': '400px', 'justify-content': 'center'}),
+                    dcc.Checklist(id={'type': 'noprimary', 'index': "0"},
+                                    options=[{'label':'Skip', 'value':'no'}], className="",
+                                    style={'display': 'grid','color': 'green', 'font-weight':'bold'})
+                    ],
+                                            style={'justify-content': 'center'}
+                                            ))],
+                                            ),
+                    style={'justify-content': 'center', 'display': 'grid'}
+            )], className='upload_second_select')
+            
+        
+        return outcomes_primary_selection, {'display': 'grid', 'justify-content': 'center'}, {'display': 'grid', 'justify-content': 'center'}
+    
+    return None, {'display': 'none', 'justify-content': 'center'}, {'display': 'none', 'justify-content': 'center'}
+
+
+
+
 
 
 

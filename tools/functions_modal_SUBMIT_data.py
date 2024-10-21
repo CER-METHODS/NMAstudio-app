@@ -657,7 +657,7 @@ def __modal_SUBMIT_button_new(submit,  reset_btn,
                 result = [
                         [(data.to_json(orient='split') if label not in ['user_elements_STORAGE', 'user_elements_out2_STORAGE'] else data) for data in data_each]
                         for label, data_each in DEFAULT_DATA.items()                    
-                    ][:-1] + ['']
+                    ][:-2] + ['']
                 return result+[None, None, False]
 
             else:
@@ -723,7 +723,7 @@ def __modal_SUBMIT_button_new(submit,  reset_btn,
                 else:
                     final_return = [
                             [(data.to_json(orient='split') if label not in ['user_elements_STORAGE', 'user_elements_out2_STORAGE'] else data) for data in data_each]
-                            for label, data_each in DEFAULT_DATA.items()][:-1] + [u"\u274C" + 'Token not found: please double-check']
+                            for label, data_each in DEFAULT_DATA.items()][:-2] + [u"\u274C" + 'Token not found: please double-check']
                     
                     return final_return+[None, None, False]
 
