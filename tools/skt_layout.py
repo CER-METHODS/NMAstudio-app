@@ -1,4 +1,3 @@
-
 import dash_bootstrap_components as dbc, dash_html_components as html
 from dash import dcc
 import dash_cytoscape as cyto
@@ -12,7 +11,7 @@ import plotly.express as px, plotly.graph_objects as go
 import dash_daq as daq
 from tools.functions_skt_forestplot import __skt_all_forstplot, __skt_PI_forstplot, __skt_direct_forstplot, __skt_indirect_forstplot, __skt_PIdirect_forstplot, __skt_PIindirect_forstplot,__skt_directin_forstplot, __skt_mix_forstplot
 import os
-
+from tools.skt_table import outcome_absolute
 
 data = pd.read_csv('db/skt/final_all.csv')
 pw_data = pd.read_csv('db/skt/forest_data_prws.csv')
@@ -419,6 +418,10 @@ grid = dag.AgGrid(
     
 )
 
+
+
+
+
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 OPTIONS = [{'label': '{}'.format(col), 'value': col} for col in ['age', 'male']]
@@ -778,8 +781,7 @@ SIDE = '/assets/icons/side_effect.png'
 CONT = '/assets/icons/contrain.png'
 VISIT = '/assets/icons/visit.png'
 COST = '/assets/icons/cost.png'
-
-
+RANK = '/assets/ranking.png'
 
 
 def skt_nonexpert():
@@ -791,35 +793,6 @@ def skt_nonexpert():
                                                     'text-align': 'center',
                                                     'color':'#5c7780',
                                                        }),
-                                            dbc.Col([
-                                                html.P(
-                                                "Standard skt",
-                                                id='skttable_1',
-                                                style={'display': 'inline-block',
-                                                        'margin': 'auto',
-                                                        'font-size': '10px',
-                                                        'padding-left': '0px'}),
-                                                daq.ToggleSwitch(
-                                                    id='toggle_grid_select',
-                                                    value = False,
-                                                    color='green', size=30, vertical=False,
-                                                    label={'label': "",
-                                                            'style': dict(color='white', font='0.5em')},
-                                                    labelPosition="top",
-                                                    style={'display': 'inline-block',
-                                                            'margin': 'auto', 'font-size': '10px',
-                                                            'padding-left': '2px',
-                                                            'padding-right': '2px'}),
-                                                html.P('league table',
-                                                        id='skttable_2',
-                                                        style={'display': 'inline-block',
-                                                            'margin': 'auto',
-                                                            'font-size': '10px',
-                                                            'padding-right': '0px'})],
-                                                style={'justify-content': 'flex-end',
-                                                        'margin-left': '70%',
-                                                        'font-size': '0.8em', 'margin-top': '2%'},
-                                                ),
                                             html.Br(),html.Br(),
                                             dcc.Markdown('Instruction: Hover your mouse over the table header to see how you can interact with it.',
                                                 className="markdown_style_main",
@@ -931,8 +904,17 @@ def skt_nonexpert():
                                                                                                'display': 'grid','background-color':'burlywood', 'height': '95%'})
                                                                                                         ],style={'width':'50%', 'justify-content': 'center','display': 'grid'})
                                                                                                         ]),], className='tab3_col2')], className='row_skt'),
-                                                      html.Br(), html.Br(),
-                                                      dbc.Row()
+                                                      html.Br(),
+                                                      dbc.Row(
+                                                        [dbc.Col(
+                                                            [dbc.Row([dbc.Col([
+                                                                html.Span('Absolute Values for Comparators (per 1000)',className='skt_span1', 
+                                                                        style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                        outcome_absolute],className='out_abs_col'),
+                                                                        # dbc.Col([html.Img(src=RANK, style={'justify-self':'center','width':'300px'}, id='rank_img')],className='out_rank_col')
+                                                                        ], style={'justify-content':'space-around'})],
+                                                              className='tab3_col2', id='col_nonexpert')],
+                                                              className='row_skt')
                                                         ]),
                                                       dbc.Col([
                                                 dcc.Markdown('Expert Committee Members',
