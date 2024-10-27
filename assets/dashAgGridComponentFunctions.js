@@ -181,3 +181,42 @@ dagcomponentfuncs.CustomLoadingOverlay = function (props) {
 };
 
 
+dagcomponentfuncs.DMC_Button = function (props) {
+    const { setData, data } = props;
+
+    function onClick() {       
+        const temp = data.treatment;
+        props.node.setDataValue( "treatment", data.comparator );
+        props.node.setDataValue( "comparator", temp );
+        setData();
+    }
+
+    // Create the icon element
+    let icon;
+    if (props.icon) {
+        icon = React.createElement(window.dash_iconify.DashIconify, {
+            icon: props.icon,
+            style: {
+                color: props.color, // Apply color directly to the icon
+                fontSize: '24px' // Adjust size as needed
+            },
+        });
+    }
+
+    // Return a minimal button with no background or borders
+    return React.createElement(
+        "div", // Change from a button to a div or span for no button appearance
+        {
+            onClick,
+            style: {
+                background: 'none',   // No background
+                border: 'none',       // No border
+                cursor: 'pointer',    // Pointer cursor for clickability
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            },
+        },
+        icon // Use only the icon as content
+    );
+};

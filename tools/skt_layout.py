@@ -11,7 +11,7 @@ import plotly.express as px, plotly.graph_objects as go
 import dash_daq as daq
 from tools.functions_skt_forestplot import __skt_all_forstplot, __skt_PI_forstplot, __skt_direct_forstplot, __skt_indirect_forstplot, __skt_PIdirect_forstplot, __skt_PIindirect_forstplot,__skt_directin_forstplot, __skt_mix_forstplot
 import os
-from tools.skt_table import outcome_absolute
+from tools.skt_table import outcome_absolute,treat_compare_grid
 
 data = pd.read_csv('db/skt/final_all.csv')
 pw_data = pd.read_csv('db/skt/forest_data_prws.csv')
@@ -29,8 +29,8 @@ outcome_list = [{'label': '{}'.format(out_name), 'value': out_name} for out_name
 
 treat_list = [np.unique(df.Treatment)]
 
-
 treatment_list = [{'label': '{}'.format(treat_name), 'value': treat_name} for treat_name in np.unique(treat_list)]
+
 
 df['Certainty']= ''
 df['within_study'] = ''
@@ -912,7 +912,9 @@ def skt_nonexpert():
                                                                         style={'color': '#B85042', 'font-weight': 'bold'}),
                                                                         outcome_absolute],className='out_abs_col'),
                                                                         # dbc.Col([html.Img(src=RANK, style={'justify-self':'center','width':'300px'}, id='rank_img')],className='out_rank_col')
-                                                                        ], style={'justify-content':'space-around'})],
+                                                                        ], style={'justify-content':'space-around'}),
+                                                                        dbc.Row(treat_compare_grid,style={'width':'30%'}),
+                                                                        ],
                                                               className='tab3_col2', id='col_nonexpert')],
                                                               className='row_skt')
                                                         ]),
