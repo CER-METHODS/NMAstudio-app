@@ -66,35 +66,37 @@ outcome_absolute = dag.AgGrid(
 
 
 
-data = pd.read_csv('db/skt/final_all.csv')
+data = pd.read_csv('db/skt/skt_df_two.csv')
 df = pd.DataFrame(data)
-treat_list = np.unique(df.Treatment).tolist()
+# treat_list = np.unique(df.Treatment).tolist()
 
 
-combinations = list(itertools.combinations(treat_list, 2))
+# combinations = list(itertools.combinations(treat_list, 2))
 
-treatment = []
-comparator =[]
+# treatment = []
+# comparator =[]
 
-for pair in combinations:
-    treatment.append(pair[0])
-    comparator.append(pair[1])
+# for pair in combinations:
+#     treatment.append(pair[0])
+#     comparator.append(pair[1])
 
-treat_compare = pd.DataFrame({
-    'treatment': treatment,
-    'comparator': comparator
-})
+# treat_compare = pd.DataFrame({
+#     'treatment': treatment,
+#     'comparator': comparator
+# })
 
-treat_compare['switch']=np.nan
+df['switch']=np.nan
 
 ColumnDefs_treat_compare = [
    
     {"headerName": "Treatment", 
-     "field": "treatment",
+     "field": "Treatment",
      "editable": False,
      "resizable": False,
      'cellStyle': {
-        'background-color': '#a6d4a6bd'}
+        'background-color': '#a6d4a6bd',
+        'color':'#04800f'
+        }
      },
     
      {"headerName": "Switch", 
@@ -107,26 +109,46 @@ ColumnDefs_treat_compare = [
             "icon": "subway:round-arrow-3",  # Use 'icon' instead of 'leftIcon' or 'rightIcon'
             "color": "#ffc000",
         },
-    #  'cellStyle': {
-    #     'border-right': 'solid 0.8px'}
+     'cellStyle': {
+        'background-color': 'white'}
      },
 
     {"headerName": "Comparator", 
-     "field": "comparator",
+     "field": "Reference",
      "editable": False,
      "resizable": False,
      'cellStyle': {
-        'background-color': '#a6d4a6bd'}
+        'background-color': '#ffc1078a',
+        'color':'#04800f'
+        }
      },
+     {
+        'headerName': 'Pasi90',
+        'headerClass': 'center-aligned-group-header',
+        'suppressStickyLabel': True,
+        'children': [
+            {'field': 'RR'},
+            {'field': 'lower'},
+        ]
+    },
+    {
+        'headerName': 'SAE',
+        'headerClass': 'center-aligned-group-header',
+        'suppressStickyLabel': True,
+        'children': [
+            {'field': 'RR_out2'},
+            {'field':'CI_lower_out2'},
+        ]
+    },
 ]
 
 treat_compare_grid = dag.AgGrid(
     id="grid_treat_compare",
-    # className="absolute-alpine color-fonts",
-    # enableEnterpriseModules=True,
-    # licenseKey=os.environ["AG_GRID_KEY"],
+    className="ag-theme-alpine color-fonts",
+    enableEnterpriseModules=True,
+    licenseKey=os.environ["AG_GRID_KEY"],
     columnDefs=ColumnDefs_treat_compare,
-    rowData = treat_compare.to_dict("records"),
+    rowData = df.to_dict("records"),
     dangerously_allow_code=True,
     defaultColDef={
                     'filter':False,
@@ -144,5 +166,8 @@ treat_compare_grid = dag.AgGrid(
                     # "tooltipComponent": "CustomTooltip"
                     },
     columnSize="sizeToFit", 
-    getRowId='params.data.Reference', 
+    getRowId='params.data.index', 
+    style={ "width": "100%",
+           'height':f'{45.5 *20}px'
+           }
 )

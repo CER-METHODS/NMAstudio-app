@@ -651,6 +651,7 @@ h6 {margin-top: 0;}
 
 .ag-header { 
     position: relative !important;
+    align-self: center;
 }
 
 .ag-floating-top {
@@ -677,7 +678,9 @@ h6 {margin-top: 0;}
     height: auto !important;
 }
 
-
+/* .ag-header-group-cell-label{
+    justify-content:center !important;
+} */
 
 .ag-theme-alpine {
     --ag-header-foreground-color: white!important;
@@ -697,6 +700,14 @@ h6 {margin-top: 0;}
     --ag-header-cell-hover-background-color: #d55f4f!important;  
 }
 
+
+/* .ag-theme-alpine2{
+    --ag-header-foreground-color: white!important;
+    --ag-header-background-color: #4CAF50 !important;
+    --ag-header-column-resize-handle-color: #4CAF50!important;
+    --ag-font-size: 15px!important;
+    --ag-header-cell-hover-background-color: #d55f4f!important;
+} */
 
 /* .ag-theme-alpine .ag-header {
     font-size: 15px;

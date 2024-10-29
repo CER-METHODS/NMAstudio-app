@@ -180,9 +180,9 @@ dagcomponentfuncs.DMC_Button = function (props) {
     const { setData, data } = props;
 
     function onClick() {       
-        const temp = data.treatment;
-        props.node.setDataValue( "treatment", data.comparator );
-        props.node.setDataValue( "comparator", temp );
+        const temp = data.Treatment;
+        props.node.setDataValue( "Treatment", data.Reference );
+        props.node.setDataValue( "Reference", temp );
         setData();
     }
 
@@ -216,16 +216,3 @@ dagcomponentfuncs.DMC_Button = function (props) {
     );
 };
 
-dagcomponentfuncs.CustomLoadingOverlay = function (props) {
-    return React.createElement(
-        'div',
-        {
-            style: {
-                border: '1pt solid grey',
-                color: props.color || 'grey',
-                padding: 10,
-            },
-        },
-        props.loadingMessage
-    );
-};

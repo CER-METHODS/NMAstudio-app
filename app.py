@@ -141,38 +141,38 @@ def display_page(pathname):
 #         return children
 
 
-@app.callback(
-    Output('skt_profile_page','style'),
-    Output('sky_expert_page','style'),
-    Output('skt_nonexpert_page','style'),
-    Input('expert_profile','n_clicks'),
-    Input('nonexpert_profile','n_clicks'),
-)
-def clear_treat(click_expert,click_nonexpert):
-    style_display = {'display':'block'}
-    style_nondisplay = {'display':'none'}
-    if click_expert:
-        return style_nondisplay,style_display, style_nondisplay
-    elif click_nonexpert:
-        return style_nondisplay,style_nondisplay,style_display
-    else:
-        return style_display,style_nondisplay, style_nondisplay
+# @app.callback(
+#     Output('skt_profile_page','style'),
+#     Output('sky_expert_page','style'),
+#     Output('skt_nonexpert_page','style'),
+#     Input('expert_profile','n_clicks'),
+#     Input('nonexpert_profile','n_clicks'),
+# )
+# def clear_treat(click_expert,click_nonexpert):
+#     style_display = {'display':'block'}
+#     style_nondisplay = {'display':'none'}
+#     if click_expert:
+#         return style_nondisplay,style_display, style_nondisplay
+#     elif click_nonexpert:
+#         return style_nondisplay,style_nondisplay,style_display
+#     else:
+#         return style_display,style_nondisplay, style_nondisplay
 
 
-@app.callback(
-    Output('pass_model','is_open'),
-    Output('skt_page_content','children'),
-    Input('password_ok','n_clicks'),
-    Input('password','value'),
-    State('pass_model','is_open'),
-    State('skt_page_content','children'),
-)
-def clear_treat(click, password, pass_model, children):
-    if password =='777' and click:
-        children = [Navbar(), skt_home(), skt_layout(), skt_nonexpert()]
-        return not pass_model, children
-    else:
-        return pass_model, children
+# @app.callback(
+#     Output('pass_model','is_open'),
+#     Output('skt_page_content','children'),
+#     Input('password_ok','n_clicks'),
+#     Input('password','value'),
+#     State('pass_model','is_open'),
+#     State('skt_page_content','children'),
+# )
+# def clear_treat(click, password, pass_model, children):
+#     if password =='777' and click:
+#         children = [Navbar(), skt_home(), skt_layout(), skt_nonexpert()]
+#         return not pass_model, children
+#     else:
+#         return pass_model, children
 
 
 
