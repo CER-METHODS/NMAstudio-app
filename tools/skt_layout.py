@@ -410,6 +410,12 @@ grid = dag.AgGrid(
                        "rowDragEntireRow": True,
                     #    "detailRowHeight": 70+83*19,
                        "detailRowAutoHeight": True,
+                       'loading': True,
+                       "loadingOverlayComponent": "CustomLoadingOverlay",
+                       "loadingOverlayComponentParams": {
+                            "loadingMessage": "One moment please...",
+                            "color": "red",
+                        },
                        }, 
     getRowId='params.data.Reference',
     style={ "width": "100%",
@@ -558,10 +564,10 @@ options_effects = [
        {'label': 'Add indirect effects to forestplots', 'value': 'indirect'},
    ]
 
-# def Sktpage():
-#     return html.Div([Navbar(), model_password], id='skt_page_content')
 def Sktpage():
-    return html.Div([Navbar(), skt_home()], id='skt_page_content')
+    return html.Div([Navbar(), model_password], id='skt_page_content')
+# def Sktpage():
+#     return html.Div([Navbar(), skt_home(), skt_layout(), skt_nonexpert()], id='skt_page_content')
 
 
 def skt_home():
@@ -588,7 +594,7 @@ def skt_home():
                                         id="nonexpert_profile")    
                                         ], id='profile_row'),
                                         ])
-    ])
+    ], id="skt_profile_page")
 
 
 
@@ -773,7 +779,7 @@ def skt_layout():
                                                                 className="markdown_style", style={"color": "black", 'font-size': 'large'}),
                                                 html.Br(),html.Br(),html.Br(),],style={ 'width': '95%', 'padding-left': '5%'}) 
                                                         ], style={'display':'block'}), 
-                                                                              ])
+                                                                              ], id='sky_expert_page',style={ 'display': 'none'})
 
 #############################################SKT Non-experts####################################################################################################
 ROUTINE = '/assets/icons/routine.png'
@@ -936,7 +942,7 @@ def skt_nonexpert():
                                                                 className="markdown_style", style={"color": "black", 'font-size': 'large'}),
                                                 html.Br(),html.Br(),html.Br(),],style={ 'width': '95%', 'padding-left': '5%'}) 
                                                         ], style={'display':'block'}), 
-                                                                              ])
+                                                                              ], id="skt_nonexpert_page",style={'display':'none'})
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 

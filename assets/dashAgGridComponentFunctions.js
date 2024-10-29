@@ -62,8 +62,6 @@ dagcomponentfuncs.DCC_GraphClickData = function (props) {
 
 
 
-var dagcomponentfuncs = window.dashAgGridComponentFunctions = window.dashAgGridComponentFunctions || {};
-
 
 // dagcomponentfuncs.CustomTooltip = function (props) {
 //     info = [
@@ -141,8 +139,6 @@ function getBackgroundColorForCertainty(certainty) {
 
 
 
-var dagcomponentfuncs = window.dashAgGridComponentFunctions = window.dashAgGridComponentFunctions || {};
-
 
 dagcomponentfuncs.CustomTooltip2 = function (props) {
     info = [
@@ -164,7 +160,6 @@ dagcomponentfuncs.CustomTooltip2 = function (props) {
 };
 
 
-var dagcomponentfuncs = window.dashAgGridComponentFunctions = window.dashAgGridComponentFunctions || {};
 
 dagcomponentfuncs.CustomLoadingOverlay = function (props) {
     return React.createElement(
@@ -218,5 +213,19 @@ dagcomponentfuncs.DMC_Button = function (props) {
             },
         },
         icon // Use only the icon as content
+    );
+};
+
+dagcomponentfuncs.CustomLoadingOverlay = function (props) {
+    return React.createElement(
+        'div',
+        {
+            style: {
+                border: '1pt solid grey',
+                color: props.color || 'grey',
+                padding: 10,
+            },
+        },
+        props.loadingMessage
     );
 };
