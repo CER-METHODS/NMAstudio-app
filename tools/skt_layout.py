@@ -915,10 +915,11 @@ def skt_nonexpert():
                                                                         outcome_absolute],className='out_abs_col'),
                                                                         # dbc.Col([html.Img(src=RANK, style={'justify-self':'center','width':'300px'}, id='rank_img')],className='out_rank_col')
                                                                         ], style={'justify-content':'space-around'}),
-                                                                        dbc.Row(treat_compare_grid),
+                                                                        dbc.Row(treat_compare_grid, 
+                                                                                style={'width':'95%', 'justify-self':'center'}),
                                                                         ],
                                                               className='tab3_col2', id='col_nonexpert')],
-                                                              className='row_skt')
+                                                              className='row_skt') 
                                                         ]),
                                                       dbc.Col([
                                                 dcc.Markdown('Expert Committee Members',

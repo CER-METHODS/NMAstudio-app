@@ -15,6 +15,7 @@ data_absolute = {
 
 data_absolute = pd.DataFrame(data_absolute)
 
+
 absolueColumnDefs = [
    
     {"headerName": "Outcome 1", 
@@ -86,6 +87,10 @@ df = pd.DataFrame(data)
 # })
 
 df['switch']=np.nan
+df['ab_out1'] = np.nan
+df['ab_out2'] = np.nan
+
+
 
 ColumnDefs_treat_compare = [
    
@@ -125,6 +130,7 @@ ColumnDefs_treat_compare = [
      {
         'headerName': 'Pasi90',
         'headerClass': 'center-aligned-group-header',
+        "resizable": False,
         'suppressStickyLabel': True,
         'children': [
             {'field': 'RR'},
@@ -134,6 +140,7 @@ ColumnDefs_treat_compare = [
     {
         'headerName': 'SAE',
         'headerClass': 'center-aligned-group-header',
+        "resizable": False,
         'suppressStickyLabel': True,
         'children': [
             {'field': 'RR_out2'},
@@ -153,6 +160,7 @@ treat_compare_grid = dag.AgGrid(
     defaultColDef={
                     'filter':False,
                     "floatingFilter": False,
+                    "resizable": False,
                     "wrapText": True, 
                     # 'autoHeight': True,
                     "enableRowGroup": False,
