@@ -89,9 +89,12 @@ df = pd.DataFrame(data)
 df['switch']=np.nan
 df['ab_out1'] = np.nan
 df['ab_out2'] = np.nan
+df = np.round(df,2)
+df['RR_inv']=np.round(1/df['RR'],2)
+df['RR_inv2']=np.round(1/df['RR_out2'],2)
 
 
-
+style_certainty = {'white-space': 'pre','display': 'grid','text-align': 'center','align-items': 'center','border-left': 'solid 0.8px'}
 ColumnDefs_treat_compare = [
    
     {"headerName": "Treatment", 
@@ -133,8 +136,20 @@ ColumnDefs_treat_compare = [
         "resizable": False,
         'suppressStickyLabel': True,
         'children': [
-            {'field': 'RR'},
-            {'field': 'lower'},
+            {'field': 'RR', 'headerName': 'RR'},
+            {'field': 'ab_out1', 'headerName': 'absoute'},
+            {'field': 'Certainty_out1', 
+             'headerName': 'Certainty',
+             "tooltipField": 'Certainty_out1',
+             "tooltipComponentParams": { "color": '#d8f0d3'},
+             "tooltipComponent": "CustomTooltip2",
+             'cellStyle':{
+                        "styleConditions": [
+                        {"condition": "params.value == 'High'", "style": {"backgroundColor": "rgb(90, 164, 105)", **style_certainty}},   
+                        {"condition": "params.value == 'Low'", "style": {"backgroundColor": "#B85042", **style_certainty}},
+                        {"condition": "params.value == 'Moderate'", "style": {"backgroundColor": "rgb(248, 212, 157)", **style_certainty}},       
+                    ]}
+             },
         ]
     },
     {
@@ -143,8 +158,19 @@ ColumnDefs_treat_compare = [
         "resizable": False,
         'suppressStickyLabel': True,
         'children': [
-            {'field': 'RR_out2'},
-            {'field':'CI_lower_out2'},
+            {'field': 'RR_out2', 'headerName': 'RR'},
+            {'field': 'ab_out2', 'headerName': 'absoute'},
+            {'field':'Certainty_out2', 'headerName': 'Certainty',
+             "tooltipField": 'Certainty_out2',
+             "tooltipComponentParams": { "color": '#d8f0d3'},
+             "tooltipComponent": "CustomTooltip3",
+              'cellStyle':{
+                        "styleConditions": [
+                        {"condition": "params.value == 'High'", "style": {"backgroundColor": "rgb(90, 164, 105)", **style_certainty}},   
+                        {"condition": "params.value == 'Low'", "style": {"backgroundColor": "#B85042", **style_certainty}},
+                        {"condition": "params.value == 'Moderate'", "style": {"backgroundColor": "rgb(248, 212, 157)", **style_certainty}},       
+                    ]}
+             },
         ]
     },
 ]

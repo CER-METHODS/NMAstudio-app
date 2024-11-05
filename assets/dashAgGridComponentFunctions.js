@@ -139,24 +139,98 @@ function getBackgroundColorForCertainty(certainty) {
 
 
 
-
 dagcomponentfuncs.CustomTooltip2 = function (props) {
-    info = [
-        React.createElement('h4', {}, "Certainty of evidence:"+ props.data.Treatment),
+    const certainty = props.data.Certainty_out1;
+    const withinstudy = props.data.within_study_out1;
+    const reporting = props.data.reporting_out1;
+    const indirectness = props.data.indirectness_out1;
+    const imprecision = props.data.imprecision_out1;
+    const heterogeneity = props.data.heterogeneity_out1;
+    const incoherence = props.data.incoherence_out1;
+
+
+    const backgroundColor = getBackgroundColorForCertainty(certainty);
+
+    const info = [
+        React.createElement('h4', {}, "Certainty of evidence: " + certainty),
         React.createElement('div', { style: { marginBottom: 8 } }, ''),
+        React.createElement('div', {}, 'Within-study bias: '+ withinstudy),
+        React.createElement('div', {}, 'Reporting bias: '+reporting),
+        React.createElement('div', {}, 'Indirectness: '+indirectness),
+        React.createElement('div', {}, 'Imprecision: '+imprecision),
+        React.createElement('div', {}, 'Heterogeneity: '+heterogeneity),
+        React.createElement('div', {}, 'Incoherence: '+incoherence),
+
     ];
+
     return React.createElement(
         'div',
         {
             style: {
                 border: '1pt solid white',
-                backgroundColor: props.color || 'grey',
+                backgroundColor: backgroundColor,
                 padding: 10,
-                lineHeight: '20px' 
+                lineHeight: '20px',
             },
         },
         info
     );
+};
+
+
+dagcomponentfuncs.CustomTooltip3 = function (props) {
+    const certainty = props.data.Certainty_out2;
+    const withinstudy = props.data.within_study_out2;
+    const reporting = props.data.reporting_out2;
+    const indirectness = props.data.indirectness_out2;
+    const imprecision = props.data.imprecision_out2;
+    const heterogeneity = props.data.heterogeneity_out2;
+    const incoherence = props.data.incoherence_out2;
+
+
+    const backgroundColor = getBackgroundColorForCertainty(certainty);
+
+    const info = [
+        React.createElement('h4', {}, "Certainty of evidence: " + certainty),
+        React.createElement('div', { style: { marginBottom: 8 } }, ''),
+        React.createElement('div', {}, 'Within-study bias: '+ withinstudy),
+        React.createElement('div', {}, 'Reporting bias: '+reporting),
+        React.createElement('div', {}, 'Indirectness: '+indirectness),
+        React.createElement('div', {}, 'Imprecision: '+imprecision),
+        React.createElement('div', {}, 'Heterogeneity: '+heterogeneity),
+        React.createElement('div', {}, 'Incoherence: '+incoherence),
+
+    ];
+
+    return React.createElement(
+        'div',
+        {
+            style: {
+                border: '1pt solid white',
+                backgroundColor: backgroundColor,
+                padding: 10,
+                lineHeight: '20px',
+            },
+        },
+        info
+    );
+};
+
+
+
+
+
+function getBackgroundColorForCertainty(certainty) {
+    switch (certainty) {
+        case 'Low':
+            return '#B85042';
+        case 'Moderate':
+            return 'rgb(248, 212, 157)';
+        case 'High':
+            return 'rgb(90, 164, 105)';
+        default:
+            return 'lightgrey'; // Default background color
+    }
 };
 
 
@@ -179,10 +253,20 @@ dagcomponentfuncs.CustomLoadingOverlay = function (props) {
 dagcomponentfuncs.DMC_Button = function (props) {
     const { setData, data } = props;
 
-    function onClick() {       
+    function onClick() {   
+        
         const temp = data.Treatment;
-        props.node.setDataValue( "Treatment", data.Reference );
-        props.node.setDataValue( "Reference", temp );
+        props.node.setDataValue( "Treatment", data.Reference);
+        props.node.setDataValue( "Reference", temp);
+        
+        // const tempRR = data.RR;
+        props.node.setDataValue("RR", parseFloat((1 / data.RR).toFixed(2)))
+        props.node.setDataValue("RR_out2", parseFloat((1 / data.RR_out2).toFixed(2)));
+
+        // const temp3 = data.RR_out2;
+        // props.node.setDataValue("RR_out2", data.RR_inv2);
+        // props.node.setDataValue("RR_inv2", temp3);
+
         setData();
     }
 
