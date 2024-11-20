@@ -42,4 +42,4 @@ tzlocal==4.1
 Werkzeug==2.0.2
 XlsxWriter==3.0.2
 dash-ag-grid==31.0.1
-dash_iconify==0.1.2
+dash-iconify==0.1.2
