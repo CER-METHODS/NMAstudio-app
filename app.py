@@ -134,9 +134,9 @@ def clear_treat(click_expert,click_nonexpert,children):
     if click_expert:
         children = [Navbar(), skt_layout()]
         return children
-    # elif click_nonexpert:
-    #     children = [Navbar(), skt_nonexpert()]
-    #     return children
+    elif click_nonexpert:
+        children = [Navbar(), skt_nonexpert()]
+        return children
     else:
         return children
 
