@@ -695,7 +695,7 @@ h6 {margin-top: 0;}
     --ag-header-background-color: #ffecb3 !important;
     /* --ag-header-column-resize-handle-color: #933f34!important; */
     --ag-font-size: 15px!important;
-    --ag-header-cell-hover-background-color: orange!important;
+    --ag-header-cell-hover-background-color: transparent!important;
 }
 
 .absolute-alpine{
@@ -704,7 +704,7 @@ h6 {margin-top: 0;}
     --ag-background-color: white!important;
     /* --ag-header-column-resize-handle-color: #933f34!important; */
     --ag-font-size: 10px!important;
-    --ag-header-cell-hover-background-color: orange!important;  
+    /* --ag-header-cell-hover-background-color: orange!important;   */
 }
 
 
@@ -717,6 +717,9 @@ h6 {margin-top: 0;}
     background-color: white;
     color: black;
 }
+
+
+
 #grid_treat_compare .ag-header-cell:nth-child(3) {
     background-color: #f1c50d;
     color: black;

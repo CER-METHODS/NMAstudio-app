@@ -559,11 +559,11 @@ options_effects = [
    ]
 
 # def Sktpage():
-# #     return html.Div([Navbar(), model_password], id='skt_page_content')
+#     return html.Div([Navbar(), model_password], id='skt_page_content')
 # def Sktpage():
 #     return html.Div([Navbar(), skt_home(), skt_layout(), skt_nonexpert()], id='skt_page_content')
 def Sktpage():
-    return html.Div([Navbar(),skt_nonexpert()], id='skt_page_content')
+    return html.Div([Navbar(),skt_home()], id='skt_page_content')
 
 
 def skt_home():
@@ -775,7 +775,7 @@ def skt_layout():
                                                                 className="markdown_style", style={"color": "black", 'font-size': 'large'}),
                                                 html.Br(),html.Br(),html.Br(),],style={ 'width': '95%', 'padding-left': '5%'}) 
                                                         ], style={'display':'block'}), 
-                                                                              ], id='sky_expert_page',style={ 'display': 'none'})
+                                                                              ], id='sky_expert_page')
 
 #############################################SKT Non-experts####################################################################################################
 ROUTINE = '/assets/icons/routine.png'

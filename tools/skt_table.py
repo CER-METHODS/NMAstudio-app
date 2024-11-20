@@ -14,7 +14,7 @@ data_absolute = {
 }
 
 data_absolute = pd.DataFrame(data_absolute)
-
+data_absolute['index']=data_absolute.index
 
 absolueColumnDefs = [
    
@@ -61,7 +61,7 @@ outcome_absolute = dag.AgGrid(
                     # "tooltipComponent": "CustomTooltip"
                     },
     columnSize="sizeToFit", 
-    getRowId='params.data.Reference',
+    getRowId='params.data.index',
     style={"height":"58px"}  
 )
 
@@ -69,8 +69,8 @@ outcome_absolute = dag.AgGrid(
 
 data = pd.read_csv('db/skt/skt_df_two.csv')
 df = pd.DataFrame(data)
+df["index"] = df.index
 # treat_list = np.unique(df.Treatment).tolist()
-
 
 # combinations = list(itertools.combinations(treat_list, 2))
 
@@ -87,11 +87,11 @@ df = pd.DataFrame(data)
 # })
 
 df['switch']=np.nan
-df['ab_out1'] = np.nan
-df['ab_out2'] = np.nan
+df['ab_out1'] = ''
+df['ab_out2'] = ''
 df = np.round(df,2)
-df['RR_inv']=np.round(1/df['RR'],2)
-df['RR_inv2']=np.round(1/df['RR_out2'],2)
+# df['RR_inv']=np.round(1/df['RR'],2)
+# df['RR_inv2']=np.round(1/df['RR_out2'],2)
 
 
 style_certainty = {'white-space': 'pre','display': 'grid','text-align': 'center','align-items': 'center','border-left': 'solid 0.8px'}
@@ -103,7 +103,7 @@ ColumnDefs_treat_compare = [
      "resizable": False,
      'cellStyle': {
         'background-color': '#a6d4a6bd',
-        'color':'#04800f'
+        'color':'#04800f',
         }
      },
     
@@ -118,7 +118,9 @@ ColumnDefs_treat_compare = [
             "color": "#ffc000",
         },
      'cellStyle': {
-        'background-color': 'white'}
+        'background-color': 'white',
+        'white-space': 'pre',
+        }
      },
 
     {"headerName": "Comparator", 
@@ -127,7 +129,8 @@ ColumnDefs_treat_compare = [
      "resizable": False,
      'cellStyle': {
         'background-color': '#ffc1078a',
-        'color':'#04800f'
+        'color':'#04800f',
+        'white-space': 'pre',
         }
      },
      {
@@ -137,7 +140,9 @@ ColumnDefs_treat_compare = [
         'suppressStickyLabel': True,
         'children': [
             {'field': 'RR', 'headerName': 'RR'},
-            {'field': 'ab_out1', 'headerName': 'absoute'},
+            {'field': 'ab_out1', 'headerName': 'Absoute',
+             'cellStyle': {'line-height': 'normal'}
+             },
             {'field': 'Certainty_out1', 
              'headerName': 'Certainty',
              "tooltipField": 'Certainty_out1',
@@ -159,7 +164,8 @@ ColumnDefs_treat_compare = [
         'suppressStickyLabel': True,
         'children': [
             {'field': 'RR_out2', 'headerName': 'RR'},
-            {'field': 'ab_out2', 'headerName': 'absoute'},
+            {'field': 'ab_out2', 'headerName': 'Absoute',
+             'cellStyle': {'line-height': 'normal'}},
             {'field':'Certainty_out2', 'headerName': 'Certainty',
              "tooltipField": 'Certainty_out2',
              "tooltipComponentParams": { "color": '#d8f0d3'},
@@ -183,6 +189,7 @@ treat_compare_grid = dag.AgGrid(
     columnDefs=ColumnDefs_treat_compare,
     rowData = df.to_dict("records"),
     dangerously_allow_code=True,
+    dashGridOptions = {"rowHeight": 50},
     defaultColDef={
                     'filter':False,
                     "floatingFilter": False,
@@ -202,6 +209,6 @@ treat_compare_grid = dag.AgGrid(
     columnSize="sizeToFit", 
     getRowId='params.data.index', 
     style={ "width": "100%",
-           'height':f'{45.5 *20}px'
+           'height':f'{45.5 *30}px'
            }
 )

@@ -124,21 +124,21 @@ def display_page(pathname):
     else:  return RealHomepage
 
 
-# @app.callback(
-#     Output('skt_page_content','children'),
-#     Input('expert_profile','n_clicks'),
-#     Input('nonexpert_profile','n_clicks'),
-#     State('skt_page_content','children'),
-# )
-# def clear_treat(click_expert,click_nonexpert,children):
-#     if click_expert:
-#         children = [Navbar(), skt_layout()]
-#         return children
-#     elif click_nonexpert:
-#         children = [Navbar(), skt_nonexpert()]
-#         return children
-#     else:
-#         return children
+@app.callback(
+    Output('skt_page_content','children'),
+    Input('expert_profile','n_clicks'),
+    Input('nonexpert_profile','n_clicks'),
+    State('skt_page_content','children'),
+)
+def clear_treat(click_expert,click_nonexpert,children):
+    if click_expert:
+        children = [Navbar(), skt_layout()]
+        return children
+    elif click_nonexpert:
+        children = [Navbar(), skt_nonexpert()]
+        return children
+    else:
+        return children
 
 
 # @app.callback(
@@ -1779,7 +1779,7 @@ def selected(value_effect, value_change,lower,rowData):
         refer_name = value_change[0]['data']['Reference']
     else:
         refer_name = None
-
+    
     if value_effect==[]:
             df = __skt_mix_forstplot(df,lower, scale_lower, scale_upper, refer_name)
     elif all(effect in value_effect for effect in ['PI', 'direct', 'indirect']):
@@ -1869,10 +1869,11 @@ def selected(value_effect, value_change,lower,rowData):
             dfc.loc[row_idx,'Treatments'][i]['ab_difference'] = f"\n{abrisk} more per 1000" if abrisk > 0 else f"\n{abs(abrisk)} less per 1000"
             dfc.loc[row_idx,'Treatments'][i]['direct'] = f"{row_data.loc[row_idx,'Treatments'][i]['direct']}" + f"\n({row_data.loc[row_idx,'Treatments'][i]['direct_low']}, {row_data.loc[row_idx,'Treatments'][i]['direct_up']})" if pd.notna(row_data.loc[row_idx,'Treatments'][i]['direct']) else ""
             dfc.loc[row_idx,'Treatments'][i]['indirect'] = f"{row_data.loc[row_idx,'Treatments'][i]['indirect']}" + f"\n({row_data.loc[row_idx,'Treatments'][i]['indirect_low']}, {row_data.loc[row_idx,'Treatments'][i]['indirect_up']})" if pd.notna(row_data.loc[row_idx,'Treatments'][i]['indirect']) else ""
-            
+        
+       
         dfc = pd.DataFrame(dfc)
         # n_row = dfc.shape[0]
-        
+    
         return dfc.to_dict("records")
 
     return dfc.to_dict("records")
@@ -2181,6 +2182,54 @@ clientside_callback(
 )
 
 
+@app.callback(
+    Output("grid_treat_compare", "rowData"),
+    Input("grid_absolute", "cellValueChanged"),
+    State("grid_treat_compare", "rowData"),
+)
+def Change_absolute(value_change, rawdat):
+    rawdat = pd.DataFrame(rawdat)
+
+    if value_change is not None:
+        col_id = value_change[0]['colId']
+        value = value_change[0]['value']
+
+        # Check for valid input
+        if value is not None and value != 'Enter a value' and col_id in ['Outcome 1', 'Outcome 2']:
+            value_risk = int(value)
+            # rawdat['ab_out1'] = value_risk
+            # Determine the correct RR value based on Outcome
+            if col_id == 'Outcome 1':
+                rr_column = 'RR'
+                ab_column = 'ab_out1'
+            elif col_id == 'Outcome 2':
+                rr_column = 'RR_out2'
+                ab_column = 'ab_out2'
+            
+            # Calculate the risk treatment and the absolute risk
+            risk_treat = value_risk * rawdat[rr_column]
+            risk_treat = risk_treat.astype(int)  # Ensure it's an integer
+            abrisk = risk_treat - value_risk
+
+            rawdat[ab_column] = [
+                    f"{ab} more \nper 1000" if ab > 0 else f"{abs(ab)} less \nper 1000"
+                    for ab in abrisk
+                ]
+            # Update the absolute risk column with appropriate text
+            # for i in range(rawdat.shape[0]):
+            #     rawdat.loc[i,'ab_out1'] = f"{i} more per 1000" if abrisk[i] > 0 else f"{abs(abrisk[i])} less per 1000"
+
+    return rawdat.to_dict("records")
+
+
+
+
+
+
+
+
+
+
 
 # @app.callback(
 #     Output("quickstart-grid", "dashGridOptions"),
@@ -2196,14 +2245,7 @@ clientside_callback(
 #     return  options
 
 
-# @app.callback(
-#     Output("quickstart-grid", "getDetailResponse"),
-#     Input("quickstart-grid", "getDetailRequest"),
-#     prevent_initial_call=True,
-# )
-# def handle_request(request):
-#     time.sleep(1)
-#     return request["data"]["Treatments"]
+
 
 
 
