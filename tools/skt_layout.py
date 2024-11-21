@@ -564,7 +564,8 @@ options_effects = [
 #     return html.Div([Navbar(), skt_home(), skt_layout(), skt_nonexpert()], id='skt_page_content')
 def Sktpage():
     return html.Div([Navbar(),skt_home()], id='skt_page_content')
-
+# def Sktpage():
+#     return html.Div([Navbar(),skt_nonexpert()], id='skt_page_content')
 
 def skt_home():
     return html.Div([

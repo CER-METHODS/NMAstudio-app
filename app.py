@@ -2046,112 +2046,112 @@ def image_color_change(style_routine, style_count,style_side,style_visit,style_c
 #     return [grid, model_skt_stand1, model_skt_stand2],display_treatment
 
 
-@app.callback(
-    Output('checklist_treat','value'),
-    Input('clear-val','n_clicks'),
-    State('checklist_treat','value')
-)
-def clear_treat(click, orig_value):
-    if click:
-        value = df_league.columns[1:].values
-    else:
-        value = orig_value
-    return value
+# @app.callback(
+#     Output('checklist_treat','value'),
+#     Input('clear-val','n_clicks'),
+#     State('checklist_treat','value')
+# )
+# def clear_treat(click, orig_value):
+#     if click:
+#         value = df_league.columns[1:].values
+#     else:
+#         value = orig_value
+#     return value
 
 
 
-@app.callback(
-    [Output('grid2', 'rowData'),
-    Output('grid2', 'columnDefs'),
-    Output("grid2", "style")],
-    [Input('checklist_treat','value'),
-    Input("base_risk_input", "value")]
-)
-def display_only_selected(values, absolute_risk):
-    values = sorted(values)
-    absolute_risk = int(absolute_risk)
-    values_t = ['Treatment'] + values
-    df_league_c = df_league.copy()
-    df_league_c = df_league_c[df_league_c['Treatment'].isin (values)]
-    df_league_c =df_league_c[values_t]
-    # df_league_c =df_league_c.sort_index(axis=1)
-    n_row2 = len(values)
-    column_update = df_league_c.columns.tolist()
+# @app.callback(
+#     [Output('grid2', 'rowData'),
+#     Output('grid2', 'columnDefs'),
+#     Output("grid2", "style")],
+#     [Input('checklist_treat','value'),
+#     Input("base_risk_input", "value")]
+# )
+# def display_only_selected(values, absolute_risk):
+#     values = sorted(values)
+#     absolute_risk = int(absolute_risk)
+#     values_t = ['Treatment'] + values
+#     df_league_c = df_league.copy()
+#     df_league_c = df_league_c[df_league_c['Treatment'].isin (values)]
+#     df_league_c =df_league_c[values_t]
+#     # df_league_c =df_league_c.sort_index(axis=1)
+#     n_row2 = len(values)
+#     column_update = df_league_c.columns.tolist()
 
-    for idx, column in enumerate(column_update):
-        if idx < 2:
-            pass   
-        for row_idx in range(idx-1):
-            treat1 = column
-            treat2 = df_league_c['Treatment'].iloc[row_idx]
-            absolute_info = df[(df['Treatment'] == treat2) & (df['Reference'] == treat1)]
-            absolute_risk = int(absolute_risk)
-            absolute = int(absolute_info['RR'].iloc[0]*absolute_risk)-20
-            text_ab1 = f"{treat2} VS. {treat1} \n{absolute} more per 1000" if absolute > 0 else f"{treat2} VS. {treat1} \n{abs(absolute)} less per 1000"
-            text_ab2 = "\n Randomize control studies: 3\n Total participants in arm: xxx \n Mean age: xxx \nMean male percentage: XXX"
-            text_ab = text_ab1 + text_ab2
-            df_league_c.iloc[row_idx,idx] = text_ab
+#     for idx, column in enumerate(column_update):
+#         if idx < 2:
+#             pass   
+#         for row_idx in range(idx-1):
+#             treat1 = column
+#             treat2 = df_league_c['Treatment'].iloc[row_idx]
+#             absolute_info = df[(df['Treatment'] == treat2) & (df['Reference'] == treat1)]
+#             absolute_risk = int(absolute_risk)
+#             absolute = int(absolute_info['RR'].iloc[0]*absolute_risk)-20
+#             text_ab1 = f"{treat2} VS. {treat1} \n{absolute} more per 1000" if absolute > 0 else f"{treat2} VS. {treat1} \n{abs(absolute)} less per 1000"
+#             text_ab2 = "\n Randomize control studies: 3\n Total participants in arm: xxx \n Mean age: xxx \nMean male percentage: XXX"
+#             text_ab = text_ab1 + text_ab2
+#             df_league_c.iloc[row_idx,idx] = text_ab
             
 
-    column1 = ['ADA','ADA', 'BIME']
-    column2 = ['ETA', 'FUM', 'GUSEL']
+#     column1 = ['ADA','ADA', 'BIME']
+#     column2 = ['ETA', 'FUM', 'GUSEL']
 
-    column_low1 = ['PBO','PBO', 'SECU']
-    column_low2 = ['RISAN', 'IFX', 'IFX']
+#     column_low1 = ['PBO','PBO', 'SECU']
+#     column_low2 = ['RISAN', 'IFX', 'IFX']
 
-    # # # Number of pairs to select (in this case, 6 pairs)
+#     # # # Number of pairs to select (in this case, 6 pairs)
     
-    treatments_list = df_league_c['Treatment'].tolist()
+#     treatments_list = df_league_c['Treatment'].tolist()
 
 
-    columnDefs=[
-    {"field": "Treatment", 
-    "headerName": "Treatment",
-     "tooltipField": 'ticker',
-     "tooltipComponentParams": { "color": '#d8f0d3' },
-    "sortable": False,
-    "filter": True, 
-    'cellStyle': {'font-weight':'bold',
-                    'background-color':'#B85042','color':'white','font-size':'12px', **default_style}}  
-    ]+[{"field": i,
-        "cellRenderer": "DCC_GraphClickData",
-        "maxWidth": 500,
-        "minWidth": 300,
-        "tooltipField": 'ticker',
-        "tooltipComponentParams": { "color": '#d8f0d3' },
-        'cellStyle': {"styleConditions":[{"condition": f"params.value === '{i}'", 
-                                    "style": {"backgroundColor": "antiquewhite", **default_style}},
-                                    {
-                                    "condition": f"{column1}.includes('{i}') &&" 
-                                    f"{[treatments_list.index(column2[index]) if (i in column1) and (column2[index] in treatments_list) else -1 for index, item in enumerate(column1)]}.includes(params.rowIndex)",
-                                    "style": {"backgroundColor": "rgb(0, 128, 0, 0.5)", **default_style}
-                                    },
+#     columnDefs=[
+#     {"field": "Treatment", 
+#     "headerName": "Treatment",
+#      "tooltipField": 'ticker',
+#      "tooltipComponentParams": { "color": '#d8f0d3' },
+#     "sortable": False,
+#     "filter": True, 
+#     'cellStyle': {'font-weight':'bold',
+#                     'background-color':'#B85042','color':'white','font-size':'12px', **default_style}}  
+#     ]+[{"field": i,
+#         "cellRenderer": "DCC_GraphClickData",
+#         "maxWidth": 500,
+#         "minWidth": 300,
+#         "tooltipField": 'ticker',
+#         "tooltipComponentParams": { "color": '#d8f0d3' },
+#         'cellStyle': {"styleConditions":[{"condition": f"params.value === '{i}'", 
+#                                     "style": {"backgroundColor": "antiquewhite", **default_style}},
+#                                     {
+#                                     "condition": f"{column1}.includes('{i}') &&" 
+#                                     f"{[treatments_list.index(column2[index]) if (i in column1) and (column2[index] in treatments_list) else -1 for index, item in enumerate(column1)]}.includes(params.rowIndex)",
+#                                     "style": {"backgroundColor": "rgb(0, 128, 0, 0.5)", **default_style}
+#                                     },
 
-                                    {
-                                    "condition": f"{column2}.includes('{i}') &&" 
-                                    f"{[treatments_list.index(column1[index]) if (i in column2) and (column1[index] in treatments_list) else -1 for index, item in enumerate(column2)]}.includes(params.rowIndex)",
-                                    "style": {"backgroundColor": "rgb(0, 128, 0, 0.5)", **default_style}
-                                    },
+#                                     {
+#                                     "condition": f"{column2}.includes('{i}') &&" 
+#                                     f"{[treatments_list.index(column1[index]) if (i in column2) and (column1[index] in treatments_list) else -1 for index, item in enumerate(column2)]}.includes(params.rowIndex)",
+#                                     "style": {"backgroundColor": "rgb(0, 128, 0, 0.5)", **default_style}
+#                                     },
 
-                                    {
-                                    "condition": f"{column_low1}.includes('{i}') &&" 
-                                    f"{[treatments_list.index(column_low2[index]) if (i in column_low1) and (column_low2[index] in treatments_list) else -1 for index, item in enumerate(column_low1)]}.includes(params.rowIndex)",
-                                    "style": {"backgroundColor": "rgb(184, 80, 66, 0.5)", **default_style}
-                                    },
+#                                     {
+#                                     "condition": f"{column_low1}.includes('{i}') &&" 
+#                                     f"{[treatments_list.index(column_low2[index]) if (i in column_low1) and (column_low2[index] in treatments_list) else -1 for index, item in enumerate(column_low1)]}.includes(params.rowIndex)",
+#                                     "style": {"backgroundColor": "rgb(184, 80, 66, 0.5)", **default_style}
+#                                     },
 
-                                    {
-                                    "condition": f"{column_low2}.includes('{i}') &&" 
-                                    f"{[treatments_list.index(column_low1[index]) if (i in column_low2) and (column_low1[index] in treatments_list) else -1 for index, item in enumerate(column_low2)]}.includes(params.rowIndex)",
-                                    "style": {"backgroundColor": "rgb(184, 80, 66, 0.5)", **default_style}
-                                    },
+#                                     {
+#                                     "condition": f"{column_low2}.includes('{i}') &&" 
+#                                     f"{[treatments_list.index(column_low1[index]) if (i in column_low2) and (column_low1[index] in treatments_list) else -1 for index, item in enumerate(column_low2)]}.includes(params.rowIndex)",
+#                                     "style": {"backgroundColor": "rgb(184, 80, 66, 0.5)", **default_style}
+#                                     },
 
-                                    {"condition": f"params.value !== '{i}'", 
-                                    "style": {**default_style}},
-                                    ]},}  for i in values]
-    style={'width': '1200px','height': f'{48 + 163 * n_row2}px'}
+#                                     {"condition": f"params.value !== '{i}'", 
+#                                     "style": {**default_style}},
+#                                     ]},}  for i in values]
+#     style={'width': '1200px','height': f'{48 + 163 * n_row2}px'}
 
 
-    return df_league_c.to_dict("records"), columnDefs, style
+#     return df_league_c.to_dict("records"), columnDefs, style
 
 
 # @app.callback(
