@@ -377,7 +377,7 @@ def __data_trans(
             data = adjust_data(data_user, search_value_format, number_outcomes)
 
             TEMP_net_data_STORAGE = [data.to_json(orient='split')]
-            # data.to_csv('db/test_dat.csv', encoding='utf-8')
+            # data.to_csv('db/test_dat_net.csv', encoding='utf-8')
      
         #except:
                 #TEMP_net_data_STORAGE = {}

@@ -396,16 +396,29 @@ league_both <- function(dat, i, j){
     # lt1 <- netleague_table1$random
     l1_treats <- sort(nma_primary$trts)
     l2_treats <- sort(nma_secondary$trts)
+    colnames(lt2) <- sortedseq
+    rownames(lt2) <- sortedseq
     lt1[upper.tri(lt1)] <- NA
     lt2[upper.tri(lt2)] <- NA
     df_1 <-  as_tibble(lt1)
     df_2 <-  as_tibble(t(lt2))
     if(length(lt1)>length(lt2)){
         which_trts <- which(!(l1_treats %in% l2_treats))
-        df_2 <- df_2 %>% add_column(NA,  .before = colnames(df_2)[which_trts], .name_repair = "universal")
+        which_trts1 <-  which_trts
+        which_trts2 <-  which_trts
+
+        for (pos in which_trts1) {
+              # Add a column before the current target position
+              df_2 <- df_2 %>% add_column(NA, .before = pos, .name_repair = "universal")
+              which_trts1 <- which_trts1 + 1
+            }
         colnames <- paste0("V", 1:dim(df_2)[1])
         colnames(df_2) <- colnames
-        df_2 <- df_2 %>% add_row( .before = as.numeric(rownames(df_2)[which_trts] ))
+        for (pos in which_trts2) {
+              # Add a column before the current target position
+              df_2<- df_2 %>% add_row( .before = as.numeric(rownames(df_2)[pos]))
+              which_trts2 <- which_trts2 + 1
+            }
         for(x in which_trts){
             df_2[x, colnames[which_trts]] <- l1_treats[x]}
         lt <- matrix(NA, nrow = length(df_1), ncol = length(df_1))
@@ -426,12 +439,23 @@ league_both <- function(dat, i, j){
         is.empty <- function(x, mode = NULL){
             if (is.null(mode)) mode <- class(x)
             identical(vector(mode, 1), c(x, vector(class(x), 1)))}
-            which_trts <- which(!(l2_treats %in% l1_treats))
+        which_trts1 <- which(!(l2_treats %in% l1_treats))
+        which_trts2 <- which_trts1
+        which_trts <- which_trts1
         if(!is.empty(which_trts,"integer")){
-            df_1 <- df_1 %>% add_column(NA,  .before = colnames(df_1)[which_trts], .name_repair = "universal")
+            for (pos in which_trts1) {
+              # Add a column before the current target position
+              df_1 <- df_1 %>% add_column(NA, .before = pos, .name_repair = "universal")
+              which_trts1 <- which_trts1 + 1
+            }
             colnames <- paste0("V", 1:dim(df_1)[1])
             colnames(df_1) <- colnames
-            df_1 <- df_1 %>% add_row( .before = as.numeric(rownames(df_1)[which_trts] ))
+
+            for (pos in which_trts2) {
+              # Add a column before the current target position
+              df_1<- df_1 %>% add_row( .before = as.numeric(rownames(df_1)[pos]))
+              which_trts2 <- which_trts2 + 1
+            }
             for(x in which_trts){
             df_1[x, colnames[which_trts]] <- l2_treats[x]}
         }

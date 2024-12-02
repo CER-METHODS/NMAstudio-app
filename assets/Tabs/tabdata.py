@@ -35,31 +35,13 @@ YEARS_DEFAULT = np.array(
 
 def tab_data(years=YEARS_DEFAULT):
     y_max, y_min = years.max(), years.min()
-
     return html.Div(
-        [
-            # html.Button(
-            #     "Upload your data",
-            #     "test_upload",
-            #     n_clicks=0,
-            #     style={
-            #         "margin-left": "5px",
-            #         "padding": "4px 4px 4px 4px",
-            #         "margin-top": "15px",
-            #         "color": "#5a87c4",
-            #         "fontSize": 12,
-            #         "font-weight": "900",
-            #         "font-family": "sans-serif",
-            #         "display": "inline-block",
-            #         "vertical-align": "middle",
-            #     },
-            # ),
-            
+        [ 
             html.Div([
                 dcc.Slider(
                     min=y_min,
                     max=y_max,
-                    step=None,
+                    step=50,
                     marks=set_slider_marks(y_min, y_max, years),
                     value=datetime.date.today().year,  # ymax
                     updatemode="drag",
@@ -89,19 +71,6 @@ def tab_data(years=YEARS_DEFAULT):
                     "margin-left": "15px",
                 }, id='slider-container'
         ), 
-
-            # html.Div([ html.P("Click the slider to see the evolution of the evidence over time. The data table will be filtered accordingly in real-time.",
-            #                   id='slider-instruction',),
-            #     html.A(
-            #      html.Img(
-            #         src="/assets/icons/query.png",
-            #         style={
-            #             "width": "16px",
-            #             "margin-top": "0px",
-            #             "border-radius": "0px",
-            #             "float":"right",},
-            #     )),
-            #     ],id="query-icon",),
 
             html.Br(),html.Br(),html.Br(),
             dash_table.DataTable(

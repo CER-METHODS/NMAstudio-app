@@ -676,7 +676,6 @@ def __update_output_bothout( store_node,store_edge,toggle_cinema,
     comprs_conf_lt = comprs_conf_ut = None
 
 
-
     if toggle_cinema:
 
         cinema_net_data1 = pd.read_json(cinema_net_data[0], orient='split')
@@ -711,6 +710,8 @@ def __update_output_bothout( store_node,store_edge,toggle_cinema,
 
 
         robs = comprs_conf
+        
+       
     # Filter according to cytoscape selection
 
     if store_node and any('id' in nd for nd in store_node):
@@ -797,7 +798,7 @@ def __update_output_bothout( store_node,store_edge,toggle_cinema,
                             ('Very Low' if toggle_cinema else 'Low') if n == 0 else 'High' if n == N_BINS - 1 else None,
                             style={'paddingLeft': '2px', 'color': 'black'})])
                for n in range(N_BINS)]
-
+  
     cmap = [CINEMA_g, CINEMA_y, CINEMA_r] if not toggle_cinema else [CINEMA_r, CINEMA_y, CINEMA_lb, CINEMA_g]
 
     df_max, df_min = max(confidence_map.values()), min(confidence_map.values())
@@ -810,8 +811,11 @@ def __update_output_bothout( store_node,store_edge,toggle_cinema,
     for treat_c in treatments:
         for treat_r in treatments:
             if treat_r!=treat_c:
-
-                rob = robs.loc[treat_r, treat_c] if not store_node else robs_slct.loc[treat_r, treat_c]
+                try:
+                    rob = robs.loc[treat_r, treat_c] if not store_node else robs_slct.loc[treat_r, treat_c] # Try to access the value in `robs`
+                except KeyError:  # Handle errors if the value is not found
+                    rob = np.nan
+                # rob = robs.loc[treat_r, treat_c] if not store_node else robs_slct.loc[treat_r, treat_c]
                 indxs = np.where(rob < ranges)[0] if rob == rob else [0]
                 clr_indx = indxs[0] - 1 if len(indxs) else 0
                 diag, empty = treat_r == treat_c, rob != rob
@@ -819,8 +823,9 @@ def __update_output_bothout( store_node,store_edge,toggle_cinema,
                                                 'column_id': treat_c},
                                                 'backgroundColor': cmap[clr_indx] if not empty else CLR_BCKGRND2,
                                                 'color': 'white' if not empty else CX2 if diag else 'black'})
+                 
     league_table_styles.append({'if': {'column_id': 'Treatment'}, 'backgroundColor': CX1})
-
+    
 
 
     # Prepare for output
@@ -830,14 +835,63 @@ def __update_output_bothout( store_node,store_edge,toggle_cinema,
     leaguetable_cols = [{"name": c, "id": c} for c in leaguetable.columns]
     leaguetable = leaguetable.to_dict('records')
 
-    tooltip_values = [{col['id']: {'value': f"**Average ROB:** {tip[col['id']]}",
-                                   'type': 'markdown'} if col['id'] != 'Treatment' else None
-                           for col in leaguetable_cols} for rn, (_, tip) in enumerate(tips.iterrows())]
-    if toggle_cinema:
-        tooltip_values = [{col['id']: {'value': f"**Reason for Downgrading:**{tip[col['id']]}" if not comprs_downgrade.empty and not store_node else f"**Reason for Downgrading:**",
-                                       'type': 'markdown'} if col['id'] != 'Treatment' else None
-                       for col in leaguetable_cols} for rn, (_, tip) in enumerate(comprs_downgrade.iterrows())]
+    # tooltip_values = [{col['id']: {'value': f"**Average ROB:** {tip[col['id']]}",
+    #                                'type': 'markdown'} if col['id'] != 'Treatment' else None
+    #                        for col in leaguetable_cols} for rn, (_, tip) in enumerate(tips.iterrows())]
+    
+    # Initialize an empty list to store tooltips
+    # Iterate through the rows of the DataFrame `tips`
+    tooltip_values = []
+    for rn, (_, tip) in enumerate(tips.iterrows()):
+        row_tooltips = {}  # Store tooltip values for the current row
 
+        # Iterate through the columns in `leaguetable_cols`
+        for col in leaguetable_cols:    
+            if col['id'] == 'Treatment':  # Special case: no tooltip for 'Treatment' column
+                row_tooltips[col['id']] = None
+            else:
+                try:
+                    rob_v = tip[col['id']]  # Try to access the value in the column
+                except KeyError:  # Handle missing column gracefully
+                    rob_v = None
+
+                # Add a tooltip value for this column
+                if rob_v is not None:  # If value exists
+                    row_tooltips[col['id']] = {'value': f"**Average ROB:** {rob_v}", 'type': 'markdown'}
+                else:  # If value is missing or causes an error
+                    row_tooltips[col['id']] = {'value': "**Average ROB:** N/A", 'type': 'markdown'}
+
+        # Append the tooltips for this row to the list
+        tooltip_values.append(row_tooltips)
+
+    if toggle_cinema:
+        tooltip_values = []
+        # tooltip_values = [{col['id']: {'value': f"**Reason for Downgrading:**{tip[col['id']]}" if not comprs_downgrade.empty and not store_node else f"**Reason for Downgrading:**",
+        #                                'type': 'markdown'} if col['id'] != 'Treatment' else None
+        #                for col in leaguetable_cols} for rn, (_, tip) in enumerate(comprs_downgrade.iterrows())]
+        
+        for rn, (_, tip) in enumerate(comprs_downgrade.iterrows()):
+                row_tooltips = {}  # Store tooltip values for the current row
+
+                # Iterate through the columns in `leaguetable_cols`
+                for col in leaguetable_cols:
+                    if col['id'] == 'Treatment':  # No tooltip for the 'Treatment' column
+                        row_tooltips[col['id']] = None
+                    else:
+                        # Determine the tooltip value based on conditions
+                        if not comprs_downgrade.empty:
+                            reason = tip[col['id']] if col['id'] in tip else ""
+                            tooltip_text = f"**Reason for Downgrading:** {reason}"
+                        else:
+                            tooltip_text = "**Reason for Downgrading:**"
+
+                        # Assign the tooltip for this column
+                        row_tooltips[col['id']] = {'value': tooltip_text, 'type': 'markdown'}
+
+                # Append the tooltips for this row to the list
+                tooltip_values.append(row_tooltips)
+
+  
 
     if store_edge or store_node:
         slctd_nods = {n['id'] for n in store_node} if store_node else set()

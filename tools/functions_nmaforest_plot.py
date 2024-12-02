@@ -54,9 +54,12 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
 
     xlog = effect_size in ('RR', 'OR')
     up_rng, low_rng = df.CI_upper.max(), df.CI_lower.min()
-    up_rng = 10**np.floor(np.log10(up_rng)) if xlog else None
-    low_rng = 10 ** np.floor(np.log10(low_rng)) if xlog else None
-
+    # up_rng = 10**np.floor(np.log10(up_rng)) if xlog else None
+    # low_rng = 10 ** np.floor(np.log10(low_rng)) if xlog else None
+    # print(up_rng, low_rng)
+    # up_rng = np.log10(up_rng)
+    # low_rng = np.log10(low_rng)
+    # print(up_rng, low_rng)
     if data:
         fig=px.scatter(df, x=effect_size, y="Treatment",
                         # error_x_minus=dict(type='data',color = colors[i],array='lower_error',visible=True),
@@ -64,7 +67,7 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
                     error_x='pre_width_hf' if xlog else 'pre_width',
                     log_x=xlog,
                     size_max=5,
-                    range_x=[min(low_rng, 0.1), max([up_rng, 10])] if xlog else None,
+                    range_x=[min(max(low_rng-0.2, 0.1), 0.9), up_rng+2] if xlog else None,
                     range_y=[-1, len(df.Treatment)],
                     size=df.WEIGHT)
         fig.update_traces(marker=dict(color='red'),  # Set points to black
@@ -101,7 +104,7 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
     #                               color='green'),
     #                   error_x=dict(thickness=2.1, color='#313539')  # '#ef563b' nice orange trace
     #                   )
-    fig.update_xaxes(ticks="outside", tickwidth=2, tickcolor='black',
+    fig.update_xaxes(ticks="outside", tickwidth=2, tickcolor='black',tickformat=".1f",
                      ticklen=5,
                      categoryorder='category descending' if outcome_direction else 'category ascending',
                      # dtick=1,
@@ -116,7 +119,7 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
                           autosize=True,
                         #   width=1500,
                           margin=dict(l=5, r=10, t=12, b=80),
-                          xaxis=dict(showgrid=False, autorange=True,
+                          xaxis=dict(showgrid=False, autorange=False,
                                      #tick0=0, # TODO: JUST EXPLAIN IT!!!
                                      title=''),
                           yaxis=dict(showgrid=False, title=''),
@@ -266,12 +269,17 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
     up_rng, low_rng = df.CI_upper.max(), df.CI_lower.min()
     up_rng = 10**np.floor(np.log10(up_rng)) if xlog else None
     low_rng = 10 ** np.floor(np.log10(low_rng)) if xlog else None
-    if len(df_second.Treatment) > len(df.Treatment):
-        trts_rmd = set(df_second.Treatment).difference(df.Treatment)
-        df_second[df_second['Treatment'].isin(trts_rmd) == False]
-    else:
-        trts_rmd = set(df.Treatment).difference(df_second.Treatment)
-        df[df['Treatment'].isin(trts_rmd) == False]
+    # if len(df_second.Treatment) > len(df.Treatment):
+    #     trts_rmd = set(df_second.Treatment).difference(df.Treatment)
+    #     df_second[df_second['Treatment'].isin(trts_rmd) == False]
+    # else:
+    #     trts_rmd = set(df.Treatment).difference(df_second.Treatment)
+    #     df[df['Treatment'].isin(trts_rmd) == False]
+    common_treatments = set(df.Treatment).intersection(df_second.Treatment)
+    # Filter each dataset to keep only the common treatments
+    df = df[df['Treatment'].isin(common_treatments)]
+    df_second = df_second[df_second['Treatment'].isin(common_treatments)]
+
     df['size'] = df.Treatment.astype("category").cat.codes
     fig = px.scatter(df, x=df[effect_size], y=df_second[effect_size_2],
                  color=df.Treatment,
