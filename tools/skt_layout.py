@@ -84,7 +84,7 @@ df['Graph'] = ''
 df['risk'] = 'Enter a number'
 df['Scale_lower'] = 'Enter a value for lower'
 df['Scale_upper'] = 'Enter a value for upper'
-df['ab_effect'] = ''
+# df['ab_effect'] = ''
 df['ab_difference'] = ''
 
 # p_score.rename(columns={'treatment': 'Treatment'}, inplace=True)
@@ -108,7 +108,8 @@ for (ref, risk, Scale_lower, Scale_upper), group in grouped:
                           "direct_low": row["direct_low"],"direct_up": row["direct_up"],
                           "indirect_low": row["indirect_low"],"indirect_up": row["indirect_up"],
                           "CI_lower": row["CI_lower"],"CI_upper": row["CI_upper"],
-                          "Comments": row["Comments"],"ab_effect": row["ab_effect"],
+                          "Comments": row["Comments"],
+                        #   "ab_effect": row["ab_effect"],
                           "ab_difference": row["ab_difference"],
                           "within_study": row["within_study"],"reporting": row["reporting"],
                           "indirectness": row["indirectness"],"imprecision": row["imprecision"],
@@ -136,7 +137,8 @@ for (ref, risk, Scale_lower, Scale_upper), group in grouped:
                           "direct_low": row["direct_low"],"direct_up": row["direct_up"],
                           "indirect_low": row["indirect_low"],"indirect_up": row["indirect_up"],
                           "CI_lower": row["CI_lower"],"CI_upper": row["CI_upper"],
-                          "Comments": row["Comments"],"ab_effect": row["ab_effect"],
+                          "Comments": row["Comments"],
+                        #   "ab_effect": row["ab_effect"],
                           "ab_difference": row["ab_difference"],
                           "within_study": row["within_study"],"reporting": row["reporting"],
                           "indirectness": row["indirectness"],"imprecision": row["imprecision"],
@@ -242,21 +244,21 @@ detailColumnDefs = [
                    }
        },
 
-    {"field": "ab_effect", 
-     "headerName": "Absolute Effect",
-     'headerTooltip': 'Specify a value for the reference treatment in \'Risk per 1000\'',
-     "width": 180,
-     "resizable": True,
-     'cellStyle': {'border-left': 'solid 0.8px',
-                   'backgroud-color':'white',
-                #    'line-height': '20px',
-                   "text-align":'center',
-                   'white-space': 'pre',
-                   'display': 'grid',
-                   'line-height': 'normal',
-                   'align-items': 'center'
-                   }
-       },
+    # {"field": "ab_effect", 
+    #  "headerName": "Absolute Effect",
+    #  'headerTooltip': 'Specify a value for the reference treatment in \'Risk per 1000\'',
+    #  "width": 180,
+    #  "resizable": True,
+    #  'cellStyle': {'border-left': 'solid 0.8px',
+    #                'backgroud-color':'white',
+    #             #    'line-height': '20px',
+    #                "text-align":'center',
+    #                'white-space': 'pre',
+    #                'display': 'grid',
+    #                'line-height': 'normal',
+    #                'align-items': 'center'
+    #                }
+    #    },
 
        {"field": "ab_difference", 
      "headerName": "Absolute Difference",
@@ -509,11 +511,10 @@ model_skt_stand2 = dbc.Modal(
         [dbc.ModalHeader("Detail information",className='skt_info_head'),
             dbc.ModalBody(
                 [
-                html.Span('Treatment: FUM, Comparator: PBO',className='skt_span_info'),
-                html.Span('Randomize control studies: 3',className='skt_span_info'),
-                html.Span('Total participants: 1929',className='skt_span_info'), 
-                html.Span('Mean age: xxx', className='skt_span_info'),
-                html.Span('Mean male percentage: XXX', className='skt_span_info'),
+                html.Span('Treatment: FUM, Comparator: PBO',className='skt_span_info', id = 'treat_comp'),
+                html.Span('Randomize control studies: 3',className='skt_span_info', id = 'num_RCT'),
+                html.Span('Total participants: 1929',className='skt_span_info', id = 'num_sample'), 
+                html.Span('Mean age: xxx', className='skt_span_info', id = 'mean_modif'),
                 ],className='skt_info_body'),
             dbc.ModalFooter(dbc.Button( "Close", id="close_compare", className="ms-auto", n_clicks=0), className='skt_info_close'),
     ],id="skt_modal_copareinfo", is_open=False, scrollable=True,contentClassName="forest_content")
@@ -563,80 +564,120 @@ options_effects = [
 # def Sktpage():
 #     return html.Div([Navbar(), skt_home(), skt_layout(), skt_nonexpert()], id='skt_page_content')
 def Sktpage():
-    return html.Div([Navbar(),skt_home()], id='skt_page_content')
+    return html.Div([Navbar(),switch_table(),html.Div([skt_layout()], id='skt_sub_content')], id='skt_page_content')
 # def Sktpage():
 #     return html.Div([Navbar(),skt_nonexpert()], id='skt_page_content')
 
-def skt_home():
-    return html.Div([
-        html.Div(id='skt_profile', 
-                 children=[html.Br(), html.Br(),html.Br(), html.Br(),
-                     dcc.Markdown('Select your profile',
-                                                className="markdown_style_main",
-                                                style={
-                                                    "font-size": '40px',
-                                                    'text-align': 'center',
-                                                    'color':'#5c7780',
-                                                       }),
-                           html.Br(), html.Br(),
-                           dbc.Row([html.A([html.Img(src="/assets/icons/expert.png",
-                                        style={'width': '200px'}),
-                                    html.Span('Methodologists',className='profile_text'),
-                                        ],
-                                        id="expert_profile"),
-                                    html.A([html.Img(src="/assets/icons/nonexpert.png",
-                                        style={'width': '200px'}),
-                                        html.Span('Others',className='profile_text'),
-                                        ],
-                                        id="nonexpert_profile")    
-                                        ], id='profile_row'),
-                                        ])
-    ], id="skt_profile_page")
+# def skt_home():
+#     return html.Div([
+#         html.Div(id='skt_profile', 
+#                  children=[html.Br(), html.Br(),html.Br(), html.Br(),
+#                      dcc.Markdown('Select your profile',
+#                                                 className="markdown_style_main",
+#                                                 style={
+#                                                     "font-size": '40px',
+#                                                     'text-align': 'center',
+#                                                     'color':'#5c7780',
+#                                                        }),
+#                            html.Br(), html.Br(),
+#                            dbc.Row([html.A([html.Img(src="/assets/icons/expert.png",
+#                                         style={'width': '200px'}),
+#                                     html.Span('Methodologists',className='profile_text'),
+#                                         ],
+#                                         id="expert_profile"),
+#                                     html.A([html.Img(src="/assets/icons/nonexpert.png",
+#                                         style={'width': '200px'}),
+#                                         html.Span('Others',className='profile_text'),
+#                                         ],
+#                                         id="nonexpert_profile")    
+#                                         ], id='profile_row'),
+#                                         ])
+#     ], id="skt_profile_page")
 
-
-
-
-def skt_layout():
-    return html.Div([
-            html.Div(id='skt_all',children=[dcc.Markdown('Scalable Knowledge Translation Tool',
+def switch_table():
+    return html.Div([dcc.Markdown('Scalable Knowledge Translation Tool',
                                                 className="markdown_style_main",
                                                 style={
                                                     "font-size": '30px',
                                                     'text-align': 'center',
                                                     'color':'#5c7780',
                                                        }),
+                    dbc.Row(dbc.Col([
+                            html.P(
+                            "Advanced Version",
+                            id='skttable_1',
+                            style={'display': 'inline-block',
+                                    'margin': 'auto',
+                                    'font-size': '16px',
+                                    'color': 'chocolate',
+                                    'padding-left': '0px'}),
+                            daq.ToggleSwitch(
+                                id='toggle_grid_select',
+                                value = False,
+                                color='green', size=50, vertical=False,
+                                label={'label': "",
+                                        'style': dict(color='white', font='0.5em')},
+                                labelPosition="top",
+                                style={'display': 'inline-block',
+                                        'margin': 'auto', 'font-size': '10px',
+                                        'padding-left': '10px',
+                                        'padding-right': '10px'}),
+                            html.P('Standard Version',
+                                    id='skttable_2',
+                                    style={'display': 'inline-block',
+                                        'margin': 'auto',
+                                        'color': 'green',
+                                        'font-size': '16px',
+                                        'padding-right': '0px'})],
+                            style={'justify-content': 'center',
+                                    # 'margin-left': '70%',
+                                    'font-size': '0.8em', 'margin-top': '2%'},
+                            ), style={'justify-content': 'center',
+                                    'width': '100%'})])
+
+
+def skt_layout():
+    return html.Div([
+            html.Div(id='skt_all',children=[
+                # dcc.Markdown('Scalable Knowledge Translation Tool',
+                #                                 className="markdown_style_main",
+                #                                 style={
+                #                                     "font-size": '30px',
+                #                                     'text-align': 'center',
+                #                                     'color':'#5c7780',
+                #                                        }),
                                     # html.Button("Export to Excel", id="btn-excel-export"),
                                     # html.Button("print", id="grid-printer-layout-btn"),
                                     # html.Button("regular", id="grid-regular-layout-btn"),
-                                            dbc.Col([
-                                                html.P(
-                                                "Standard skt",
-                                                id='skttable_1',
-                                                style={'display': 'inline-block',
-                                                        'margin': 'auto',
-                                                        'font-size': '10px',
-                                                        'padding-left': '0px'}),
-                                                daq.ToggleSwitch(
-                                                    id='toggle_grid_select',
-                                                    value = False,
-                                                    color='green', size=30, vertical=False,
-                                                    label={'label': "",
-                                                            'style': dict(color='white', font='0.5em')},
-                                                    labelPosition="top",
-                                                    style={'display': 'inline-block',
-                                                            'margin': 'auto', 'font-size': '10px',
-                                                            'padding-left': '2px',
-                                                            'padding-right': '2px'}),
-                                                html.P('league table',
-                                                        id='skttable_2',
-                                                        style={'display': 'inline-block',
-                                                            'margin': 'auto',
-                                                            'font-size': '10px',
-                                                            'padding-right': '0px'})],
-                                                style={'justify-content': 'flex-end',
-                                                        'margin-left': '70%',
-                                                        'font-size': '0.8em', 'margin-top': '2%'},
-                                                ),
+                                            # dbc.Col([
+                                            #     html.P(
+                                            #     "Standard skt",
+                                            #     id='skttable_1',
+                                            #     style={'display': 'inline-block',
+                                            #             'margin': 'auto',
+                                            #             'font-size': '10px',
+                                            #             'padding-left': '0px'}),
+                                            #     daq.ToggleSwitch(
+                                            #         id='toggle_grid_select',
+                                            #         value = False,
+                                            #         color='green', size=30, vertical=False,
+                                            #         label={'label': "",
+                                            #                 'style': dict(color='white', font='0.5em')},
+                                            #         labelPosition="top",
+                                            #         style={'display': 'inline-block',
+                                            #                 'margin': 'auto', 'font-size': '10px',
+                                            #                 'padding-left': '2px',
+                                            #                 'padding-right': '2px'}),
+                                            #     html.P('league table',
+                                            #             id='skttable_2',
+                                            #             style={'display': 'inline-block',
+                                            #                 'margin': 'auto',
+                                            #                 'font-size': '10px',
+                                            #                 'padding-right': '0px'})],
+                                            #     style={'justify-content': 'flex-end',
+                                            #             'margin-left': '70%',
+                                            #             'font-size': '0.8em', 'margin-top': '2%'},
+                                            #     ),
                                             html.Br(),html.Br(),
                                             dcc.Markdown('Instruction: Hover your mouse over the table header to see how you can interact with it.',
                                                 className="markdown_style_main",
@@ -789,13 +830,14 @@ RANK = '/assets/ranking.png'
 
 def skt_nonexpert():
     return html.Div([
-            html.Div(id='skt_all',children=[dcc.Markdown('Scalable Knowledge Translation Tool',
-                                                className="markdown_style_main",
-                                                style={
-                                                    "font-size": '30px',
-                                                    'text-align': 'center',
-                                                    'color':'#5c7780',
-                                                       }),
+            html.Div(id='skt_all',children=[
+                # dcc.Markdown('Scalable Knowledge Translation Tool',
+                #                                 className="markdown_style_main",
+                #                                 style={
+                #                                     "font-size": '30px',
+                #                                     'text-align': 'center',
+                #                                     'color':'#5c7780',
+                #                                        }),
                                             html.Br(),html.Br(),
                                             dcc.Markdown('Instruction: Hover your mouse over the table header to see how you can interact with it.',
                                                 className="markdown_style_main",
@@ -1124,36 +1166,37 @@ columnDefs2=[
                                        {"condition": f"params.value !== '{i}'", 
                                        "style": {**default_style}}
                                        ]}}  for i in treatnames]
+############################League Table######################################################
 
-grid2 = dag.AgGrid(
-    id="grid2",
-    rowData=df_league.to_dict("records"),
-    columnDefs= columnDefs2,
-    defaultColDef={"resizable": False, 
-                   "filter": True, "minWidth":125,
-                   "wrapText": True, 
-                   'autoHeight': True,
-                    'cellStyle': {'white-space': 'pre',
-                                  'display': 'grid2',
-                                  'text-align': 'center',
-                                #   'align-items': 'center',
-                                  'background-color':'#E7E8D1',
-                                  'border': 'solid 0.5px gray',
-                                #   "styleConditions":styleConditions
-                                    # "styleConditions": [
-                                    #   {"condition": "params.value === 'ADA'", 
-                                    #    "style": {"backgroundColor": "green"}}]
-                                },
-                   }, 
-    columnSize="sizeToFit",
-    # dashGridOptions = {'suppressRowTransform': True,
-    #                    "rowSelection": "multiple",
-    #                    "tooltipShowDelay": 100}, 
-    style={'width': '1200px','height': f'{48 + 163 * n_row}px'},
-)
+# grid2 = dag.AgGrid(
+#     id="grid2",
+#     rowData=df_league.to_dict("records"),
+#     columnDefs= columnDefs2,
+#     defaultColDef={"resizable": False, 
+#                    "filter": True, "minWidth":125,
+#                    "wrapText": True, 
+#                    'autoHeight': True,
+#                     'cellStyle': {'white-space': 'pre',
+#                                   'display': 'grid2',
+#                                   'text-align': 'center',
+#                                 #   'align-items': 'center',
+#                                   'background-color':'#E7E8D1',
+#                                   'border': 'solid 0.5px gray',
+#                                 #   "styleConditions":styleConditions
+#                                     # "styleConditions": [
+#                                     #   {"condition": "params.value === 'ADA'", 
+#                                     #    "style": {"backgroundColor": "green"}}]
+#                                 },
+#                    }, 
+#     columnSize="sizeToFit",
+#     # dashGridOptions = {'suppressRowTransform': True,
+#     #                    "rowSelection": "multiple",
+#     #                    "tooltipShowDelay": 100}, 
+#     style={'width': '1200px','height': f'{48 + 163 * n_row}px'},
+# )
 
-checklist = dcc.Checklist(options= df_league.columns[1:], value= df_league.columns[1:3].values, 
-                          id='checklist_treat', style={'display': 'contents'})
-button_clear=html.Button('select all', id='clear-val', n_clicks=0)
+# checklist = dcc.Checklist(options= df_league.columns[1:], value= df_league.columns[1:3].values, 
+#                           id='checklist_treat', style={'display': 'contents'})
+# button_clear=html.Button('select all', id='clear-val', n_clicks=0)
 
 
