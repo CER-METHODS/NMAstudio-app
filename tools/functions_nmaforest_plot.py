@@ -279,6 +279,8 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
     # Filter each dataset to keep only the common treatments
     df = df[df['Treatment'].isin(common_treatments)]
     df_second = df_second[df_second['Treatment'].isin(common_treatments)]
+    df = df.sort_values(by='Treatment')
+    df_second = df_second.sort_values(by='Treatment')
 
     df['size'] = df.Treatment.astype("category").cat.codes
     fig = px.scatter(df, x=df[effect_size], y=df_second[effect_size_2],
@@ -286,7 +288,7 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
                  error_x_minus=df['lower_error_1'] if xlog else None,
                  error_x='CI_width_hf' if xlog else 'CI_width' if data else None,
                  error_y_minus=df_second['lower_error_2'] if xlog else None,
-                 error_y=df_second.CI_width_hf if data else df_second.CI_width if xlog else None,
+                 error_y=df_second.CI_width_hf if xlog else df_second.CI_width if data else None,
                  log_x=xlog,
                  log_y=xlog,
                  size_max = 10,
