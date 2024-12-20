@@ -9,9 +9,9 @@ from assets.storage import DEFAULT_DATA
 import numpy as np
 import plotly.express as px, plotly.graph_objects as go
 import dash_daq as daq
-from tools.functions_skt_forestplot import __skt_all_forstplot, __skt_PI_forstplot, __skt_direct_forstplot, __skt_indirect_forstplot, __skt_PIdirect_forstplot, __skt_PIindirect_forstplot,__skt_directin_forstplot, __skt_mix_forstplot
+from tools.functions_skt_forestplot import __skt_options_forstplot, __skt_mix_forstplot
 import os
-from tools.skt_table import outcome_absolute,treat_compare_grid
+from tools.skt_table import treat_compare_grid
 
 data = pd.read_csv('db/skt/final_all.csv')
 pw_data = pd.read_csv('db/skt/forest_data_prws.csv')
@@ -31,6 +31,15 @@ treat_list = [np.unique(df.Treatment)]
 
 treatment_list = [{'label': '{}'.format(treat_name), 'value': treat_name} for treat_name in np.unique(treat_list)]
 
+long_dat = pd.read_csv('db/psoriasis_long_complete.csv')
+long_dat = pd.DataFrame(long_dat)
+
+range_ref_ab = long_dat.groupby('treat').apply(
+    lambda group: pd.Series({
+        "min_value": (group["rpasi90m"] / group["nm"]).min() * 1000,
+        "max_value": (group["rpasi90m"] / group["nm"]).max() * 1000
+    })
+).reset_index()
 
 df['Certainty']= ''
 df['within_study'] = ''
@@ -91,8 +100,8 @@ df['ab_difference'] = ''
 # df = pd.merge(df, p_score, on='Treatment', how='left')
 
 
-
-df_all = __skt_all_forstplot(df,0.8,scale_lower=None, scale_upper=None, refer_name=None)
+value_effect = ['PI', 'direct', 'indirect']
+df_all = __skt_options_forstplot(value_effect,df,0.2,scale_lower=None, scale_upper=None, refer_name=None)
 
 df = df_all
 
@@ -124,7 +133,12 @@ for (ref, risk, Scale_lower, Scale_upper), group in grouped:
 row_data = pd.DataFrame(rowData)
 
 row_data = row_data.merge(p_score, left_on='Reference', right_on='treatment', how='left')
-
+row_data = row_data.merge(range_ref_ab, left_on='Reference', right_on='treat', how='left')
+row_data['risk_range'] = row_data.apply(
+    lambda row: f"from {int(row['min_value'])} to {int(row['max_value'])}",
+    axis=1
+)
+# print(row_data.head(5))
 
 row_data_default = []
 for (ref, risk, Scale_lower, Scale_upper), group in grouped:
@@ -153,6 +167,12 @@ for (ref, risk, Scale_lower, Scale_upper), group in grouped:
 row_data_default = pd.DataFrame(row_data_default)
 
 row_data_default = row_data_default.merge(p_score, left_on='Reference', right_on='treatment', how='left')
+row_data_default = row_data_default.merge(range_ref_ab, left_on='Reference', right_on='treat', how='left')
+
+row_data_default['risk_range'] = row_data_default.apply(
+    lambda row: f"from {int(row['min_value'])} to {int(row['max_value'])}",
+    axis=1
+)
 
 
 for j in range(0, row_data_default.shape[0]):
@@ -169,6 +189,14 @@ for j in range(0, row_data_default.shape[0]):
 
 
 style_certainty = {'white-space': 'pre','display': 'grid','text-align': 'center','align-items': 'center','border-left': 'solid 0.8px'}
+style_mixed = {'border-left': 'solid 0.8px',
+                   'backgroud-color':'white',
+                #    'line-height': '20px',
+                   "text-align":'center',
+                   'white-space': 'pre',
+                   'display': 'grid',
+                   'line-height': 'normal',
+                   'align-items': 'center'}
 
 masterColumnDefs = [
     {
@@ -197,6 +225,13 @@ masterColumnDefs = [
      'cellStyle': {
         'color': 'grey','border-right': 'solid 0.8px'}
      },
+     
+     {"headerName": "Range of the risk\n(in dataset)", 
+     "field": "risk_range",
+     "editable": True,
+     'cellStyle': {
+        'border-right': 'solid 0.8px'}
+     },
      {"headerName": "Scale lower\n(forestplots)", 
      "field": "Scale_lower",
      'headerTooltip': 'This is for the forest plots in the nested table',
@@ -220,6 +255,9 @@ detailColumnDefs = [
      "filter": True,
      "width": 130,
      'headerTooltip': 'Click a cell to see the details of the corresponding comparison',
+    #  "tooltipField": 'Treatment',
+    #  "tooltipComponentParams": { "color": '#d8f0d3'},
+    #  "tooltipComponent": "CustomTooltiptreat",
       "resizable": True ,
       'cellStyle': {
         'display': 'grid',
@@ -233,15 +271,16 @@ detailColumnDefs = [
      "headerName": "Mixed effect\n95%CI",
      "width": 180,
      "resizable": True,
-     'cellStyle': {'border-left': 'solid 0.8px',
-                   'backgroud-color':'white',
-                #    'line-height': '20px',
-                   "text-align":'center',
-                   'white-space': 'pre',
-                   'display': 'grid',
-                   'line-height': 'normal',
-                   'align-items': 'center'
-                   }
+     'cellStyle': {
+         "styleConditions": [
+        {"condition": "params.value =='RR'", "style": { **style_mixed}},
+        {"condition": "params.data.CI_lower < 1 && params.data.CI_upper < 1", "style": {"color": "red", **style_mixed}}, 
+        {"condition": "params.data.CI_lower > 1 && params.data.CI_upper > 1", "style": {"color": "red", **style_mixed}},
+        {
+                "condition": "!(params.data.CI_lower < 1 && params.data.CI_upper < 1) && !(params.data.CI_lower > 1 && params.data.CI_upper > 1)",
+                "style": {**style_mixed}
+            }      
+    ]}
        },
 
     # {"field": "ab_effect", 
@@ -288,7 +327,7 @@ detailColumnDefs = [
     },
     {"field": "direct",
      "headerName": "Direct effect\n(95%CI)",
-     'headerTooltip': 'Click a cell to open the pairwise forest plot',
+     'headerTooltip': 'Click a cell with values to open the pairwise forest plot',
       "width": 170,
       "resizable": True,
       'cellStyle': {'color': '#707B7C', "text-align":'center', 'display': 'grid',
@@ -374,7 +413,7 @@ grid = dag.AgGrid(
                 "detailGridOptions": {
                 "columnDefs": detailColumnDefs,
                 # "sideBar": sideBar,
-                "rowHeight": 60,
+                "rowHeight": 80,
                 "rowDragManaged": True,
                 "rowDragMultiRow": True,
                 "rowDragEntireRow": True,
@@ -406,7 +445,7 @@ grid = dag.AgGrid(
     dashGridOptions = {'suppressRowTransform': True,
                     #    "domLayout":'print',
                        "rowSelection": "multiple",
-                       "tooltipShowDelay": 100,
+                    #    "tooltipShowDelay": 100,
                        "rowDragManaged": True,
                        "rowDragMultiRow": True,
                        "rowDragEntireRow": True,
@@ -415,11 +454,10 @@ grid = dag.AgGrid(
                        }, 
     getRowId='params.data.Reference',
     style={ "width": "100%",
-           'height':f'{45.5 *20}px'
+           'height':f'{46.5 *20}px'
            }
     
 )
-
 
 
 
@@ -784,8 +822,24 @@ def skt_layout():
                                                                             #             value=1.25,
                                                                             #             placeholder="e.g. 1.25",style={'width':'80px'}) 
                                                                                                 ],className='skt_studyinfo2', bodyClassName='slect_body',headerClassName='headtab1'),
-                                                                            dcc.Checklist(options= options_effects, value= ['PI', 'direct', 'indirect'], 
-                                                                                          id='checklist_effects', style={'display': 'grid', 'align-items': 'end'})],
+                                                                            dbc.Col([dcc.Checklist(options= options_effects, value= ['PI', 'direct', 'indirect'], 
+                                                                                          id='checklist_effects', style={'display': 'grid', 'align-items': 'end'}),
+                                                                            html.Div([html.P("nomal scale", id='',
+                                                                                        style={'display': 'inline-block',
+                                                                                                'font-size': '12px',
+                                                                                                'padding-left': '10px'}),
+                                                                                    daq.ToggleSwitch(id='nomal_vs_log',
+                                                                                                    color='', size=30,
+                                                                                                    labelPosition="bottom",
+                                                                                                    style={'display': 'inline-block',
+                                                                                                            'margin': 'auto',
+                                                                                                            'padding-left': '10px',
+                                                                                                            'padding-right': '10px'}),
+                                                                                    html.P('log scale', id='',
+                                                                                        style={'display': 'inline-block', 'margin': 'auto',
+                                                                                                'font-size': '12px',
+                                                                                                'padding-right': '0px'})
+                                                                                    ], style={'display': 'inline-block', 'margin-top': '0px'})])],
                                                                                             style={'display': 'grid', 'grid-template-columns': '1fr 1fr'})
                                                                                                 ],
                                                                     style={'width':'38%','margin-left': '1%', 'border': '1px dashed rgb(184, 80, 66)','display':'grid'}),
@@ -826,7 +880,7 @@ CONT = '/assets/icons/contrain.png'
 VISIT = '/assets/icons/visit.png'
 COST = '/assets/icons/cost.png'
 RANK = '/assets/ranking.png'
-
+from tools.functions_chatbot import render_chatbot
 
 def skt_nonexpert():
     return html.Div([
@@ -892,7 +946,7 @@ def skt_nonexpert():
                                                             dbc.Col([
                                                                         dbc.Row([
                                                                             html.Span('Interventions Diagram', className='inter_label'),
-                                                                            html.Span('Interventions practical issues',className='skt_span1', 
+                                                                            html.Span('Ask Dr.Bot',className='skt_span1', 
                                                                                               style={'color': '#B85042', 'font-weight': 'bold'}),
                                                                             #  html.Span('Please tick to select the reference treatment', className='note_tick')
                                                                                 ], style={'padding-top': 0, 'display':'grid', 'grid-template-columns': '1fr 1fr'}),
@@ -911,53 +965,55 @@ def skt_nonexpert():
                                                                             stylesheet=skt_stylesheet()), 
                                                                             style={'border-right': '3px solid #B85042',
                                                                                     'width': '50%'}),
-                                                                            dbc.Col([
-                                                                                # html.Span('Interventions practical issues',className='skt_span1', 
-                                                                                #               style={'color': '#B85042', 'font-weight': 'bold'}),
-                                                                                    dbc.Row([
-                                                                                            dbc.Col([html.Img(src=ROUTINE,
-                                                                                            width="45px", style={'justify-self':'center'},
-                                                                                            className='medpractice', id='routine'),
-                                                                                            html.Span('Medical routine',className= 'main_results1')], 
-                                                                                            className='col_results1'),
-                                                                                            dbc.Col([html.Img(src=CONT,
-                                                                                            width="45px", style={'justify-self':'center'},
-                                                                                            className='medpractice', id='cont'),
-                                                                                            html.Span('Contraindications', className= 'main_results1')],
-                                                                                            className='col_results1'),
-                                                                                            dbc.Col([html.Img(src=SIDE,
-                                                                                            width="45px", style={'justify-self':'center'},
-                                                                                            className='medpractice', id='side'),
-                                                                                            html.Span('Side effects', className= 'main_results1')],
-                                                                                            className='col_results1'),
-                                                                                            dbc.Col([html.Img(src=VISIT, n_clicks=0,
-                                                                                            width="45px", style={'justify-self':'center'},
-                                                                                            className='medpractice', id='visit'),
-                                                                                            html.Span('Visit and test', className= 'main_results1')],
-                                                                                            className='col_results1'),
-                                                                                            dbc.Col([html.Img(src=COST,
-                                                                                            width="45px", style={'justify-self':'center'},
-                                                                                            className='medpractice', id='cost'),
-                                                                                            html.Span('Cost', className= 'main_results1')],
-                                                                                            className='col_results1'),
-                                                                                            ],
-                                                                                            style={'width' : '-webkit-fill-available',
-                                                                                                        'justify-content': 'center',}
-                                                                                                        ),
-                                                                                    dbc.Row(html.Span(id='trigger_info2'),
-                                                                                        style={'align-items': 'center','margin-bottom': '50%',
-                                                                                               'display': 'grid','background-color':'burlywood', 'height': '95%'})
-                                                                                                        ],style={'width':'50%', 'justify-content': 'center','display': 'grid'})
+                                                                            dbc.Col(render_chatbot(), style={'width':'50%','justify-items': 'center',"height": "500px"})
+                                                                            # dbc.Col([
+                                                                            #     # html.Span('Interventions practical issues',className='skt_span1', 
+                                                                            #     #               style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                            #         dbc.Row([
+                                                                            #                 dbc.Col([html.Img(src=ROUTINE,
+                                                                            #                 width="45px", style={'justify-self':'center'},
+                                                                            #                 className='medpractice', id='routine'),
+                                                                            #                 html.Span('Medical routine',className= 'main_results1')], 
+                                                                            #                 className='col_results1'),
+                                                                            #                 dbc.Col([html.Img(src=CONT,
+                                                                            #                 width="45px", style={'justify-self':'center'},
+                                                                            #                 className='medpractice', id='cont'),
+                                                                            #                 html.Span('Contraindications', className= 'main_results1')],
+                                                                            #                 className='col_results1'),
+                                                                            #                 dbc.Col([html.Img(src=SIDE,
+                                                                            #                 width="45px", style={'justify-self':'center'},
+                                                                            #                 className='medpractice', id='side'),
+                                                                            #                 html.Span('Side effects', className= 'main_results1')],
+                                                                            #                 className='col_results1'),
+                                                                            #                 dbc.Col([html.Img(src=VISIT, n_clicks=0,
+                                                                            #                 width="45px", style={'justify-self':'center'},
+                                                                            #                 className='medpractice', id='visit'),
+                                                                            #                 html.Span('Visit and test', className= 'main_results1')],
+                                                                            #                 className='col_results1'),
+                                                                            #                 dbc.Col([html.Img(src=COST,
+                                                                            #                 width="45px", style={'justify-self':'center'},
+                                                                            #                 className='medpractice', id='cost'),
+                                                                            #                 html.Span('Cost', className= 'main_results1')],
+                                                                            #                 className='col_results1'),
+                                                                            #                 ],
+                                                                            #                 style={'width' : '-webkit-fill-available',
+                                                                            #                             'justify-content': 'center',}
+                                                                            #                             ),
+                                                                            #         dbc.Row(html.Span(id='trigger_info2'),
+                                                                            #             style={'align-items': 'center','margin-bottom': '50%',
+                                                                            #                    'display': 'grid','background-color':'burlywood', 'height': '95%'})
+                                                                            #                             ],style={'width':'50%', 'justify-content': 'center','display': 'grid'})
                                                                                                         ]),], className='tab3_col2')], className='row_skt'),
                                                       html.Br(),
                                                       dbc.Row(
                                                         [dbc.Col(
-                                                            [dbc.Row([dbc.Col([
-                                                                html.Span('Absolute Values for Comparators (per 1000)',className='skt_span1', 
-                                                                        style={'color': '#B85042', 'font-weight': 'bold'}),
-                                                                        outcome_absolute],className='out_abs_col'),
-                                                                        # dbc.Col([html.Img(src=RANK, style={'justify-self':'center','width':'300px'}, id='rank_img')],className='out_rank_col')
-                                                                        ], style={'justify-content':'space-around'}),
+                                                            [
+                                                                # dbc.Row([dbc.Col([
+                                                                # html.Span('Absolute Values for Comparators (per 1000)',className='skt_span1', 
+                                                                #         style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                #         outcome_absolute],className='out_abs_col'),
+                                                                #         # dbc.Col([html.Img(src=RANK, style={'justify-self':'center','width':'300px'}, id='rank_img')],className='out_rank_col')
+                                                                #         ], style={'justify-content':'space-around'}),
                                                                         dbc.Row(treat_compare_grid, 
                                                                                 style={'width':'95%', 'justify-self':'center'}),
                                                                         ],

@@ -1,11 +1,21 @@
 import pandas as pd
 from tools.skt_layout import *
-from tools.functions_skt_forestplot import __skt_all_forstplot, __skt_PI_forstplot, __skt_direct_forstplot, __skt_indirect_forstplot, __skt_PIdirect_forstplot, __skt_PIindirect_forstplot,__skt_directin_forstplot, __skt_mix_forstplot
+from tools.functions_skt_forestplot import __skt_ab_forstplot, __skt_options_forstplot, __skt_mix_forstplot
 
-def __Change_Abs(value_effect, value_change,lower,rowData):
+def __Change_Abs(toggle_value,value_effect, value_change,lower,rowData):
     
     data = pd.read_csv('db/skt/final_all.csv')
     p_score = pd.read_csv('db/ranking/rank.csv')
+    long_dat = pd.read_csv('db/psoriasis_long_complete.csv')
+    long_dat = pd.DataFrame(long_dat)
+
+    range_ref_ab = long_dat.groupby('treat').apply(
+        lambda group: pd.Series({
+            "min_value": (group["rpasi90m"] / group["nm"]).min() * 1000,
+            "max_value": (group["rpasi90m"] / group["nm"]).max() * 1000
+        })
+    ).reset_index()
+
     df = pd.DataFrame(data)
     df['Certainty']= ''
     df['within_study'] = ''
@@ -59,25 +69,37 @@ def __Change_Abs(value_effect, value_change,lower,rowData):
     # if value_change is not None and value_change[0]['value'] is not None and (value_change[0]['value'] != 'Enter a value for upper' and value_change[0]['value'] != 'Enter a value for lower') and (value_change[0]['colId']=='Scale_upper' or value_change[0]['colId']=='Scale_lower'):
     if value_change is not None and value_change[0]['value'] is not None:
         refer_name = value_change[0]['data']['Reference']
+        risk = int(value_change[0]['value'])
     else:
         refer_name = None
+        risk = None
+        
     
-    if value_effect==[]:
-            df = __skt_mix_forstplot(df,lower, scale_lower, scale_upper, refer_name)
-    elif all(effect in value_effect for effect in ['PI', 'direct', 'indirect']):
-            df = __skt_all_forstplot(df,lower, scale_lower, scale_upper, refer_name)
-    elif all(effect in ['PI'] for effect in value_effect):
-            df = __skt_PI_forstplot(df,lower, scale_lower, scale_upper, refer_name)
-    elif all(effect in ['direct'] for effect in value_effect):
-            df = __skt_direct_forstplot(df,lower, scale_lower, scale_upper, refer_name)
-    elif all(effect in ['indirect'] for effect in value_effect):
-            df = __skt_indirect_forstplot(df,lower, scale_lower, scale_upper, refer_name)
-    elif all(effect in ['PI', 'direct'] for effect in value_effect):
-            df = __skt_PIdirect_forstplot(df,lower, scale_lower, scale_upper, refer_name)
-    elif all(effect in ['PI', 'indirect'] for effect in value_effect):
-            df = __skt_PIindirect_forstplot(df,lower, scale_lower, scale_upper, refer_name)
-    elif all(effect in ['direct', 'indirect'] for effect in value_effect):
-            df = __skt_directin_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # if value_effect==[]:
+    #         df = __skt_mix_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # elif all(effect in value_effect for effect in ['PI', 'direct', 'indirect']):
+    #         df = __skt_all_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # elif all(effect in ['PI'] for effect in value_effect):
+    #     
+    #     df = __skt_PI_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # elif all(effect in ['direct'] for effect in value_effect):
+    #         df = __skt_direct_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # elif all(effect in ['indirect'] for effect in value_effect):
+    #         df = __skt_indirect_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # elif all(effect in ['PI', 'direct'] for effect in value_effect):
+    #         df = __skt_PIdirect_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # elif all(effect in ['PI', 'indirect'] for effect in value_effect):
+    #         df = __skt_PIindirect_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # elif all(effect in ['direct', 'indirect'] for effect in value_effect):
+    #         df = __skt_directin_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+    # print(df['risk'])
+    if toggle_value:
+        df = __skt_ab_forstplot(risk, value_effect, df,lower, scale_lower, scale_upper, refer_name)
+    else:
+        if value_effect==[]:
+                df = __skt_mix_forstplot(df,lower, scale_lower, scale_upper, refer_name)
+        else:
+                df = __skt_options_forstplot(value_effect,df,lower, scale_lower, scale_upper, refer_name)
 
     grouped = df.groupby(["Reference", "risk", 'Scale_lower', 'Scale_upper'])
     rowData_effect = []
@@ -105,7 +127,12 @@ def __Change_Abs(value_effect, value_change,lower,rowData):
 
     rowData_effect = pd.DataFrame(rowData_effect)
     rowData_effect = rowData_effect.merge(p_score, left_on='Reference', right_on='treatment', how='left')
-
+    rowData_effect = rowData_effect.merge(range_ref_ab, left_on='Reference', right_on='treat', how='left')
+    rowData_effect['risk_range'] = rowData_effect.apply(
+        lambda row: f"from {int(row['min_value'])} to {int(row['max_value'])}",
+        axis=1
+    )
+    
     dfc_2 = rowData_effect.copy()   
     
     rowData = pd.DataFrame(rowData)
@@ -123,7 +150,7 @@ def __Change_Abs(value_effect, value_change,lower,rowData):
     dfc = pd.DataFrame(dfc)
 
     if value_change is not None and value_change[0]['value'] is not None and value_change[0]['value'] != 'Enter a number' and value_change[0]['colId']=='risk':
-    
+        
         row_idx = value_change[0]['rowIndex']
         # print(row_idx)
         # rowData = pd.DataFrame(rowData)

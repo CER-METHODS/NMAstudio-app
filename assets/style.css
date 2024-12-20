@@ -693,9 +693,18 @@ h6 {margin-top: 0;}
 #grid_treat_compare {
     --ag-header-foreground-color: black!important;
     --ag-header-background-color: #ffecb3 !important;
+    /* --ag-header-column-separator-display: block;
+    --ag-header-column-separator-height: 100%;
+    --ag-header-column-separator-width: 2px;
+    --ag-header-column-separator-color: black; */
     /* --ag-header-column-resize-handle-color: #933f34!important; */
     --ag-font-size: 15px!important;
     --ag-header-cell-hover-background-color: transparent!important;
+}
+
+
+.center-aligned-group-header:nth-of-type(4) {
+    border-right: 1px solid rgb(165, 163, 163); /* Apply separator styling */
 }
 
 .absolute-alpine{
@@ -715,7 +724,7 @@ h6 {margin-top: 0;}
 
 #grid_treat_compare .ag-header-cell:nth-child(2) {
     background-color: white;
-    color: black;
+    color: black 2px;
 }
 
 
@@ -725,10 +734,13 @@ h6 {margin-top: 0;}
     color: black;
 }
 
-
+#grid_treat_compare .ag-header-cell:nth-child(5) {
+    border-right: 1px solid rgb(165, 163, 163)
+}
 
 .center-aligned-group-header .ag-header-group-cell-label {
     justify-content: center;
+    /* border-right: solid 0.8px */
 }
 
 .forest_head{

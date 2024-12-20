@@ -63,6 +63,7 @@ dagcomponentfuncs.DCC_GraphClickData = function (props) {
 
 
 
+
 // dagcomponentfuncs.CustomTooltip = function (props) {
 //     info = [
 //         React.createElement('h4', {}, "Certainty of evidence:"+ props.data.Certainty),
@@ -86,6 +87,29 @@ dagcomponentfuncs.DCC_GraphClickData = function (props) {
 //         info
 //     );
 // };
+
+// dagcomponentfuncs.CustomTooltiptreat = function (props) {
+//     return React.createElement(
+//         'div',
+//         {
+//             style: {
+//                 border: '5px',
+//                 backgroundColor: props.color || 'grey',
+//                 padding: 10,
+//             },
+//         },
+//         [
+//             React.createElement('b', {}, 'Click a cell to see the details of the corresponding comparison')
+//         ]
+//     );
+// };
+
+
+
+
+
+
+
 dagcomponentfuncs.CustomTooltip = function (props) {
     const certainty = props.data.Certainty;
     const withinstudy = props.data.within_study;
@@ -136,6 +160,8 @@ function getBackgroundColorForCertainty(certainty) {
             return 'lightgrey'; // Default background color
     }
 };
+
+
 
 
 
@@ -239,21 +265,50 @@ function getBackgroundColorForCertainty(certainty) {
 
 
 dagcomponentfuncs.DMC_Button = function (props) {
-    const { setData, data } = props;
+    var { setData, data } = props;
 
     function onClick() {   
-        
-        const temp = data.Treatment;
-        props.node.setDataValue( "Treatment", data.Reference);
-        props.node.setDataValue( "Reference", temp);
-        
+        const temp = structuredClone(data);
+        props.node.setDataValue( "Treatment", temp.Reference);
+        props.node.setDataValue( "Reference", temp.Treatment);
+        data = props.node.data;
         // const tempRR = data.RR;
-        props.node.setDataValue("RR", parseFloat((1 / data.RR).toFixed(2)))
-        props.node.setDataValue("RR_out2", parseFloat((1 / data.RR_out2).toFixed(2)));
+        // props.node.setDataValue("RR", parseFloat((1 / data.RR).toFixed(2)))
+        // props.node.setDataValue("RR_out2", parseFloat((1 / data.RR_out2).toFixed(2)));
 
         // const temp3 = data.RR_out2;
         // props.node.setDataValue("RR_out2", data.RR_inv2);
         // props.node.setDataValue("RR_inv2", temp3);
+        
+        const rrParts = data.RR.match(/([\d.]+)\n\(([\d.]+) to ([\d.]+)\)/);
+        if (rrParts) {
+            const mainRR = parseFloat(rrParts[1]);
+            const ciLower = parseFloat(rrParts[2]);
+            const ciUpper = parseFloat(rrParts[3]);
+
+            const invertedMainRR = (1 / mainRR).toFixed(2);
+            const invertedCiLower = (1 / ciLower).toFixed(2);
+            const invertedCiUpper = (1 / ciUpper).toFixed(2);
+
+            // Reformat the RR string with inverted values
+            const newRR = `${invertedMainRR}\n(${invertedCiLower} to ${invertedCiUpper})`;
+            props.node.setDataValue("RR", newRR);
+        }
+        
+        const rrParts2 = data.RR_out2.match(/([\d.]+)\n\(([\d.]+) to ([\d.]+)\)/);
+        if (rrParts2) {
+            const mainRR2 = parseFloat(rrParts2[1]);
+            const ciLower2 = parseFloat(rrParts2[2]);
+            const ciUpper2 = parseFloat(rrParts2[3]);
+
+            const invertedMainRR2 = (1 / mainRR2).toFixed(2);
+            const invertedCiLower2 = (1 / ciLower2).toFixed(2);
+            const invertedCiUpper2 = (1 / ciUpper2).toFixed(2);
+
+            // Reformat the RR string with inverted values
+            const newRR2 = `${invertedMainRR2}\n(${invertedCiLower2} to ${invertedCiUpper2})`;
+            props.node.setDataValue("RR_out2", newRR2);
+        }
 
         setData();
     }

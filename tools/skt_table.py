@@ -8,62 +8,62 @@ import dash_iconify
 import json
 
 
-data_absolute = {
-    'Outcome 1': ['Enter a value'],
-    'Outcome 2': ['Enter a value']
-}
+# data_absolute = {
+#     'Outcome 1': ['Enter a value'],
+#     'Outcome 2': ['Enter a value']
+# }
 
-data_absolute = pd.DataFrame(data_absolute)
-data_absolute['index']=data_absolute.index
+# data_absolute = pd.DataFrame(data_absolute)
+# data_absolute['index']=data_absolute.index
 
-absolueColumnDefs = [
+# absolueColumnDefs = [
    
-    {"headerName": "Outcome 1", 
-     "field": "Outcome 1",
-     "editable": True,
-     "resizable": False,
-     'cellStyle': {
-        'color': 'grey','border-right': 'solid 0.8px'}
-     },
+#     {"headerName": "Outcome 1", 
+#      "field": "Outcome 1",
+#      "editable": True,
+#      "resizable": False,
+#      'cellStyle': {
+#         'color': 'grey','border-right': 'solid 0.8px'}
+#      },
 
-    {"headerName": "Outcome 2", 
-     "field": "Outcome 2",
-     "editable": True,
-     "resizable": False,
-     'cellStyle': {
-        'color': 'grey','border-right': 'solid 0.8px'}
-     }
-]
+#     {"headerName": "Outcome 2", 
+#      "field": "Outcome 2",
+#      "editable": True,
+#      "resizable": False,
+#      'cellStyle': {
+#         'color': 'grey','border-right': 'solid 0.8px'}
+#      }
+# ]
 
 
-outcome_absolute = dag.AgGrid(
-    id="grid_absolute",
-    className="absolute-alpine color-fonts",
-    enableEnterpriseModules=True,
-    licenseKey=os.environ["AG_GRID_KEY"],
-    columnDefs=absolueColumnDefs,
-    rowData = data_absolute.to_dict("records"),
-    dangerously_allow_code=True,
-    defaultColDef={
-                    'filter':False,
-                    "floatingFilter": False,
-                    "wrapText": True, 
-                    'autoHeight': True,
-                    "enableRowGroup": False,
-                    "enableValue": False,
-                    "enablePivot": False,
-                    'cellStyle': {'white-space': 'pre',
-                                  'display': 'grid',
-                                  'text-align': 'center',
-                                  'align-items': 'center',
-                                  'border-bottom': 'solid 0.5px'
-                                  },
-                    # "tooltipComponent": "CustomTooltip"
-                    },
-    columnSize="sizeToFit", 
-    getRowId='params.data.index',
-    style={"height":"58px"}  
-)
+# outcome_absolute = dag.AgGrid(
+#     id="grid_absolute",
+#     className="absolute-alpine color-fonts",
+#     enableEnterpriseModules=True,
+#     licenseKey=os.environ["AG_GRID_KEY"],
+#     columnDefs=absolueColumnDefs,
+#     rowData = data_absolute.to_dict("records"),
+#     dangerously_allow_code=True,
+#     defaultColDef={
+#                     'filter':False,
+#                     "floatingFilter": False,
+#                     "wrapText": True, 
+#                     'autoHeight': True,
+#                     "enableRowGroup": False,
+#                     "enableValue": False,
+#                     "enablePivot": False,
+#                     'cellStyle': {'white-space': 'pre',
+#                                   'display': 'grid',
+#                                   'text-align': 'center',
+#                                   'align-items': 'center',
+#                                   'border-bottom': 'solid 0.5px'
+#                                   },
+#                     # "tooltipComponent": "CustomTooltip"
+#                     },
+#     columnSize="sizeToFit", 
+#     getRowId='params.data.index',
+#     style={"height":"58px"}  
+# )
 
 
 
@@ -86,19 +86,27 @@ df["index"] = df.index
 #     'comparator': comparator
 # })
 
+
+
 df['switch']=np.nan
-df['ab_out1'] = ''
-df['ab_out2'] = ''
+# df['ab_out1'] = ''
+# df['ab_out2'] = ''
 df = np.round(df,2)
 # df['RR_inv']=np.round(1/df['RR'],2)
 # df['RR_inv2']=np.round(1/df['RR_out2'],2)
 
+df['RR'] = df.apply(lambda row: f"{row['RR']}\n({row['CI_lower']} to {row['CI_upper']})", axis=1)
+
+df['RR_out2'] = df.apply(lambda row: f"{row['RR_out2']}\n({row['CI_lower_out2']} to {row['CI_upper_out2']})", axis=1)
+
+df_origin = df.copy()
 
 style_certainty = {'white-space': 'pre','display': 'grid','text-align': 'center','align-items': 'center','border-left': 'solid 0.8px'}
 ColumnDefs_treat_compare = [
    
     {"headerName": "Treatment", 
      "field": "Treatment",
+     "suppressHeaderMenuButton": True,
      "editable": False,
      "resizable": False,
      'cellStyle': {
@@ -108,6 +116,7 @@ ColumnDefs_treat_compare = [
      },
     
      {"headerName": "Switch", 
+      "suppressHeaderMenuButton": True,
      "field": "switch",
      "editable": False,
      "resizable": False,
@@ -125,6 +134,7 @@ ColumnDefs_treat_compare = [
 
     {"headerName": "Comparator", 
      "field": "Reference",
+     "suppressHeaderMenuButton": True,
      "editable": False,
      "resizable": False,
      'cellStyle': {
@@ -139,12 +149,14 @@ ColumnDefs_treat_compare = [
         "resizable": False,
         'suppressStickyLabel': True,
         'children': [
-            {'field': 'RR', 'headerName': 'RR'},
-            {'field': 'ab_out1', 'headerName': 'Absoute',
-             'cellStyle': {'line-height': 'normal'}
-             },
-            {'field': 'Certainty_out1', 
+            {'field': 'RR', 'headerName': 'RR',"suppressHeaderMenuButton": True},
+            # {'field': 'ab_out1', 'headerName': 'Absoute',
+            #  'cellStyle': {'line-height': 'normal'}
+            #  },
+            {'field': 'Certainty_out1',
+             "suppressHeaderMenuButton": True, 
              'headerName': 'Certainty',
+             "resizable": False,
              "tooltipField": 'Certainty_out1',
              "tooltipComponentParams": { "color": '#d8f0d3'},
              "tooltipComponent": "CustomTooltip2",
@@ -163,10 +175,12 @@ ColumnDefs_treat_compare = [
         "resizable": False,
         'suppressStickyLabel': True,
         'children': [
-            {'field': 'RR_out2', 'headerName': 'RR'},
-            {'field': 'ab_out2', 'headerName': 'Absoute',
-             'cellStyle': {'line-height': 'normal'}},
-            {'field':'Certainty_out2', 'headerName': 'Certainty',
+            {'field': 'RR_out2', 'headerName': 'RR',"suppressHeaderMenuButton": True},
+            # {'field': 'ab_out2', 'headerName': 'Absoute',
+            #  'cellStyle': {'line-height': 'normal'}},
+            {'field':'Certainty_out2', 
+             "suppressHeaderMenuButton": True,
+             'headerName': 'Certainty',
              "tooltipField": 'Certainty_out2',
              "tooltipComponentParams": { "color": '#d8f0d3'},
              "tooltipComponent": "CustomTooltip3",
@@ -189,7 +203,7 @@ treat_compare_grid = dag.AgGrid(
     columnDefs=ColumnDefs_treat_compare,
     rowData = df.to_dict("records"),
     dangerously_allow_code=True,
-    dashGridOptions = {"rowHeight": 50},
+    dashGridOptions = {"rowHeight": 60},
     defaultColDef={
                     'filter':False,
                     "floatingFilter": False,
@@ -203,7 +217,9 @@ treat_compare_grid = dag.AgGrid(
                                   'display': 'grid',
                                   'text-align': 'center',
                                   'align-items': 'center',
+                                  'line-height': 'normal'
                                   },
+                    "animateRows": False,
                     # "tooltipComponent": "CustomTooltip"
                     },
     columnSize="sizeToFit", 

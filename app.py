@@ -33,7 +33,6 @@ from tools.functions_generate_stylesheet import __generate_stylesheet
 from tools.functions_export import __generate_xlsx_netsplit, __generate_xlsx_league, __generate_csv_consistency
 from tools.functions_show_forest_plot import __show_forest_plot
 from tools.functions_skt_boxplot import __show_boxplot
-from tools.functions_skt_forestplot import __skt_all_forstplot, __skt_PI_forstplot, __skt_direct_forstplot, __skt_indirect_forstplot, __skt_PIdirect_forstplot, __skt_PIindirect_forstplot,__skt_directin_forstplot, __skt_mix_forstplot
 from tools.functions_skt_others import __generate_skt_stylesheet, __generate_skt_stylesheet2
 from dash import ctx, no_update
 # --------------------------------------------------------------------------------------------------------------------#
@@ -46,7 +45,7 @@ GRAPH_INTERVAL = os.environ.get("GRAPH_INTERVAL", 5000)
 
 
 app = dash.Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],
-                #external_stylesheets=[dbc.themes.BOOTSTRAP],
+                # external_stylesheets=[dbc.themes.BOOTSTRAP],
                 suppress_callback_exceptions=True)
 # app.config.suppress_callback_exceptions = True
 # app.scripts.append_script({'external_url':'https://NMAstudio.com/assets/gtag.js'})
@@ -1726,6 +1725,7 @@ from tools.functions_skt_abs_forest import __Change_Abs
 @app.callback(
     Output("quickstart-grid", "rowData"),
     # Output("quickstart-grid", "style"),
+    Input("nomal_vs_log", "value"),
     Input("checklist_effects", "value"),
     Input("quickstart-grid", "cellValueChanged"),
     Input("range_lower", "value"),
@@ -1733,8 +1733,8 @@ from tools.functions_skt_abs_forest import __Change_Abs
     State("quickstart-grid", "rowData"),
 )
 
-def selected(value_effect, value_change,lower,rowData):
-    return __Change_Abs(value_effect, value_change,lower,rowData)
+def selected(toggle_value,value_effect, value_change,lower,rowData):
+    return __Change_Abs(toggle_value, value_effect, value_change,lower,rowData)
 
 
 
@@ -2069,60 +2069,76 @@ def image_color_change(style_routine, style_count,style_side,style_visit,style_c
 #     else:
 #         return pass_model, skt_style
 
-clientside_callback(
-    """function (n) {
-        if (n) {
-            dash_ag_grid.getApi("quickstart-grid").exportDataAsExcel();
-        }
-        return dash_clientside.no_update
-    }""",
-    Output("btn-excel-export", "n_clicks"),
-    Input("btn-excel-export", "n_clicks"),
-    prevent_initial_call=True
-)
+# clientside_callback(
+#     """function (n) {
+#         if (n) {
+#             dash_ag_grid.getApi("quickstart-grid").exportDataAsExcel();
+#         }
+#         return dash_clientside.no_update
+#     }""",
+#     Output("btn-excel-export", "n_clicks"),
+#     Input("btn-excel-export", "n_clicks"),
+#     prevent_initial_call=True
+# )
 
 
-@app.callback(
-    Output("grid_treat_compare", "rowData"),
-    Input("grid_absolute", "cellValueChanged"),
-    State("grid_treat_compare", "rowData"),
-)
-def Change_absolute(value_change, rawdat):
-    rawdat = pd.DataFrame(rawdat)
+# @app.callback(
+#     Output("grid_treat_compare", "rowData"),
+#     Input("grid_absolute", "cellValueChanged"),
+#     State("grid_treat_compare", "rowData"),
+# )
+# def Change_absolute(value_change, rawdat):
+#     rawdat = pd.DataFrame(rawdat)
 
-    if value_change is not None:
-        col_id = value_change[0]['colId']
-        value = value_change[0]['value']
+#     if value_change is not None:
+#         col_id = value_change[0]['colId']
+#         value = value_change[0]['value']
 
-        # Check for valid input
-        if value is not None and value != 'Enter a value' and col_id in ['Outcome 1', 'Outcome 2']:
-            value_risk = int(value)
-            # rawdat['ab_out1'] = value_risk
-            # Determine the correct RR value based on Outcome
-            if col_id == 'Outcome 1':
-                rr_column = 'RR'
-                ab_column = 'ab_out1'
-            elif col_id == 'Outcome 2':
-                rr_column = 'RR_out2'
-                ab_column = 'ab_out2'
+#         # Check for valid input
+#         if value is not None and value != 'Enter a value' and col_id in ['Outcome 1', 'Outcome 2']:
+#             value_risk = int(value)
+#             # rawdat['ab_out1'] = value_risk
+#             # Determine the correct RR value based on Outcome
+#             if col_id == 'Outcome 1':
+#                 rr_column = 'RR'
+#                 ab_column = 'ab_out1'
+#             elif col_id == 'Outcome 2':
+#                 rr_column = 'RR_out2'
+#                 ab_column = 'ab_out2'
             
-            # Calculate the risk treatment and the absolute risk
-            risk_treat = value_risk * rawdat[rr_column]
-            risk_treat = risk_treat.astype(int)  # Ensure it's an integer
-            abrisk = risk_treat - value_risk
+#             # Calculate the risk treatment and the absolute risk
+#             risk_treat = value_risk * rawdat[rr_column]
+#             risk_treat = risk_treat.astype(int)  # Ensure it's an integer
+#             abrisk = risk_treat - value_risk
 
-            rawdat[ab_column] = [
-                    f"{ab} more \nper 1000" if ab > 0 else f"{abs(ab)} less \nper 1000"
-                    for ab in abrisk
-                ]
-            # Update the absolute risk column with appropriate text
-            # for i in range(rawdat.shape[0]):
-            #     rawdat.loc[i,'ab_out1'] = f"{i} more per 1000" if abrisk[i] > 0 else f"{abs(abrisk[i])} less per 1000"
+#             rawdat[ab_column] = [
+#                     f"{ab} more \nper 1000" if ab > 0 else f"{abs(ab)} less \nper 1000"
+#                     for ab in abrisk
+#                 ]
+#             # Update the absolute risk column with appropriate text
+#             # for i in range(rawdat.shape[0]):
+#             #     rawdat.loc[i,'ab_out1'] = f"{i} more per 1000" if abrisk[i] > 0 else f"{abs(abrisk[i])} less per 1000"
 
-    return rawdat.to_dict("records")
+#     return rawdat.to_dict("records")
 
+from tools.skt_table import df_origin
 
+@app.callback(Output("grid_treat_compare", "rowData"),
+              [Input('cytoscape_skt2', 'selectedNodeData'),
+              Input('cytoscape_skt2', 'selectedEdgeData')
+               ],
+            #   State("grid_treat_compare", "rowData")
+              )
+def filter_data(node_data, edge_data):
+    rowdata = df_origin
+    
+    if node_data or edge_data:
+        slctd_nods = {n['id'] for n in node_data} if node_data else set()
+        slctd_edgs = [e['source'] + e['target'] for e in edge_data] if edge_data else []
+        rowdata = rowdata[(rowdata.Treatment.isin(slctd_nods) & rowdata.Reference.isin(slctd_nods))
+                    | ((rowdata.Treatment + rowdata.Reference).isin(slctd_edgs) | (rowdata.Reference + rowdata.Treatment).isin(slctd_edgs))]
 
+    return rowdata.to_dict("records")
 
 
 
@@ -2145,7 +2161,50 @@ def Change_absolute(value_change, rawdat):
 #     return  options
 
 
+#####################chatbot#######################################################
 
+from tools.functions_chatbot import *
+
+@app.callback(
+    Output(component_id="display-conversation", component_property="children"), 
+    Input(component_id="store-conversation", component_property="data")
+)
+def update_display(chat_history):
+    return [
+        render_textbox(x, box="human") if i % 2 == 0 else render_textbox(x, box="AI")
+        for i, x in enumerate(chat_history.split("<split>")[:-1])
+    ]
+
+@app.callback(
+    Output(component_id="user-input", component_property="value"),
+    Input(component_id="submit", component_property="n_clicks"), 
+    Input(component_id="user-input", component_property="n_submit"),
+)
+def clear_input(n_clicks, n_submit):
+    return ""
+
+@app.callback(
+    Output(component_id="store-conversation", component_property="data"), 
+    Output(component_id="loading-component", component_property="children"),
+    Input(component_id="submit", component_property="n_clicks"), 
+    Input(component_id="user-input", component_property="n_submit"),
+    State(component_id="user-input", component_property="value"), 
+    State(component_id="store-conversation", component_property="data"),
+)
+def run_chatbot(n_clicks, n_submit, user_input, chat_history):
+    if n_clicks == 0 and n_submit is None:
+        return "", None
+
+    if user_input is None or user_input == "":
+        return chat_history, None
+    
+    chat_history += f"Human: {user_input}<split>ChatBot: "
+    # result_ai = conversation.predict(input=user_input)
+    # model_output = result_ai.strip()
+    result_ai = chain.invoke({"text": f"base on {chat_history},{user_input}. Please generate less than 100 words (20-50 wloud be good) and be concise and clear. avoiding the use of bullet points, asterisks (*), or any special formatting."})
+    model_output = result_ai.content
+    chat_history += f"{model_output}<split>"
+    return chat_history, None
 
 
 
