@@ -565,6 +565,18 @@ h6 {margin-top: 0;}
     color: var(--color-1);
 }
 
+.abvalue_simple{
+    font-weight: bold;
+    color: green;
+}
+
+.abvalue_range{
+    /* font-weight: bold; */
+    color: red;
+    display: block;
+    font-size: small
+}
+
 .select_outcome{
     display: grid;
     text-align: center;
@@ -838,6 +850,66 @@ h6 {margin-top: 0;}
     padding-left: 20px;
     white-space: pre;
 }
+
+
+.skt_span_info2{
+    display: block;
+    /* padding-left: 20px; */
+    white-space: pre;
+    font-weight: bold;
+}
+
+
+#skt_modal_copare_simple{
+    /* height: 300px;
+    width: 350px; */
+    display: grid;
+    /* margin-left: 400px; */
+    background-color: #E7E8D1;
+}
+
+.skt_info_head_simple{
+    height: 50px;
+    font-size: 25px;
+    border-bottom: solid 0.7px gray;
+    /* align-items: center; */
+    display: grid;
+    justify-content: center;
+    padding-left: 20px;
+    background-color: #a6d4a6bd;
+}
+.skt_info_head_title{
+    color: black;
+    font-weight: bold;
+}
+
+.skt_info_body_simple{
+    /* height: 200px; */
+    text-align: start;
+    align-items: start;
+    display: grid;
+    overflow-y: auto;
+    font-size: 15px;
+    padding-left: 20px;
+    background-color: white;
+}
+
+
+
+.skt_info_close_simple{
+    border-top: solid 0.7px gray;
+    text-align: end;
+    justify-content: end;
+    /* align-items: center; */
+    display: grid;
+    justify-items: end;
+    background-color: #a6d4a6bd
+}
+
+
+
+
+
 
 
 

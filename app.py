@@ -2131,7 +2131,7 @@ from tools.skt_table import df_origin
               )
 def filter_data(node_data, edge_data):
     rowdata = df_origin
-    
+
     if node_data or edge_data:
         slctd_nods = {n['id'] for n in node_data} if node_data else set()
         slctd_edgs = [e['source'] + e['target'] for e in edge_data] if edge_data else []
@@ -2142,6 +2142,21 @@ def filter_data(node_data, edge_data):
 
 
 
+@app.callback(
+    Output("skt_modal_copare_simple", "is_open"), 
+    Input("grid_treat_compare", "cellClicked"),
+    Input("close_compare_simple", "n_clicks"),
+)
+
+def display_sktinfo(cell, _):
+    if ctx.triggered_id == "close_compare_simple":
+        return False
+    if cell is None or len(cell) == 0:  
+        return False
+    else:
+        if ('colId' in cell and (cell['colId'] == "RR"or cell['colId'] == "RR_out2") and cell['value']is not None):
+            return True
+    return no_update
 
 
 

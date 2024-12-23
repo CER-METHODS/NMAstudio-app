@@ -882,6 +882,59 @@ COST = '/assets/icons/cost.png'
 RANK = '/assets/ranking.png'
 from tools.functions_chatbot import render_chatbot
 
+
+model_skt_compare_simple = dbc.Modal(
+    [
+        dbc.ModalHeader("ADA VS. ETA", className="skt_info_head_simple"),
+        dbc.ModalBody(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(),
+                        dbc.Col(
+                            [
+                                html.Span('Enter the risk for comparator (per 1000):',className='abvalue_simple'),
+                                dcc.Input(id="simple_abvalue",
+                                        type="text",
+                                        name='risk',
+                                        # value=20,
+                                        placeholder="e.g. 20", style={'width':'80px', 'margin-left': '15px'}),
+                                html.Span('The risk of comparator ranges from 10 per 1000 to 30 per 1000 in the dataset.',className='abvalue_range'),
+                                html.Br(),
+                                html.Span("Outcome: PASI90", className="skt_span_info2", id="treat_comp"),
+                                html.Span("Treatment: ADA", className="skt_span_info2", id="num_RCT"),
+                                html.Span("Comparator: ETA", className="skt_span_info2", id="num_RCT"),
+                                html.Span("Absolute difference: 30 more per 1000", className="skt_span_info2", id="num_sample"),
+                                html.Span(
+                                    "CI: 10 per 1000 to 40 per 1000",
+                                    className="skt_span_info2",
+                                    id="mean_modif",
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+                dbc.Row(),
+            ],
+            className="skt_info_body_simple",
+        ),
+        dbc.ModalFooter(
+            dbc.Button(
+                "Close", id="close_compare_simple", className="ms-auto", n_clicks=0
+            ),
+            className="skt_info_close_simple",
+        ),
+    ],
+    id="skt_modal_copare_simple",
+    is_open=False,
+    scrollable=True,
+    contentClassName="forest_content",
+)
+                                                  
+
+
+
+
 def skt_nonexpert():
     return html.Div([
             html.Div(id='skt_all',children=[
@@ -1007,7 +1060,7 @@ def skt_nonexpert():
                                                       html.Br(),
                                                       dbc.Row(
                                                         [dbc.Col(
-                                                            [
+                                                            [model_skt_compare_simple,
                                                                 # dbc.Row([dbc.Col([
                                                                 # html.Span('Absolute Values for Comparators (per 1000)',className='skt_span1', 
                                                                 #         style={'color': '#B85042', 'font-weight': 'bold'}),
@@ -1019,7 +1072,7 @@ def skt_nonexpert():
                                                                         ],
                                                               className='tab3_col2', id='col_nonexpert')],
                                                               className='row_skt') 
-                                                        ]),
+                                                        ]),html.Br(), html.Br(),
                                                       dbc.Col([
                                                 dcc.Markdown('Expert Committee Members',
                                                 className="markdown_style_main",

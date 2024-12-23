@@ -1228,7 +1228,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
     border-top-right-radius:.3rem}
 .modal-header .close{padding:1rem;
                      margin:-1rem -1rem -1rem auto}
-.modal-title{margin-bottom:0;line-height:1.5; color: white;}
+.modal-title{margin-bottom:0;line-height:1.5;}
 .modal-body{position:relative;-ms-flex:1 1 auto;flex:1 1 auto;padding:1rem}
 .modal-body,
 .modal-body .dropdown {position: static;}
