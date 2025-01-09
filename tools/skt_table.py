@@ -380,7 +380,7 @@ modal_compare_grid = dag.AgGrid(
                     # "tooltipComponent": "CustomTooltip"
                     },
     columnSize="autoSize", 
-    getRowId='params.data.index', 
+    getRowId='params.data.studlab', 
     style={ 
         # "width": "100%",
         #    'height':f'{45.5 *30}px'

@@ -2187,7 +2187,18 @@ from tools.functions_modal_info import display_modal_text
 def display_textinfo(cell,value,rowdata):
     return display_modal_text(cell,value,rowdata)
 
+from tools.functions_modal_info import display_modal_data
 
+@app.callback(
+    Output("modal_treat_compare", "rowData"),
+    Input("grid_treat_compare", "cellClicked"), 
+    Input("simple_abvalue", "value"),
+    State('grid_treat_compare','rowData'),
+    State('modal_treat_compare','rowData')
+)
+
+def display_modaldata(cell,value,rowdata,rowdata_modal):
+    return display_modal_data(cell,value,rowdata,rowdata_modal)
 
 
 

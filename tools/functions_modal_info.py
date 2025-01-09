@@ -136,3 +136,70 @@ def display_modal_text(cell,value,rowdata):
 
     return children
 
+def display_modal_data(cell, value, rowdata, rowdata_modal):
+    # Convert rowdata to DataFrame
+    rowdata = pd.DataFrame(rowdata)
+    rowdata_modal = pd.DataFrame(rowdata_modal)
+
+    
+    # Return original rowdata if no cell or invalid cell
+    if not cell or len(cell) == 0:
+        return rowdata_modal.to_dict("records")
+    
+    # Load modal data
+    df_modal = pd.read_csv('db/psoriasis_wide_complete.csv')
+
+    # Check if the column is 'RR'
+    if cell.get('colId') == "RR":
+        # Extract relative risk (RR) value from the cell's value
+        rr = float(cell['value'].split('\n')[0])
+        row_idx = cell['rowIndex']
+        treatment = rowdata.loc[row_idx, 'Treatment']
+        compare = rowdata.loc[row_idx, 'Reference']
+        
+        # Filter df_modal based on selected treatments and comparisons
+        filtered_df = df_modal[
+            ((df_modal['treat1'] == treatment) & (df_modal['treat2'] == compare)) |
+            ((df_modal['treat1'] == compare) & (df_modal['treat2'] == treatment))
+        ]
+        
+        # Filter out rows with missing TE1 values
+        filtered_df = filtered_df[filtered_df['TE1'].notna()]
+        
+        # Calculate TE1 and RR values
+        filtered_df['TE1_up'] = filtered_df['TE1'] + 1.96 * filtered_df['seTE1']
+        filtered_df['TE1_low'] = filtered_df['TE1'] - 1.96 * filtered_df['seTE1']  # Correction for low bound
+        filtered_df['RR'] = np.exp(filtered_df['TE1'])
+        filtered_df['RR_up'] = np.exp(filtered_df['TE1_up'])
+        filtered_df['RR_low'] = np.exp(filtered_df['TE1_low'])
+
+        # Adjust rows where 'treat1' and 'treat2' need to be swapped
+        mask = (filtered_df['treat1'] == compare) & (filtered_df['treat2'] == treatment)
+        filtered_df.loc[mask, ['treat1', 'treat2']] = filtered_df.loc[mask, ['treat2', 'treat1']].values
+        
+        # Invert the RR and associated values for swapped treatments
+        for col in ['TE1', 'TE1_up', 'TE1_low', 'RR', 'RR_up', 'RR_low']:
+            filtered_df.loc[mask, col] = 1 / filtered_df.loc[mask, col]
+        
+        if value:
+            value = int(value)
+            abrisk = (value * filtered_df['RR'] - value).astype(int)
+        else:
+            abrisk = (20 * filtered_df['RR'] - 20).astype(int)
+        
+
+    else:
+        # If not the 'RR' column, return original rowdata
+        return rowdata_modal.to_dict("records")
+    
+    filtered_df['ab_diff'] = abrisk.apply(lambda x: f"{x} more per 1000" if x > 0 else f"{abs(x)} less per 1000")
+        
+        # Replace 'bias' values with descriptive terms
+    filtered_df['bias'] = filtered_df['bias'].replace({'L': 'Low', 'M': 'Moderate', 'H': 'High'})
+
+    # Add 'ntc' and 'link' columns
+    filtered_df['ntc'] = 'NTC00001'
+    filtered_df['link'] = 'https://www.nejm.org/doi/10.1056/NEJMoa1314258?url_ver=Z39.88-2003&rfr_id=ori:rid:crossref.org&rfr_dat=cr_pub%20%200www.ncbi.nlm.nih.gov'
+
+    # Return the filtered DataFrame as a dictionary
+    return filtered_df.to_dict("records")
