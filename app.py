@@ -2143,7 +2143,7 @@ def filter_data(node_data, edge_data):
 
 
 @app.callback(
-    Output("skt_modal_copare_simple", "is_open"), 
+    Output("skt_modal_compare_simple", "is_open"), 
     Input("grid_treat_compare", "cellClicked"),
     Input("close_compare_simple", "n_clicks"),
 )
@@ -2157,6 +2157,35 @@ def display_sktinfo(cell, _):
         if ('colId' in cell and (cell['colId'] == "RR"or cell['colId'] == "RR_out2") and cell['value']is not None):
             return True
     return no_update
+
+
+
+from tools.functions_modal_info import display_modal_barplot
+
+@app.callback(
+    Output("barplot_compare", "figure"),
+    Output("modal_info_head", "children"),
+    Input("grid_treat_compare", "cellClicked"), 
+    Input("simple_abvalue", "value"),
+    State('grid_treat_compare','rowData')
+)
+
+def display_sktinfo(cell,value,rowdata):
+    return display_modal_barplot(cell,value,rowdata)
+
+
+
+from tools.functions_modal_info import display_modal_text
+@app.callback(
+    # Output("risk_range", "children"),
+    Output("text_info_col", "children"),
+    Input("grid_treat_compare", "cellClicked"), 
+    Input("simple_abvalue", "value"),
+    State('grid_treat_compare','rowData')
+)
+
+def display_textinfo(cell,value,rowdata):
+    return display_modal_text(cell,value,rowdata)
 
 
 

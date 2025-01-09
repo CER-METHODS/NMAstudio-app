@@ -570,6 +570,12 @@ h6 {margin-top: 0;}
     color: green;
 }
 
+
+.studyinfo_simple{
+    font-weight: bold;
+    font-size: larger;
+}
+
 .abvalue_range{
     /* font-weight: bold; */
     color: red;
@@ -714,6 +720,13 @@ h6 {margin-top: 0;}
     --ag-header-cell-hover-background-color: transparent!important;
 }
 
+#modal_treat_compare{
+    --ag-header-foreground-color: black!important;
+    --ag-header-background-color: #ffc1078a !important;
+    --ag-font-size: 15px!important;
+    --ag-header-cell-hover-background-color: transparent!important;
+}
+
 
 .center-aligned-group-header:nth-of-type(4) {
     border-right: 1px solid rgb(165, 163, 163); /* Apply separator styling */
@@ -773,7 +786,14 @@ h6 {margin-top: 0;}
 }
 
 
+.skt_modal_simple{
+    width: min-content
+}
 
+#skt_modal_compare_simple{
+    justify-content: center;
+    display: grid;
+}
 
 /* .modal-content{
     display: grid;

@@ -10,7 +10,7 @@ def render_chat_input():
     chat_input = dbc.InputGroup(
         children=[
             dbc.Input(id="user-input", 
-                      placeholder="Send a message...", 
+                      placeholder="What is the side effects of eicosatetraenoic acid (ETA)?", 
                       type="text", style={'width': '95%'}),
             dbc.Button(id="submit", children=">", color="success"),
         ],

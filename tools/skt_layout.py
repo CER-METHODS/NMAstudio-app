@@ -11,7 +11,7 @@ import plotly.express as px, plotly.graph_objects as go
 import dash_daq as daq
 from tools.functions_skt_forestplot import __skt_options_forstplot, __skt_mix_forstplot
 import os
-from tools.skt_table import treat_compare_grid
+from tools.skt_table import treat_compare_grid, modal_compare_grid
 
 data = pd.read_csv('db/skt/final_all.csv')
 pw_data = pd.read_csv('db/skt/forest_data_prws.csv')
@@ -885,52 +885,112 @@ from tools.functions_chatbot import render_chatbot
 
 model_skt_compare_simple = dbc.Modal(
     [
-        dbc.ModalHeader("ADA VS. ETA", className="skt_info_head_simple"),
+        dbc.ModalHeader([html.P("")],className="skt_info_head_simple", id='modal_info_head'),
+        
         dbc.ModalBody(
             [
+                # First row for the risk input
                 dbc.Row(
                     [
-                        dbc.Col(),
                         dbc.Col(
                             [
-                                html.Span('Enter the risk for comparator (per 1000):',className='abvalue_simple'),
-                                dcc.Input(id="simple_abvalue",
-                                        type="text",
-                                        name='risk',
-                                        # value=20,
-                                        placeholder="e.g. 20", style={'width':'80px', 'margin-left': '15px'}),
-                                html.Span('The risk of comparator ranges from 10 per 1000 to 30 per 1000 in the dataset.',className='abvalue_range'),
+                                html.Span(
+                                    "Enter the risk for comparator (per 1000):", 
+                                    className="abvalue_simple"
+                                ),
+                                dcc.Input(
+                                    id="simple_abvalue",
+                                    type="text",
+                                    name="risk",
+                                    placeholder="e.g. 20", 
+                                    style={"width": "80px", "margin-left": "15px"}
+                                ),
+                                html.Span(
+                                    [html.P("The risk of comparator ranges from 10 per 1000 to 30 per 1000 in the dataset.")], 
+                                    className="abvalue_range", id='risk_range'
+                                ),
                                 html.Br(),
+                            ]
+                        ),
+                    ]
+                ),
+
+                # Second row for displaying other information
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
                                 html.Span("Outcome: PASI90", className="skt_span_info2", id="treat_comp"),
                                 html.Span("Treatment: ADA", className="skt_span_info2", id="num_RCT"),
-                                html.Span("Comparator: ETA", className="skt_span_info2", id="num_RCT"),
-                                html.Span("Absolute difference: 30 more per 1000", className="skt_span_info2", id="num_sample"),
+                                html.Span("Comparator: PBO", className="skt_span_info2", id="num_RCT"),
+                                html.Span(
+                                    "Absolute difference: 30 more per 1000", 
+                                    className="skt_span_info2", 
+                                    id="num_sample"
+                                ),
                                 html.Span(
                                     "CI: 10 per 1000 to 40 per 1000",
                                     className="skt_span_info2",
                                     id="mean_modif",
                                 ),
-                            ]
+                            ], style={'margin-right': '20px'}, id= 'text_info_col'
                         ),
-                    ]
+                        dbc.Col(dcc.Loading(
+                                    html.Div([
+                                        dcc.Graph(
+                                            id='barplot_compare',
+                                            style={'width':'100%'},
+                                            config={'editable': True,
+                                                    'displayModeBar': False,
+                                            'edits': dict(annotationPosition=True,
+                                                        annotationTail=True,
+                                                        annotationText=True, axisTitleText=False,
+                                                        colorbarPosition=False,
+                                                        colorbarTitleText=False,
+                                                        titleText=False,
+                                                        legendPosition=True, legendText=True,
+                                                        shapePosition=True),
+                                                'toImageButtonOptions': {
+                                                    'format': 'png',
+                                                    # one of png, svg,
+                                                    'filename': 'custom_image',
+                                                    'scale': 3.5
+                                                    # Multiply title/legend/axis/canvas sizes by this factor
+                                                },
+                                                'displaylogo': False})], style={'width':'100%'})
+                                             ),),  # Empty column for alignment
+                    ], 
+                    style={'display': 'grid', 
+                           'grid-template-columns': '1fr 1fr', 
+                           'align-items': 'center', 'border-bottom': '2px solid green'}
                 ),
-                dbc.Row(),
+                
+                dbc.Row([html.Span("Study Information", 
+                                    className="studyinfo_simple"),
+                                    modal_compare_grid],
+                        style={'width':'95%', 'justify-self':'center',
+                               'justify-content':'center'}),
             ],
             className="skt_info_body_simple",
         ),
+        
+        # Modal footer with close button
         dbc.ModalFooter(
             dbc.Button(
-                "Close", id="close_compare_simple", className="ms-auto", n_clicks=0
+                "Close", 
+                id="close_compare_simple", 
+                className="ms-auto", 
+                n_clicks=0
             ),
             className="skt_info_close_simple",
         ),
     ],
-    id="skt_modal_copare_simple",
+    id="skt_modal_compare_simple",  # Corrected id for typo
     is_open=False,
     scrollable=True,
-    contentClassName="forest_content",
+    contentClassName="skt_modal_simple",
 )
-                                                  
+                                            
 
 
 
@@ -1007,7 +1067,7 @@ def skt_nonexpert():
                                                                                     minZoom=0.6,  maxZoom=1.5,  panningEnabled=True,   
                                                                                     elements=get_skt_elements(),
                                                                                     style={ 
-                                                                                        'height': '50vh', 
+                                                                                        'height': '100%', 
                                                                                         'width': '100%', 
                                                                                         'margin-top': '-2%',
                                                                                         'z-index': '999',

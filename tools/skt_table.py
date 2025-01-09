@@ -228,3 +228,161 @@ treat_compare_grid = dag.AgGrid(
            'height':f'{45.5 *30}px'
            }
 )
+
+############################# Modal Grid ####################################################
+
+
+data_modal = pd.read_csv('db/psoriasis_wide_complete.csv')
+df_modal = pd.DataFrame(data_modal)
+filtered_df = df_modal[((df_modal['treat1'] == 'ADA') & (df_modal['treat2'] == 'PBO')) |
+                 ((df_modal['treat1'] == 'PBO') & (df_modal['treat2'] == 'ADA'))]
+filtered_df = filtered_df[filtered_df['TE1'].notna()]
+filtered_df['TE1_up'] = filtered_df['TE1'] + 1.96*filtered_df['seTE1']
+filtered_df['TE1_low'] = filtered_df['TE1'] + 1.96*filtered_df['seTE1']
+filtered_df['RR'] = np.exp(filtered_df['TE1'])
+filtered_df['RR_up'] = np.exp(filtered_df['TE1_up'])
+filtered_df['RR_low'] = np.exp(filtered_df['TE1_low'])
+
+for index, row in filtered_df.iterrows():
+    if row['treat1'] == 'PBO' and row['treat2'] == 'ADA':
+        # Swap treat1 and treat2
+        filtered_df.at[index, 'treat1'], filtered_df.at[index, 'treat2'] = row['treat2'], row['treat1']
+        
+        # Invert the values for the specified columns
+        for col in ['TE1', 'TE1_up', 'TE1_low', 'RR', 'RR_up', 'RR_low']:
+            filtered_df.at[index, col] = 1 / row[col]
+
+# Calculate the 'ab_diff' column in a vectorized way
+abrisk = (20 * filtered_df['RR'] - 20).astype(int)
+
+# Use a condition to assign the appropriate text based on the value of 'abrisk'
+filtered_df['ab_diff'] = abrisk.apply(lambda x: f"{x} more per 1000" if x > 0 else f"\n{abs(x)} less per 1000")
+# Replace values in the 'bias' column
+filtered_df['bias'] = filtered_df['bias'].replace({'L': 'Low', 'M': 'Moderate', 'H': 'High'})
+
+filtered_df['ntc'] = 'NTC00001'
+filtered_df['link'] = 'https://www.nejm.org/doi/10.1056/NEJMoa1314258?url_ver=Z39.88-2003&rfr_id=ori:rid:crossref.org&rfr_dat=cr_pub%20%200www.ncbi.nlm.nih.gov'
+
+modal_treat_compare = [
+   
+    {"headerName": "Study", 
+     "field": "studlab",
+     "suppressHeaderMenuButton": True,
+     "editable": False,
+     "resizable": False,
+     'cellStyle': {
+        'background-color': '#ffecb3',
+        },
+     "cellRenderer": "StudyLink",
+     },
+     
+     {"headerName": "NTC", 
+     "field": "ntc",
+     "suppressHeaderMenuButton": True,
+     "editable": False,
+     "resizable": False,
+     'cellStyle': {
+        'background-color': '#ffecb3',
+        }
+     },
+
+     {"headerName": "Absolute Effect\n(per 1000)", 
+     "field": "ab_diff",
+     "suppressHeaderMenuButton": True,
+     "editable": False,
+     "resizable": False,
+     'cellStyle': {
+        'background-color': '#ffecb3',
+        }
+     },
+     
+     {"headerName": "Study size", 
+     "field": "sample_size",
+     "suppressHeaderMenuButton": True,
+     "editable": False,
+     "resizable": False,
+     'cellStyle': {
+        'background-color': '#ffecb3',
+        }
+     },
+
+     {"headerName": "Age", 
+     "field": "age",
+     "suppressHeaderMenuButton": True,
+     "editable": False,
+     "resizable": False,
+     'cellStyle': {
+        'background-color': '#ffecb3',
+        }
+     },
+
+     {"headerName": "BMI", 
+     "field": "bmi",
+     "suppressHeaderMenuButton": True,
+     "editable": False,
+     "resizable": False,
+     'cellStyle': {
+        'background-color': '#ffecb3',
+        }
+     },
+
+     {"headerName": "Weight", 
+     "field": "weight",
+     "suppressHeaderMenuButton": True,
+     "editable": False,
+     "resizable": False,
+     'cellStyle': {
+        'background-color': '#ffecb3',
+        }
+     },
+     
+     {"headerName": "Risk of bias", 
+     "field": "bias",
+     "suppressHeaderMenuButton": True,
+     "editable": False,
+     "resizable": False,
+     'cellStyle':{
+                "styleConditions": [
+                {"condition": "params.value == 'High'", "style": {"backgroundColor": "rgb(90, 164, 105)", **style_certainty}},   
+                {"condition": "params.value == 'Low'", "style": {"backgroundColor": "#B85042", **style_certainty}},
+                {"condition": "params.value == 'Moderate'", "style": {"backgroundColor": "rgb(248, 212, 157)", **style_certainty}},       
+                    ]}
+     },
+]
+
+
+
+modal_compare_grid = dag.AgGrid(
+    id="modal_treat_compare",
+    # className="ag-theme-alpine color-fonts",
+    enableEnterpriseModules=True,
+    licenseKey=os.environ["AG_GRID_KEY"],
+    columnDefs=modal_treat_compare,
+    rowData = filtered_df.to_dict("records"),
+    dangerously_allow_code=True,
+    dashGridOptions = {"rowHeight": 60},
+    defaultColDef={
+                    'filter':False,
+                    "floatingFilter": False,
+                    "resizable": False,
+                    "wrapText": True, 
+                    # 'autoHeight': True,
+                    "enableRowGroup": False,
+                    "enableValue": False,
+                    "enablePivot": False,
+                    'cellStyle': {'white-space': 'pre',
+                                  'display': 'grid',
+                                  'text-align': 'center',
+                                  'align-items': 'center',
+                                  'line-height': 'normal'
+                                  },
+                    "animateRows": False,
+                    # "tooltipComponent": "CustomTooltip"
+                    },
+    columnSize="autoSize", 
+    getRowId='params.data.index', 
+    style={ 
+        # "width": "100%",
+        #    'height':f'{45.5 *30}px'
+           }
+)

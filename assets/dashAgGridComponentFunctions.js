@@ -343,3 +343,15 @@ dagcomponentfuncs.DMC_Button = function (props) {
     );
 };
 
+
+
+dagcomponentfuncs.StudyLink = function (props) {
+    return React.createElement(
+        'a',
+        {
+            href: props.node.data.link,
+            target: "_blank"
+        },
+        props.value
+    );
+};

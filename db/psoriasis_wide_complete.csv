@@ -1,4 +1,4 @@
-studlab,id,treat1,treat2,TE1,seTE1,pasi90,n11,sae,n21,co_intervention.x,sample_size.x,age,male,duration_pso.x,bmi,weight,previous_topical,previous_photo,previous_systemic,previous_bio,treat1_class,treat2_class,TE2,seTE2,year,bias,rob,n12,n22,outcome1_direction,outcome2_direction
+studlab,id,treat1,treat2,TE1,seTE1,pasi90,n11,sae,n21,co_intervention.x,sample_size,age,male,duration_pso.x,bmi,weight,previous_topical,previous_photo,previous_systemic,previous_bio,treat1_class,treat2_class,TE2,seTE2,year,bias,rob,n12,n22,outcome1_direction,outcome2_direction
 ACCEPT_2010,1,ETA,USK,-0.588947562,0.110220682,80,347,231,556,0,903,45,613,19,,90,874,592,510,103,ATA,AIL1223,-0.221703666,0.608538901,2010,H,3,347,556,beneficial,harmful
 Igarashi_2012,2,USK,PBO,2.500655007,0.990780917,48,126,1,32,0,160,45,126,16,26,72,158,107,119,1,AIL1223,PBO,-0.965080896,0.89114916,2012,M,2,126,32,beneficial,harmful
 Krueger_2007,3,USK,PBO,3.16758253,0.995487351,95,256,1,64,0,320,45,222,18,,93,NA,NA,NA,.,AIL1223,PBO,0.810930216,1.044786993,2007,L,1,256,64,beneficial,harmful
