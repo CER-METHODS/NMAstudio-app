@@ -11,7 +11,7 @@ def display_modal_barplot(cell, value, rowdata):
         return fig, header
     
     rowdata = pd.DataFrame(rowdata)
-    if ('colId' in cell and cell['colId'] == "RR"):
+    if ('colId' in cell and (cell['colId'] == "RR" or cell['colId'] == "RR_out2")):
         first_part = cell['value'].split('\n')[0]
         rr = float(first_part)
         row_idx = cell['rowIndex']
@@ -91,16 +91,26 @@ def display_modal_text(cell,value,rowdata):
         return info_col
     
     rowdata = pd.DataFrame(rowdata)
-    if ('colId' in cell and cell['colId'] == "RR"):
+    if ('colId' in cell and (cell['colId'] == "RR"or cell['colId'] == "RR_out2")):
+        row_idx = cell['rowIndex']
         
         if value:
             value = int(value)
         else:
             value = 20
         
+        if cell['colId'] == "RR":
+            out = 'PASI90'
+            rr_low = rowdata.loc[row_idx, 'CI_lower']
+            rr_up = rowdata.loc[row_idx, 'CI_upper']
+        else:
+            out = 'SAE'
+            rr_low = rowdata.loc[row_idx, 'CI_lower_out2']
+            rr_up = rowdata.loc[row_idx, 'CI_upper_out2']
+        
         first_part = cell['value'].split('\n')[0]
         rr = float(first_part)
-        row_idx = cell['rowIndex']
+
         treatment = rowdata.loc[row_idx, 'Treatment']
         compare = rowdata.loc[row_idx, 'Reference']
         
@@ -108,18 +118,16 @@ def display_modal_text(cell,value,rowdata):
         ab_diff = ab_treat-value
         span_diff = f"{ab_diff} more per 1000" if ab_diff > 0 else f"{abs(ab_diff)} less per 1000"
         
-        rr_low = rowdata.loc[row_idx, 'CI_lower']
         ab_diff_low = int(rr_low*value)-value
         span_diff_low = f"{ab_diff_low} more per 1000" if ab_diff_low > 0 else f"{abs(ab_diff_low)} less per 1000"
 
-        rr_up = rowdata.loc[row_idx, 'CI_upper']
         ab_diff_up = int(rr_up*value)-value
         span_diff_up = f"{ab_diff_up} more per 1000" if ab_diff_up > 0 else f"{abs(ab_diff_up)} less per 1000"
     
     else:
         return ''
     
-    span1 = html.Span("Outcome: PASI90", className="skt_span_info2", id="treat_comp")
+    span1 = html.Span(f"Outcome: {out}", className="skt_span_info2", id="treat_comp")
     span2 = html.Span(f"Treatment: {treatment}", className="skt_span_info2", id="num_RCT")
     span3 = html.Span(f"Comparator: {compare}", className="skt_span_info2", id="num_RCT")
     span4 = html.Span(
@@ -150,7 +158,7 @@ def display_modal_data(cell, value, rowdata, rowdata_modal):
     df_modal = pd.read_csv('db/psoriasis_wide_complete.csv')
 
     # Check if the column is 'RR'
-    if cell.get('colId') == "RR":
+    if (cell.get('colId') == "RR" or cell.get('colId') == "RR_out2"):
         # Extract relative risk (RR) value from the cell's value
         rr = float(cell['value'].split('\n')[0])
         row_idx = cell['rowIndex']
@@ -163,24 +171,36 @@ def display_modal_data(cell, value, rowdata, rowdata_modal):
             ((df_modal['treat1'] == compare) & (df_modal['treat2'] == treatment))
         ]
         
+        if cell.get('colId') == "RR":
         # Filter out rows with missing TE1 values
-        filtered_df = filtered_df[filtered_df['TE1'].notna()]
+            filtered_df = filtered_df[filtered_df['TE1'].notna()]
+            
+            # Calculate TE1 and RR values
+            filtered_df['TE_up'] = filtered_df['TE1'] + 1.96 * filtered_df['seTE1']
+            filtered_df['TE_low'] = filtered_df['TE1'] - 1.96 * filtered_df['seTE1']  # Correction for low bound
+            filtered_df['RR'] = np.exp(filtered_df['TE1'])
         
-        # Calculate TE1 and RR values
-        filtered_df['TE1_up'] = filtered_df['TE1'] + 1.96 * filtered_df['seTE1']
-        filtered_df['TE1_low'] = filtered_df['TE1'] - 1.96 * filtered_df['seTE1']  # Correction for low bound
-        filtered_df['RR'] = np.exp(filtered_df['TE1'])
-        filtered_df['RR_up'] = np.exp(filtered_df['TE1_up'])
-        filtered_df['RR_low'] = np.exp(filtered_df['TE1_low'])
+        else:
+            filtered_df = filtered_df[filtered_df['TE2'].notna()]
+            
+            # Calculate TE1 and RR values
+            filtered_df['TE_up'] = filtered_df['TE2'] + 1.96 * filtered_df['seTE2']
+            filtered_df['TE_low'] = filtered_df['TE2'] - 1.96 * filtered_df['seTE2']  # Correction for low bound
+            filtered_df['RR'] = np.exp(filtered_df['TE2'])
+        
+        
+        filtered_df['RR_up'] = np.exp(filtered_df['TE_up'])
+        filtered_df['RR_low'] = np.exp(filtered_df['TE_low'])
 
         # Adjust rows where 'treat1' and 'treat2' need to be swapped
         mask = (filtered_df['treat1'] == compare) & (filtered_df['treat2'] == treatment)
         filtered_df.loc[mask, ['treat1', 'treat2']] = filtered_df.loc[mask, ['treat2', 'treat1']].values
         
         # Invert the RR and associated values for swapped treatments
-        for col in ['TE1', 'TE1_up', 'TE1_low', 'RR', 'RR_up', 'RR_low']:
+        for col in ['TE1', 'TE_up', 'TE_low', 'RR', 'RR_up', 'RR_low']:
             filtered_df.loc[mask, col] = 1 / filtered_df.loc[mask, col]
-        
+
+
         if value:
             value = int(value)
             abrisk = (value * filtered_df['RR'] - value).astype(int)
