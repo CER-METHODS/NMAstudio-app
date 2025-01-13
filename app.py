@@ -1209,6 +1209,7 @@ def modal_ENABLE_UPLOAD_button(effect_mod, no_effect_mod):
 
 from assets.storage import DEFAULT_DATA
 OUTPUTS_STORAGE_IDS = list(DEFAULT_DATA.keys())[:-2]
+# OUTPUTS_STORAGE_IDS = list(DEFAULT_DATA.keys())
 
 
 @app.callback([Output(id, 'data') for id in OUTPUTS_STORAGE_IDS] + [Output('token-not-found-alert','children'),
