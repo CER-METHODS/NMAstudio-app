@@ -359,7 +359,7 @@ cytoscape_main = cyto.Cytoscape(id='cytoscape', responsive=True, autoRefreshLayo
                                         
                                 elements=[],
                                 style={ 
-                                    'height': '70vh', 'width': '100%', 
+                                    'height': '95%', 'width': '100%', 
                                        'margin-top': '10px',
                                         'margin-left': '-10px','margin-right': '-10px',  'z-index': '999',
                                         'padding-left': '-10px', 

@@ -451,6 +451,38 @@ def is_secondicon_show(search_value_format,search_value_outcome1):
 #     else:
 #         return donotshow_outcome2_icon, donot_show_DIV_style, '', filename
 
+@app.callback(
+        Output('protocol_link_button', 'disabled'),
+        Input('protocol-link', 'value')
+)
+def enable(value):
+    if value:
+        return False
+    return True
+
+
+@app.callback([
+               Output("upload_original_data", "style"),
+               Output("arrow_protocol", "style")
+               ],
+               [Input('protocol-link', 'value'),
+                Input("protocol_link_button", "n_clicks")
+                ]
+              )
+def is_data_file_uploaded(value,click):
+    show_DIV_style = {'display': 'grid', 'justify-content': 'center'}
+    donot_show_DIV_style = {'display': 'none', 'justify-content': 'center'}
+    arrow1_show={'display':'grid', 'justify-content': 'center'}
+    arrow1_notshow={'display':'none', 'justify-content': 'center'}
+
+    if value and click:
+        return  show_DIV_style,  arrow1_show
+    else:
+        return  donot_show_DIV_style, arrow1_notshow
+
+
+
+
 @app.callback([
                Output("dropdowns-DIV2", "style"),
                Output("uploaded_datafile2", "children"),
@@ -1452,17 +1484,17 @@ def toggle_modal(expand, zoomout, expand1, zoomout1, expand_plot, zoomout_plot):
     style_no = {"display": "none"}
     style_height = {'display': 'block','height': '100%'}
     style_neplot={
-            'height': '70vh', 'width': '100%', 
+            'height': '75vh', 'width': '100%', 
                 'margin-top': '10px',
                 'margin-left': '-10px','margin-right': '-10px',  'z-index': '999',
                 'padding-left': '-10px', 'border-right': '3px solid rgb(165 74 97)'}
     style_neplot_expand={
-            'height': '70vh', 'width': '100%', 
+            'height': '75vh', 'width': '100%', 
                 'margin-top': '10px',
                 'margin-left': '-10px','margin-right': '-10px',  'z-index': '999',
                 'padding-left': '-10px', 'border-right': '3px solid rgb(165 74 97)'}
     style_neplot_down={
-        'height': '140vh', 'width': '100%', 
+        'height': '95%', 'width': '100%', 
             'margin-top': '10px',
             'margin-left': '-10px','margin-right': '-10px',  'z-index': '999',
             'padding-left': '-10px', 'border-right': '3px solid rgb(165 74 97)'}
@@ -1709,9 +1741,9 @@ def results_display(selected):
     if selected == 2:
         return [style_no_display]*4 + [style_display]*2 + [style_no_display]*3+['league_tab']+['league_tab_both']
     if selected == 3:
-        return [style_no_display]*6 + [style_display]*2 + [style_no_display]+['consis_tab']+['funnel_tab']
-    if selected == 4:
         return [style_no_display]*8 + [style_display]+['ranking_tab']+['']
+    if selected == 4:
+        return [style_no_display]*6 + [style_display]*2 + [style_no_display]+['consis_tab']+['funnel_tab']
 
 
    

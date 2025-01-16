@@ -284,7 +284,7 @@ def real_homelayout():
 def Homepage():
     return html.Div([Navbar(), home_layout(), upload_data()], id='')
 
-OPTIONS_results = [{'label': col, 'value': idx} for idx, col in enumerate(['Data & Transitivity', 'Forest plots', 'League tables', 'Consistency & Reporting bias', 'Ranking'])]
+OPTIONS_results = [{'label': col, 'value': idx} for idx, col in enumerate(['Data & Transitivity', 'Forest plots', 'League tables','Ranking', 'Consistency & Reporting bias'])]
 def home_layout():
     return html.Div(id='result_page',className="app__container", children=STORAGE+[
                         html.Div(dataupload_error, style={'vertical-align': "top"}),
@@ -790,6 +790,38 @@ def upload_data():
     return html.Div(id='upload_page',style={'display':'none'},children=[
         dbc.Row( [html.Img(src="/assets/icons/back_arrow.png",n_clicks=0,
                 style={'width': '40px'}, id='back_plot'), html.P('Back to the results', id='back_result')], id='arrow_back'),
+        html.Br(),
+        dbc.Row([dbc.Col([html.P("Provide the link of the protocol of your study:", className="selcect_title",),
+                         html.Div(
+                                [dcc.Input(id='protocol-link', className='upload_radio', style={'width':'200px'}),
+                                 dbc.Button("OK", n_clicks=0, id='protocol_link_button',disabled=True,
+                                    style={'color': 'white',
+                                            'background-color':'orange',
+                                            'display': 'inline-block',
+                                            'justify-self':'center',
+                                            'border': 'unset',
+                                            'padding': '4px'})],
+                                        style={'display': 'flex',
+                                                'justify-content': 'space-evenly',
+                                                'width': '250px',
+                                                'justify-self': 'center'
+                                               }),
+                                               ],
+                                       style={'display': 'grid', 
+                                               'background-color': 'beige',
+                                                'width': '500px',
+                                                'justify-content': 'center',
+                                                'height': '100px',
+                                                'align-items': 'center'
+                                               }),
+                dbc.Col(html.Div(html.Span('*NMAStudio resuires users to provide protocol links before runing analysis.',className='upload_instuspan',
+                            )), className='upload_instrucol')], 
+                                         id="protocol-link-input", className= 'upload_row'),
+        html.Br(),
+        dbc.Row( html.Img(src="/assets/icons/arrow.png",
+                style={'width': '60px'}), 
+                style={'display':'none', 'justify-content': 'center'}, id='arrow_protocol'),
+        html.Br(),
         dbc.Row([dbc.Col([
                         html.Div(dcc.Upload(['Drag and Drop or ', html.A('Select a File')],
                             id='datatable-upload2', multiple=False,
@@ -808,7 +840,7 @@ def upload_data():
         #         style={'display': 'inline-block'}),
         dbc.Col(html.Div(html.Span('* The dataset should be uploaded as the csv format',className='upload_instuspan',
                             )), className='upload_instrucol')
-                ], className= 'upload_row'),
+                ], className= 'upload_row', id = 'upload_original_data'),
         dbc.Row( html.Img(src="/assets/icons/arrow.png",
                 style={'width': '60px'}), 
                 style={'display':'none', 'justify-content': 'center'}, id='arrow_step1'),
