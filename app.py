@@ -481,6 +481,18 @@ def is_data_file_uploaded(value,click):
         return  donot_show_DIV_style, arrow1_notshow
 
 
+@app.callback(
+               Output("show_protocol_link", "href"),
+               Input('protocol-link', 'value'),
+               Input('submit_modal_data', 'n_clicks'),
+               State("show_protocol_link", "href"),   
+              )
+def is_data_file_uploaded(value,click, link):
+    if value and click:
+        return value
+    else: return link
+
+
 
 
 @app.callback([

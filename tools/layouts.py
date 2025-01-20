@@ -295,6 +295,17 @@ def home_layout():
                         html.Div(R_errors_funnel, style={'vertical-align': "top"}),
                         html.Br(), html.Br(),
                         dbc.Row([
+                             html.Span('Project protocol link:   ', 
+                                  style={'justify-self':'center',
+                                         'align-self': 'center', 
+                                         'white-space': 'pre',
+                                         'font-size': 'medium', 'color': 'chocolate'}),
+                             dcc.Link(href = 'https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD011535/full', 
+                                  style={'justify-self':'center',
+                                         'align-self': 'center', 
+                                         'font-size': 'medium'}, id= 'show_protocol_link')]),
+                        html.Br(),
+                        dbc.Row([
                                 html.Span('Select results to display:', style={'justify-self':'center','align-self': 'center', 'font-size': 'large', 'font-weight': 'bold'}),
                                 dcc.Dropdown(placeholder="", options=OPTIONS_results, value = 0,
                                             style={'display': 'grid', 'justify-items': 'center', 'width':'230px'},
