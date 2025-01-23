@@ -144,7 +144,7 @@ def display_modal_text(cell,value,rowdata):
 
     return children
 
-def display_modal_data(cell, value, rowdata, rowdata_modal):
+def display_modal_data(cell, rowdata, rowdata_modal):
     # Convert rowdata to DataFrame
     rowdata = pd.DataFrame(rowdata)
     rowdata_modal = pd.DataFrame(rowdata_modal)
@@ -195,26 +195,32 @@ def display_modal_data(cell, value, rowdata, rowdata_modal):
         # Adjust rows where 'treat1' and 'treat2' need to be swapped
         mask = (filtered_df['treat1'] == compare) & (filtered_df['treat2'] == treatment)
         filtered_df.loc[mask, ['treat1', 'treat2']] = filtered_df.loc[mask, ['treat2', 'treat1']].values
-        
         # Invert the RR and associated values for swapped treatments
         for col in ['TE1', 'TE_up', 'TE_low', 'RR', 'RR_up', 'RR_low']:
             filtered_df.loc[mask, col] = 1 / filtered_df.loc[mask, col]
-
-
-        if value:
-            value = int(value)
-            abrisk = (value * filtered_df['RR'] - value).astype(int)
-        else:
-            abrisk = (20 * filtered_df['RR'] - 20).astype(int)
+        filtered_df.loc[mask, ['RR_up', 'RR_low']] = filtered_df.loc[mask, ['RR_low', 'RR_up']].values
+        # if value:
+        #     value = int(value)
+        #     abrisk = (value * filtered_df['RR'] - value).astype(int)
+        # else:
+        #     abrisk = (20 * filtered_df['RR'] - 20).astype(int)
         
 
     else:
         # If not the 'RR' column, return original rowdata
         return rowdata_modal.to_dict("records")
     
-    filtered_df['ab_diff'] = abrisk.apply(lambda x: f"{x} more per 1000" if x > 0 else f"{abs(x)} less per 1000")
-        
-        # Replace 'bias' values with descriptive terms
+    # filtered_df['ab_diff'] = abrisk.apply(lambda x: f"{x} more per 1000" if x > 0 else f"{abs(x)} less per 1000")
+    
+    if not filtered_df.empty:
+        filtered_df['RR_ci'] = filtered_df.apply(
+            lambda row: f"{round(row['RR'], 2)}\n({round(row['RR_low'], 2)} to {round(row['RR_up'], 2)})", 
+            axis=1
+        )
+    else:
+        # Add an empty column 'RR_ci' since the DataFrame is empty
+        filtered_df['RR_ci'] = pd.Series(dtype='str')
+     # Replace 'bias' values with descriptive terms
     filtered_df['bias'] = filtered_df['bias'].replace({'L': 'Low', 'M': 'Moderate', 'H': 'High'})
 
     # Add 'ntc' and 'link' columns

@@ -146,10 +146,10 @@ def display_page(pathname):
 )
 def display_grid(value, children):
     if value:
-        children = [skt_nonexpert()]
+        children = [skt_layout()]
     
     else:
-        children = [skt_layout()]
+        children = [skt_nonexpert()]
     return children
 
 
@@ -2237,13 +2237,13 @@ from tools.functions_modal_info import display_modal_data
 @app.callback(
     Output("modal_treat_compare", "rowData"),
     Input("grid_treat_compare", "cellClicked"), 
-    Input("simple_abvalue", "value"),
+    # Input("simple_abvalue", "value"),
     State('grid_treat_compare','rowData'),
     State('modal_treat_compare','rowData')
 )
 
-def display_modaldata(cell,value,rowdata,rowdata_modal):
-    return display_modal_data(cell,value,rowdata,rowdata_modal)
+def display_modaldata(cell,rowdata,rowdata_modal):
+    return display_modal_data(cell,rowdata,rowdata_modal)
 
 
 

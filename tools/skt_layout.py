@@ -95,7 +95,7 @@ df['Scale_lower'] = 'Enter a value for lower'
 df['Scale_upper'] = 'Enter a value for upper'
 # df['ab_effect'] = ''
 df['ab_difference'] = ''
-
+df['rationality'] = ''
 # p_score.rename(columns={'treatment': 'Treatment'}, inplace=True)
 # df = pd.merge(df, p_score, on='Treatment', how='left')
 
@@ -221,6 +221,13 @@ masterColumnDefs = [
 
     {"headerName": "Risk per 1000", 
      "field": "risk",
+     "editable": True,
+     'cellStyle': {
+        'color': 'grey','border-right': 'solid 0.8px'}
+     },
+     
+     {"headerName": "The rationality of the risk", 
+     "field": "rationality",
      "editable": True,
      'cellStyle': {
         'color': 'grey','border-right': 'solid 0.8px'}
@@ -602,7 +609,7 @@ options_effects = [
 # def Sktpage():
 #     return html.Div([Navbar(), skt_home(), skt_layout(), skt_nonexpert()], id='skt_page_content')
 def Sktpage():
-    return html.Div([Navbar(),switch_table(),html.Div([skt_layout()], id='skt_sub_content')], id='skt_page_content')
+    return html.Div([Navbar(),switch_table(),html.Div([skt_nonexpert()], id='skt_sub_content')], id='skt_page_content')
 # def Sktpage():
 #     return html.Div([Navbar(),skt_nonexpert()], id='skt_page_content')
 
@@ -642,7 +649,7 @@ def switch_table():
                                                        }),
                     dbc.Row(dbc.Col([
                             html.P(
-                            "Advanced Version",
+                            "Standard Version",
                             id='skttable_1',
                             style={'display': 'inline-block',
                                     'margin': 'auto',
@@ -660,7 +667,7 @@ def switch_table():
                                         'margin': 'auto', 'font-size': '10px',
                                         'padding-left': '10px',
                                         'padding-right': '10px'}),
-                            html.P('Standard Version',
+                            html.P('Advanced Version',
                                     id='skttable_2',
                                     style={'display': 'inline-block',
                                         'margin': 'auto',

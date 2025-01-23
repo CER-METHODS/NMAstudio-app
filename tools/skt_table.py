@@ -238,7 +238,7 @@ filtered_df = df_modal[((df_modal['treat1'] == 'ADA') & (df_modal['treat2'] == '
                  ((df_modal['treat1'] == 'PBO') & (df_modal['treat2'] == 'ADA'))]
 filtered_df = filtered_df[filtered_df['TE1'].notna()]
 filtered_df['TE1_up'] = filtered_df['TE1'] + 1.96*filtered_df['seTE1']
-filtered_df['TE1_low'] = filtered_df['TE1'] + 1.96*filtered_df['seTE1']
+filtered_df['TE1_low'] = filtered_df['TE1'] - 1.96*filtered_df['seTE1']
 filtered_df['RR'] = np.exp(filtered_df['TE1'])
 filtered_df['RR_up'] = np.exp(filtered_df['TE1_up'])
 filtered_df['RR_low'] = np.exp(filtered_df['TE1_low'])
@@ -247,17 +247,21 @@ for index, row in filtered_df.iterrows():
     if row['treat1'] == 'PBO' and row['treat2'] == 'ADA':
         # Swap treat1 and treat2
         filtered_df.at[index, 'treat1'], filtered_df.at[index, 'treat2'] = row['treat2'], row['treat1']
-        
+        filtered_df.at[index, ['RR_up', 'RR_low']] = filtered_df.loc[index, ['RR_low', 'RR_up']].values
         # Invert the values for the specified columns
         for col in ['TE1', 'TE1_up', 'TE1_low', 'RR', 'RR_up', 'RR_low']:
             filtered_df.at[index, col] = 1 / row[col]
 
-# Calculate the 'ab_diff' column in a vectorized way
-abrisk = (20 * filtered_df['RR'] - 20).astype(int)
+# # Calculate the 'ab_diff' column in a vectorized way
+# abrisk = (20 * filtered_df['RR'] - 20).astype(int)
 
-# Use a condition to assign the appropriate text based on the value of 'abrisk'
-filtered_df['ab_diff'] = abrisk.apply(lambda x: f"{x} more per 1000" if x > 0 else f"\n{abs(x)} less per 1000")
-# Replace values in the 'bias' column
+# # Use a condition to assign the appropriate text based on the value of 'abrisk'
+# filtered_df['ab_diff'] = abrisk.apply(lambda x: f"{x} more per 1000" if x > 0 else f"\n{abs(x)} less per 1000")
+
+filtered_df['RR_ci'] = filtered_df.apply(
+    lambda row: f"{round(row['RR'], 2)}\n({round(row['RR_low'], 2)} to {round(row['RR_up'], 2)})", 
+    axis=1)
+# # Replace values in the 'bias' column
 filtered_df['bias'] = filtered_df['bias'].replace({'L': 'Low', 'M': 'Moderate', 'H': 'High'})
 
 filtered_df['ntc'] = 'NTC00001'
@@ -286,8 +290,8 @@ modal_treat_compare = [
         }
      },
 
-     {"headerName": "Absolute Effect\n(per 1000)", 
-     "field": "ab_diff",
+     {"headerName": "RR", 
+     "field": "RR_ci",
      "suppressHeaderMenuButton": True,
      "editable": False,
      "resizable": False,
@@ -361,8 +365,9 @@ modal_compare_grid = dag.AgGrid(
     rowData = filtered_df.to_dict("records"),
     dangerously_allow_code=True,
     dashGridOptions = {"rowHeight": 60},
+    suppressDragLeaveHidesColumns=False,
     defaultColDef={
-                    'filter':False,
+                    'filter':True,
                     "floatingFilter": False,
                     "resizable": False,
                     "wrapText": True, 

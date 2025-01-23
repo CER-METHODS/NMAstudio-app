@@ -49,6 +49,7 @@ def __Change_Abs(toggle_value,value_effect, value_change,lower,rowData):
     df['Scale_upper'] = 'Enter a value for upper'
     # df['ab_effect'] = ''
     df['ab_difference'] = ''
+    df['rationality'] = ''
 
     if value_change is not None and value_change[0]['value'] is not None and value_change[0]['value'] != 'Enter a value for lower' and value_change[0]['colId']=='Scale_lower':
         scale_lower = float(value_change[0]['value'])
@@ -67,7 +68,7 @@ def __Change_Abs(toggle_value,value_effect, value_change,lower,rowData):
         scale_upper = None
 
     # if value_change is not None and value_change[0]['value'] is not None and (value_change[0]['value'] != 'Enter a value for upper' and value_change[0]['value'] != 'Enter a value for lower') and (value_change[0]['colId']=='Scale_upper' or value_change[0]['colId']=='Scale_lower'):
-    if value_change is not None and value_change[0]['value'] is not None:
+    if value_change is not None and value_change[0]['value'] is not None and value_change[0]['colId']=='risk':
         refer_name = value_change[0]['data']['Reference']
         risk = int(value_change[0]['value'])
     else:
