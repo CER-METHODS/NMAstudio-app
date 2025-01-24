@@ -95,7 +95,7 @@ df['Scale_lower'] = 'Enter a value for lower'
 df['Scale_upper'] = 'Enter a value for upper'
 # df['ab_effect'] = ''
 df['ab_difference'] = ''
-df['rationality'] = ''
+df['rationality'] = 'Enter a reason'
 # p_score.rename(columns={'treatment': 'Treatment'}, inplace=True)
 # df = pd.merge(df, p_score, on='Treatment', how='left')
 
@@ -138,7 +138,7 @@ row_data['risk_range'] = row_data.apply(
     lambda row: f"from {int(row['min_value'])} to {int(row['max_value'])}",
     axis=1
 )
-# print(row_data.head(5))
+
 
 row_data_default = []
 for (ref, risk, Scale_lower, Scale_upper), group in grouped:
@@ -185,7 +185,6 @@ for j in range(0, row_data_default.shape[0]):
         row_data_default.loc[j,'Treatments'][i]['direct'] = f"{row_data_default.loc[j,'Treatments'][i]['direct']}" + f"\n({row_data_default.loc[j,'Treatments'][i]['direct_low']}, {row_data_default.loc[j,'Treatments'][i]['direct_up']})" if pd.notna(row_data_default.loc[j,'Treatments'][i]['direct']) else ""
         row_data_default.loc[j,'Treatments'][i]['indirect'] = f"{row_data_default.loc[j,'Treatments'][i]['indirect']}" + f"\n({row_data_default.loc[j,'Treatments'][i]['indirect_low']}, {row_data_default.loc[j,'Treatments'][i]['indirect_up']})" if pd.notna(row_data_default.loc[j,'Treatments'][i]['indirect']) else ""
         
-
 
 
 style_certainty = {'white-space': 'pre','display': 'grid','text-align': 'center','align-items': 'center','border-left': 'solid 0.8px'}
@@ -733,14 +732,35 @@ def skt_layout():
                                                     'color':'rgb(184 80 66)',
                                                     'width': '90%'
                                                        }),
-                                            html.Div([dbc.Row([dbc.Col(html.Span('Project Title', className='title_first'),className='title_col1'), 
+                                            html.Div([dbc.Row([dbc.Col(html.Span('Project Title', className='title_first'),className='title_col1'),
+                                                               html.Div([ html.P("editable, put your project title here",
+                                                                                 id='title-instruction'),
+                                                                            html.A(
+                                                                            html.Img(
+                                                                                src="/assets/icons/query.png",
+                                                                                style={
+                                                                                    "width": "16px",
+                                                                                    # "float":"right",
+                                                                                    },
+                                                                            )),],id="query-title",), 
                                                               dbc.Col(dcc.Input(id='title_skt',
                                                                             value='Systematic pharmacological treatments for chronic plaque psoriasis: a network meta-analysis', 
                                                                             style={'width':'800px'}
                                                                             ),className='title_col2')],
                                                                        className='row_skt'),
                                                       dbc.Row([dbc.Col([
-                                                          dbc.Toast([html.Span('PICOS', className='study_design'),
+                                                          dbc.Toast([dbc.Row([html.Span('PICOS', className='study_design'),
+                                                                              html.Div([ html.P("editable, add more PICOS information",
+                                                                                id='PICOS-instruction'),
+                                                                                html.A(
+                                                                                    html.Img(
+                                                                                            src="/assets/icons/query.png",
+                                                                                            style={
+                                                                                                "width": "16px",
+                                                                                                # "float":"right",
+                                                                                                },
+                                                                                                )),],id="query-PICOS",)
+                                                                                                ]),
                                                                      dcc.Textarea(value ='Patients: patients with psoriasis\n'+
                                                                                 'Primary outcome: PASI90\n'+
                                                                                 'Study design: randomized control study'
@@ -764,7 +784,6 @@ def skt_layout():
                                                                 #               ], className='tab2_col'),
                                                                 dbc.Col([
                                                                          dbc.Row([html.Span('Interventions Diagram', className='inter_label'),
-                                                                                #  html.Span('Please tick to select the reference treatment', className='note_tick')
                                                                                  ], style={'padding-top': 0}),
                                                                          dbc.Row([dbc.Col(cyto.Cytoscape(id='cytoscape_skt', responsive=False, autoRefreshLayout=True,
                                                                                         minZoom=0.6,  maxZoom=1.2,  panningEnabled=True,   
@@ -831,7 +850,7 @@ def skt_layout():
                                                                                                 ],className='skt_studyinfo2', bodyClassName='slect_body',headerClassName='headtab1'),
                                                                             dbc.Col([dcc.Checklist(options= options_effects, value= ['PI', 'direct', 'indirect'], 
                                                                                           id='checklist_effects', style={'display': 'grid', 'align-items': 'end'}),
-                                                                            html.Div([html.P("nomal scale", id='',
+                                                                            html.Div([html.P("log scale", id='',
                                                                                         style={'display': 'inline-block',
                                                                                                 'font-size': '12px',
                                                                                                 'padding-left': '10px'}),
@@ -842,7 +861,7 @@ def skt_layout():
                                                                                                             'margin': 'auto',
                                                                                                             'padding-left': '10px',
                                                                                                             'padding-right': '10px'}),
-                                                                                    html.P('log scale', id='',
+                                                                                    html.P('nomal scale', id='',
                                                                                         style={'display': 'inline-block', 'margin': 'auto',
                                                                                                 'font-size': '12px',
                                                                                                 'padding-right': '0px'})
@@ -1023,13 +1042,34 @@ def skt_nonexpert():
                                                     'width': '90%'
                                                        }),
                                             html.Div([dbc.Row([dbc.Col(html.Span('Project Title', className='title_first'),className='title_col1'), 
+                                                               html.Div([ html.P("editable, put your project title here",
+                                                                                 id='title-instruction'),
+                                                                            html.A(
+                                                                            html.Img(
+                                                                                src="/assets/icons/query.png",
+                                                                                style={
+                                                                                    "width": "16px",
+                                                                                    # "float":"right",
+                                                                                    },
+                                                                            )),],id="query-title",),
                                                               dbc.Col(dcc.Input(id='title_skt',
                                                                             value='Systematic pharmacological treatments for chronic plaque psoriasis: a network meta-analysis', 
                                                                             style={'width':'800px'}
                                                                             ),className='title_col2')],
                                                                        className='row_skt'),
                                                       dbc.Row([dbc.Col([
-                                                          dbc.Toast([html.Span('PICOS', className='study_design'),
+                                                          dbc.Toast([dbc.Row([html.Span('PICOS', className='study_design'),
+                                                                              html.Div([ html.P("editable, add more PICOS information",
+                                                                                id='PICOS-instruction'),
+                                                                                html.A(
+                                                                                    html.Img(
+                                                                                            src="/assets/icons/query.png",
+                                                                                            style={
+                                                                                                "width": "16px",
+                                                                                                # "float":"right",
+                                                                                                },
+                                                                                                )),],id="query-PICOS",)
+                                                                                                ]),
                                                                      dcc.Textarea(value ='Patients: patients with psoriasis\n'+
                                                                                 'Primary outcome: PASI90\n'+
                                                                                 'Study design: randomized control study'
@@ -1065,9 +1105,24 @@ def skt_nonexpert():
                                                       dbc.Row([
                                                             dbc.Col([
                                                                         dbc.Row([
-                                                                            html.Span('Interventions Diagram', className='inter_label'),
-                                                                            html.Span('Ask Dr.Bot',className='skt_span1', 
+                                                                            dbc.Row([html.Span('Interventions Diagram', className='inter_label'),
+                                                                            html.Div([html.P("Select nodes/edges to dispaly results for specific interventions or comparisons in the table below.",
+                                                                                            id='diagram-instruction'),
+                                                                                            html.A(
+                                                                                                html.Img(
+                                                                                                        src="/assets/icons/query.png",
+                                                                                                        style={
+                                                                                                            "width": "16px",
+                                                                                                            # "float":"right",
+                                                                                                            },
+                                                                                                            )),],id="query-diagram",)]),
+                                                                            dbc.Row([html.Span('Ask Dr.Bot',className='skt_span1', 
                                                                                               style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                                              html.Img(src="/assets/icons/chatbot.png",
+                                                                                                       style={ "height": 30, 
+                                                                                                              'margin-left': '7px'})
+                                                                                              ], style={'justify-content':'center',
+                                                                                                        'align-items': 'center'}),
                                                                             #  html.Span('Please tick to select the reference treatment', className='note_tick')
                                                                                 ], style={'padding-top': 0, 'display':'grid', 'grid-template-columns': '1fr 1fr'}),
                                                                         dbc.Row([dbc.Col(cyto.Cytoscape(id='cytoscape_skt2', responsive=False, autoRefreshLayout=True,

@@ -388,7 +388,7 @@ h6 {margin-top: 0;}
 
 .title_col1{
     /* width: 80px; */
-    width: 10%;
+    width: 7%;
     background-color: #A7BEAE;
     justify-content: start;
     display: grid;
@@ -1984,3 +1984,78 @@ li a {
     width: -webkit-fill-available;
 }
 
+
+#query-title{
+    /* margin-left: 360px; */
+    width: 3%;
+    background-color: #A7BEAE;
+}
+
+
+#query-title:hover #title-instruction {
+    display: block;
+}
+
+#title-instruction{
+    display: none;
+    margin-top: -27px;
+    position: absolute;
+    /* left: 18px;
+    z-index: 1000;
+    color: white; */
+    /* width: 255px; */
+    background-color: #faead7;
+    color: #B85042;
+    padding: 5px 5px;
+    font-size: small;
+    font-weight: bold;
+    text-align: justify;
+    /* border: 1px solid black; */
+}
+
+
+
+#query-PICOS{
+    margin-left: 7px;
+    background-color: unset;
+}
+
+#query-PICOS:hover #PICOS-instruction {
+    display: block;
+}
+
+#PICOS-instruction{
+    display: none;
+    margin-top: -27px;
+    position: absolute;
+    background-color: #faead7;
+    color: #B85042;
+    padding: 5px 5px;
+    font-size: small;
+    font-weight: bold;
+    text-align: justify;
+}
+
+
+#query-diagram{
+    margin-left: 7px;
+    background-color: unset;
+}
+
+#query-diagram:hover #diagram-instruction {
+    display: block;
+}
+
+#diagram-instruction{
+    display: none;
+    margin-top: -35px;
+    margin-left: 25px;
+    position: absolute;
+    background-color: #e7e8d1;
+    width: 270px;
+    color: #B85042;
+    padding: 7px 7px 7px 7px;
+    font-size: small;
+    font-weight: bold;
+    text-align: justify;
+}
