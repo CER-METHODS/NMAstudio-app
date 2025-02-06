@@ -34,9 +34,10 @@ def __modal_submit_checks_NMA_new(modal_data_checks_is_open, num_outcome,TEMP_ne
 
             for i in range(num_outcome):
                 TEMP_user_elements_STORAGE[i] = get_network_new(df=net_data, i=i)
-                # net_data.to_csv('db/test_net_data.csv', encoding='utf-8')
+                print(37)
+                net_data.to_csv('db/test_net_data.csv', encoding='utf-8')
                 NMA_data[i] = run_network_meta_analysis(net_data, i)
-            
+                print(40)
             TEMP_forest_data_STORAGE = [df.to_json(orient='split') for df in NMA_data]
             # TEMP_user_elements_STORAGE = [df.to_json(orient='split') for df in TEMP_user_elements_STORAGE]
 

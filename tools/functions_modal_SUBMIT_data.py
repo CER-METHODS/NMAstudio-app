@@ -265,14 +265,14 @@ def __data_trans(
                 effect_data[i] = effectselectors[i]
                 direct_data[i] = directionselectors[i]
             
-
+            
             TE_dict = {iv_data[i][0]:f'TE{i+1}' for i in range(number_outcomes)}
             seTE_dict = {iv_data[i][1] : f'seTE{i+1}' for i in range(number_outcomes)}
             n1_dict = {iv_data[i][2]:f'n1{i+1}' for i in range(number_outcomes)}
             n2_dict = {iv_data[i][3]:f'n2{i+1}' for i in range(number_outcomes)}
             effect_size = {f'effect_size{i+1}' : effect_data[i] for i in range(number_outcomes)}
             direct = {f'outcome{i+1}_direction' :  direct_data[i] for i in range(number_outcomes)}
-            
+           
 
 
             var_dict = var_dict1.copy()  # Make a copy of the first dictionary
@@ -372,10 +372,8 @@ def __data_trans(
 
 
         
-        
         try:
             data = adjust_data(data_user, search_value_format, number_outcomes)
-
             TEMP_net_data_STORAGE = [data.to_json(orient='split')]
             # data.to_csv('db/test_dat.csv', encoding='utf-8')
      
