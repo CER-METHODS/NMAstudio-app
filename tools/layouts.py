@@ -302,13 +302,19 @@ def home_layout():
                                          'font-size': 'medium', 'color': 'chocolate'}),
                              dcc.Link(href = 'https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD011535/full', 
                                   style={'justify-self':'center',
-                                         'align-self': 'center', 
-                                         'font-size': 'medium'}, id= 'show_protocol_link')]),
+                                         'align-self': 'center',
+                                         'color':'#0FA0CE', 
+                                         'font-size': 'medium',
+                                         'padding': 'unset'
+                                         }, id= 'show_protocol_link')]),
                         html.Br(),
                         dbc.Row([
                                 html.Span('Select results to display:', style={'justify-self':'center','align-self': 'center', 'font-size': 'large', 'font-weight': 'bold'}),
                                 dcc.Dropdown(placeholder="", options=OPTIONS_results, value = 0,
-                                            style={'display': 'grid', 'justify-items': 'center', 'width':'230px'},
+                                            style={'display': 'grid', 
+                                                   'justify-items': 'center', 
+                                                   'place-self': 'center',
+                                                   'width':'230px'},
                                             id='result_selected'
                                                  ),
                                 html.Span('or', style={'justify-self':'center','align-self': 'center'}),
@@ -316,7 +322,7 @@ def home_layout():
                                         "Setup Analysis",
                                         "test_upload",
                                         n_clicks=0,
-                                        ),
+                                          ),
                                 html.Div([html.A(html.Img(src="/assets/icons/reset.png",
                                                      style={'width': '40px', 'filter': 'invert()'}), ##DIV RESET  BUTTON
                                   id="reset_project", style={'display': 'grid', 'justify-items': 'center'}),

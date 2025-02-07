@@ -56,8 +56,7 @@ def tab_data(years=YEARS_DEFAULT):
                     style={
                         "width": "16px",
                         "margin-top": "0px",
-                        "border-radius": "0px",
-                        "float":"right",},
+                        "border-radius": "0px",},
                 )),
                 ],id="query-icon",),
                 ],

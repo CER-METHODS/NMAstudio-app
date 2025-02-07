@@ -12,6 +12,7 @@ import dash_daq as daq
 from tools.functions_skt_forestplot import __skt_options_forstplot, __skt_mix_forstplot
 import os
 from tools.skt_table import treat_compare_grid, modal_compare_grid
+from dash_yada import YadaAIO
 
 data = pd.read_csv('db/skt/final_all.csv')
 pw_data = pd.read_csv('db/skt/forest_data_prws.csv')
@@ -1023,6 +1024,7 @@ model_skt_compare_simple = dbc.Modal(
 
 def skt_nonexpert():
     return html.Div([
+            YadaAIO(yada_id="yada_standard"),
             html.Div(id='skt_all',children=[
                 # dcc.Markdown('Scalable Knowledge Translation Tool',
                 #                                 className="markdown_style_main",

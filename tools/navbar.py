@@ -11,16 +11,16 @@ UP_LOGO = "/assets/logos/logo_universite_paris.jpg"
 def Navbar():
     realhome_button = dbc.NavItem(dbc.NavLink('HOME', href="/home", external_link=True,
                                           style = {'color':'#white','font-family': "sans-serif ",
-                                                   'font-size': '13px'}))
+                                                   'font-size': '15px'}))
     home_button = dbc.NavItem(dbc.NavLink('RESULTS', href="/results", external_link=True,
                                           style = {'color':'#white','font-family': "sans-serif ",
-                                                   'font-size': '13px'}))
+                                                   'font-size': '15px'}))
     skt_button = dbc.NavItem(dbc.NavLink('Knowledge Translation (under construction)', href="/skt",external_link=True,
                                          style = {'color':'lightsteelblue','font-family': "sans-serif ",
-                                                  'font-size': '13px'}, id= 'skt_button'))
+                                                  'font-size': '15px'}, id= 'skt_button'))
     setup_button = dbc.NavItem(dbc.NavLink('Setup Analysis (under construction)', href="/setup",external_link=True,
                                          style = {'color':'lightsteelblue','font-family': "sans-serif ",
-                                                  'font-size': '13px'}, id= ''))
+                                                  'font-size': '15px'}, id= ''))
     # skt_button = dbc.NavItem(dbc.NavLink('SKT TOOL', n_click=0,
     #                                      style = {'color':'#white','font-family': "sans-serif ",
     #                                               'font-size': '13px', 'pointer-events': 'stroke',
@@ -48,8 +48,8 @@ def Navbar():
                              className="child", sm=3, md=2),
                      style={
                             #"border": "0.01px white solid",
-                            'padding-bottom':'0.2%','padding-left':'0.2%',
-                            'padding-right':'0.2%', 'padding-top':'0.2%',
+                            'padding-bottom':'0.6%','padding-left':'0.6%',
+                            'padding-right':'0.6%', 'padding-top':'0.6%',
                            # 'background-color':'#304569'
                             }),
 

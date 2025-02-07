@@ -80,8 +80,7 @@ tab_league = html.Div([
                            html.Img(
                                    src="/assets/icons/query.png",
                                    style={
-                                   "width": "16px",
-                                   "float":"right",},)),],
+                                   "width": "16px",},)),],
                      id="queryicon-cinima"),
                      dcc.Upload(html.A('Upload CINeMA report',
                       style={'margin-left': '5px', 'font-size':'12px','color':'rgb(90, 135, 196)'}),
@@ -196,8 +195,7 @@ tab_league_both = html.Div([
                            html.Img(
                                    src="/assets/icons/query.png",
                                    style={
-                                   "width": "16px",
-                                   "float":"right",},)),],
+                                   "width": "16px",},)),],
                      id="queryicon-cinima"),
                      dcc.Upload(html.A('Upload CINeMA report for outcome 1',
                       style={'margin-left': '5px', 'font-size':'12px','color':'rgb(90, 135, 196)'}),

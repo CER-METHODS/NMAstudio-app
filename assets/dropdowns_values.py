@@ -3,7 +3,7 @@ from assets.modal_values import *
 
 
 Dropdown_nodesize = dbc.DropdownMenu(
-    label="Node size", direction="right", bs_size="sm",
+    label="Node size", direction="right", size="sm",
     children=[dbc.DropdownMenuItem("Default", id='dd_nds_default'),
               dbc.DropdownMenuItem("Tot randomized", id='dd_nds_tot_rnd'),
               html.Div(id='dd_nds', style={'display': 'none'}),
@@ -12,7 +12,7 @@ Dropdown_nodesize = dbc.DropdownMenu(
 
 
 Dropdown_nodecolor = dbc.DropdownMenu(
-    label="Node colour", direction="right",bs_size="sm",
+    label="Node colour", direction="right",size="sm",
     children=[dbc.DropdownMenuItem("Default", id='dd_nclr_default'),
               dbc.DropdownMenuItem("Risk of Bias", id='dd_nclr_rob'),
               dbc.DropdownMenuItem("By class", id='dd_nclr_class'),
@@ -23,7 +23,7 @@ Dropdown_nodecolor = dbc.DropdownMenu(
 
 
 Dropdown_edgecolor = dbc.DropdownMenu(
-    label="Edge colour", direction="right", bs_size="sm",
+    label="Edge colour", direction="right", size="sm",
     children=[dbc.DropdownMenuItem("Default", id='dd_edge_default'),
               dbc.DropdownMenuItem("Custom selection", id='open_modal_dd_eclr_input'), # Calls up Modal
               dbc.DropdownMenuItem("Add label", id='dd_edge_label'),
@@ -33,7 +33,7 @@ Dropdown_edgecolor = dbc.DropdownMenu(
 
 
 Dropdown_graphlayout_inner = dbc.DropdownMenu(
-    label="Graph Layout",bs_size="sm",
+    label="Graph Layout",size="sm",
     children=[
         dbc.DropdownMenuItem(item, id=f'dd_ngl_{item.lower()}')
         for item in ['Circle', 'Breadthfirst', 'Grid', 'Spread', 'Cose', 'Cola',
@@ -44,7 +44,7 @@ Dropdown_graphlayout_inner = dbc.DropdownMenu(
 )
 
 Dropdown_edgesize = dbc.DropdownMenu(
-    label="Edge size", direction="right",bs_size="sm",
+    label="Edge size", direction="right",size="sm",
     children=[
         dbc.DropdownMenuItem("Number of studies", id='dd_egs_tot_rnd'),
         dbc.DropdownMenuItem("No size", id='dd_egs_default'),
@@ -53,7 +53,7 @@ Dropdown_edgesize = dbc.DropdownMenu(
 )
 
 Dropdown_export = dbc.DropdownMenu(
-    label="Export options", direction="right",bs_size="sm",
+    label="Export options", direction="right",size="sm",
     children=[
         dbc.DropdownMenuItem("as svg", id='svg-option'),
         dbc.DropdownMenuItem("as png", id='png-option'),
@@ -65,5 +65,5 @@ Dropdown_export = dbc.DropdownMenu(
 Dropdown_graphlayout = dbc.DropdownMenu(
     label="Graph Settings",
     children=[Dropdown_graphlayout_inner, Dropdown_export, Dropdown_edgesize, Dropdown_nodesize, Dropdown_nodecolor, Dropdown_edgecolor],
-    style={'display': 'inline-block', 'background-color':'#5c7780','color':'white'},
+    toggle_style={'display': 'inline-block', 'background-color':'#00ab9c','color':'white'},
 )

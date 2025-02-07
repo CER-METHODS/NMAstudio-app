@@ -117,9 +117,6 @@ saveload_modal = html.Div(
                 id="modal_saveload",
                 is_open=False,
                 size="xl",
-                style={"max-width": "none", "width": "70%", "font-size":"16px", "border": "1px solid gray",
-                            "color": "black",'font-family':'sans-serif',
-                             "background-color": "#d7dbda"},
             ),
         ], style={"display":'grid', 'align-items': 'center'}
     )
