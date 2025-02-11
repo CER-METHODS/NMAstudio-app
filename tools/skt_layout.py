@@ -1020,11 +1020,11 @@ model_skt_compare_simple = dbc.Modal(
                                             
 
 
-
+from tools.yada import yada_stand
 
 def skt_nonexpert():
     return html.Div([
-            YadaAIO(yada_id="yada_standard"),
+            yada_stand,
             html.Div(id='skt_all',children=[
                 # dcc.Markdown('Scalable Knowledge Translation Tool',
                 #                                 className="markdown_style_main",
@@ -1033,7 +1033,7 @@ def skt_nonexpert():
                 #                                     'text-align': 'center',
                 #                                     'color':'#5c7780',
                 #                                        }),
-                                            html.Br(),html.Br(),
+                                            html.Br(id='yoda_stand_start'),html.Br(),
                                             dcc.Markdown('Instruction: Hover your mouse over the table header to see how you can interact with it.',
                                                 className="markdown_style_main",
                                                 style={

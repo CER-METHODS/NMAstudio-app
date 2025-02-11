@@ -1493,6 +1493,7 @@ img:hover {
     background: rgb(219, 211, 50);
 }
 
+
 #modal_saveload{
     max-width: none;
     width: 70%;
@@ -2071,4 +2072,146 @@ li a {
     font-size: small;
     font-weight: bold;
     text-align: justify;
+}
+
+
+/* .fade yada-active-message show popover bs-popover-start{
+    background-color: white;
+    border: 1px solid grey;
+    border-radius: 25px;
+    width: 300px;
+    height: 150px;
+    justify-content: center;
+    display: grid;
+    align-content: space-evenly;
+} */
+
+.yada-active-message {
+    opacity: 1;
+    background-color: white !important;
+    border: 1px solid grey !important;
+    border-radius: 25px !important;
+    width: 300px !important;
+    height: 150px !important;
+    justify-content: center !important;
+    display: grid !important;
+    align-content: space-evenly !important;
+}
+
+/* .data popover-body{
+    height: 130px;
+    display: grid;
+    align-content: space-evenly;
+} */
+
+.data_message {
+    height: 150px !important;
+    display: grid !important
+}
+
+.yada-hover-message {
+    background-color: white !important;
+    border: 1px solid grey !important;
+    border-radius: 25px !important;
+    width: 300px !important;
+    height: 150px !important;
+    justify-content: center !important;
+    display: grid !important;
+    align-content:center !important;
+    white-space: pre-wrap !important;
+}
+
+.popover-header{
+display: grid;
+align-items: center;
+border-bottom: 1px solid grey;
+color: rgb(128, 128, 1);
+font-weight: bold;
+margin: 10px
+}
+
+.popover-body{
+    margin: 10px
+    }
+
+/* .yada-play-script {
+ background-color: beige !important;
+ padding: 0px;
+ width: 150px;
+} */
+
+.data_message .btn-primary{
+    background-color: beige !important;
+    padding: 0px;
+    width: 150px; 
+}
+
+.data_message .btn-primary:hover{
+    background-color: #95a5a6 !important;
+    /* padding: 0px;
+    width: 150px;  */
+}
+
+.yada-info.offcanvas-start,  .yada-info.offcanvas-end {
+    width: 200px;
+}
+
+.yada-info.offcanvas-top,  .yada-info.offcanvas-bottom {
+    height: fit-content;
+    max-height: 50vh;
+}
+
+.yada-info .offcanvas-header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 0;
+    padding: ""
+}
+
+.yada-info{
+    flex-direction: column-reverse;
+    visibility: visible;
+    display: flex;
+    position: absolute;
+    top: 100vh;
+    left: 25%;
+    background-color: white;
+    max-width: 800px;
+    width: 100vh;
+    border-radius: 25px;
+    border: 1px solid #b85042;
+}
+
+.offcanvas-header{
+    padding: 10px;
+    /* display: grid; */
+    display: inline;
+}
+
+.offcanvas-body{
+    height: 300px;
+    padding: 10px;
+    border-bottom: 1px solid;
+    display: grid;
+}
+
+/* .offcanvas-title{
+    display: inline !important;
+} */
+
+
+.yada-info .btn-primary{
+    background-color: beige !important;
+    padding: 0px;
+    width: 150px; 
+}
+
+.yada-info .btn-primary:hover{
+    background-color: #95a5a6 !important;
+    /* padding: 0px;
+    width: 150px;  */
+}
+.yada-info .btn-close{
+    display: none;
 }
