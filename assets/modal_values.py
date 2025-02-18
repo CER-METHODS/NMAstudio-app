@@ -207,7 +207,7 @@ file_upload_controls2 = [
 
 
 modal_checks = dbc.Modal(is_open=False, children=[
-                   dbc.ModalHeader("Running data analysis"),
+                   dbc.ModalHeader("Running data analysis", style={'font-size': 'large'}),
                    dbc.ModalBody([html.Div(id='data_checks_div', style={"color":"black"}),
                                   html.Br(),
                                   html.P("Data check:",style={"color":"black"}),
@@ -250,7 +250,7 @@ modal_checks = dbc.Modal(is_open=False, children=[
 
                                   html.Br()]),
                    dbc.ModalFooter([dbc.Button("Submit", id="submit_modal_data", className="ml-auto", disabled=True)])
-                        ], id="modal_data_checks", centered=False, style={'background-color':'#40515e',"max-width": "none", "width": "50%"})
+                        ], id="modal_data_checks", centered=True, style={"max-width": "none", "width": "50%",'justify-self': 'center'})
 
 
 modal_data_table = dbc.Modal([

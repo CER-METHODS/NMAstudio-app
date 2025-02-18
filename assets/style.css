@@ -2215,3 +2215,11 @@ margin: 10px
 .yada-info .btn-close{
     display: none;
 }
+
+/* .skt_info_head .btn-close{
+    display: none;
+} */
+
+.modal-header .btn-close{
+    display: none;
+}

@@ -840,7 +840,7 @@ def upload_data():
                 style={'display':'none', 'justify-content': 'center'}, id='arrow_protocol'),
         html.Br(),
         dbc.Row([dbc.Col([
-                        html.Div(dcc.Upload(['Drag and Drop or ', html.A('Select a File', style={'color':'color: #1EAEDB'})],
+                        html.Div(dcc.Upload(['Drag and Drop or ', html.A('Select a File', style={'color':'#1EAEDB'})],
                             id='datatable-upload2', multiple=False,
                             className='control-upload',
                             style={'width': '100%','height': '60px',
