@@ -2075,6 +2075,75 @@ li a {
 }
 
 
+
+#query-logscale{
+    background-color: unset;
+    display: inline-block;
+    margin-right: -10px;
+}
+
+#query-logscale:hover #logscale-instruction {
+    display: block;
+}
+
+#logscale-instruction {
+    display: none;
+    position: absolute;
+    background-color: #e7e8d1;
+    width: 270px;
+    color: #B85042;
+    padding: 7px 7px 7px 7px;
+    font-size: small;
+    font-weight: bold;
+    text-align: justify;
+    margin-top: 24px;
+    margin-left: 20px;
+    z-index: 10;
+}
+
+
+#query-abscale{
+    background-color: unset;
+    display: inline-block;
+    margin-right: -10px;
+}
+
+#query-abscale:hover #abscale-instruction {
+    display: block;
+}
+
+#abscale-instruction {
+    display: none;
+    position: absolute;
+    background-color: #e7e8d1;
+    width: 270px;
+    color: #B85042;
+    padding: 7px 7px 7px 7px;
+    font-size: small;
+    font-weight: bold;
+    text-align: justify;
+    margin-top: -55px;
+    margin-left: -250px;
+    z-index: 10;
+}
+
+#sktdropdown-out{
+    height: 30px;
+    display: grid;
+    width: 150px;
+    justify-content: start;
+    justify-self: start;
+}
+
+.sktdropdown-out{
+    width: 150px;
+}
+
+#outselect_row{
+    display: grid;
+    justify-self: center;
+    width: 90%;
+}
 /* .fade yada-active-message show popover bs-popover-start{
     background-color: white;
     border: 1px solid grey;

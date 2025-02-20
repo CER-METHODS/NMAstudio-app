@@ -640,9 +640,12 @@ def Sktpage():
 #     ], id="skt_profile_page")
 
 def switch_table():
-    return html.Div([dcc.Markdown('Scalable Knowledge Translation Tool',
+    return html.Div([
+                    html.Br(),
+                    dcc.Markdown('Knowledge Translation Tool',
                                                 className="markdown_style_main",
                                                 style={
+                                                    "font-weight": 'bold',
                                                     "font-size": '30px',
                                                     'text-align': 'center',
                                                     'color':'#5c7780',
@@ -733,6 +736,16 @@ def skt_layout():
                                                     'color':'rgb(184 80 66)',
                                                     'width': '90%'
                                                        }),
+                                            dbc.Row([html.P(f"Select outcome",className="", style={'display': 'flex', 
+                                                                                                          "text-align": 'right',
+                                                                                                          'align-items': 'center',
+                                                                                                          'font-weight':'bold',
+                                                                                                          'color':'rgb(184, 80, 66)',
+                                                                                                          'margin-left': '10px', 'font-size': 'large'}),
+                                            dcc.Dropdown(id='sktdropdown-out', options=[{'label': 'PASI90', 'value': 0}, {'label': 'SAE', 'value': 1}],
+                                               clearable=True, placeholder="",
+                                               className="sktdropdown-out")], id='outselect_row'),
+                                            html.Br(),
                                             html.Div([dbc.Row([dbc.Col(html.Span('Project Title', className='title_first'),className='title_col1'),
                                                                html.Div([ html.P("editable, put your project title here",
                                                                                  id='title-instruction'),
@@ -851,7 +864,18 @@ def skt_layout():
                                                                                                 ],className='skt_studyinfo2', bodyClassName='slect_body',headerClassName='headtab1'),
                                                                             dbc.Col([dcc.Checklist(options= options_effects, value= ['PI', 'direct', 'indirect'], 
                                                                                           id='checklist_effects', style={'display': 'grid', 'align-items': 'end'}),
-                                                                            html.Div([html.P("log scale", id='',
+                                                                            html.Div([
+                                                                                html.Div([ html.P("The forest plots in the table will be presented on a logarithmic scale.",
+                                                                                 id='logscale-instruction'),
+                                                                                html.A(
+                                                                                html.Img(
+                                                                                    src="/assets/icons/query.png",
+                                                                                    style={
+                                                                                        "width": "16px",
+                                                                                        # "float":"right",
+                                                                                        },
+                                                                                )),],id="query-logscale",),
+                                                                                html.P("log scale", id='',
                                                                                         style={'display': 'inline-block',
                                                                                                 'font-size': '12px',
                                                                                                 'padding-left': '10px'}),
@@ -862,10 +886,20 @@ def skt_layout():
                                                                                                             'margin': 'auto',
                                                                                                             'padding-left': '10px',
                                                                                                             'padding-right': '10px'}),
-                                                                                    html.P('nomal scale', id='',
+                                                                                    html.P('absolute scale', id='',
                                                                                         style={'display': 'inline-block', 'margin': 'auto',
                                                                                                 'font-size': '12px',
-                                                                                                'padding-right': '0px'})
+                                                                                                'padding-right': '0px'}),
+                                                                                    html.Div([ html.P("The forest plots in the table will be presented on a absolute scale.",
+                                                                                               id='abscale-instruction'),
+                                                                                    html.A(
+                                                                                    html.Img(
+                                                                                        src="/assets/icons/query.png",
+                                                                                        style={
+                                                                                            "width": "16px",
+                                                                                            # "float":"right",
+                                                                                            },
+                                                                                    )),],id="query-abscale",),
                                                                                     ], style={'display': 'inline-block', 'margin-top': '0px'})])],
                                                                                             style={'display': 'grid', 'grid-template-columns': '1fr 1fr'})
                                                                                                 ],
