@@ -41,6 +41,7 @@ def __skt_options_forstplot(value_effect,df, lower, scale_lower, scale_upper, re
         up_mix_max, low_mix_min = data_ex.RR.max(), data_ex.RR.min()
         # up_mix_max = 10**np.floor(np.log10(up_mix_max)) 
         # low_mix_min = 10 ** np.floor(np.log10(low_mix_min))
+
         if refer_name is not None and refer_name == df['Reference'][j+1] and scale_lower is not None and scale_upper is not None:
             range_scale = [np.log10(scale_lower), np.log10(scale_upper)]
         elif refer_name is not None and refer_name == df['Reference'][j+1] and scale_lower is not None and scale_upper is None:
@@ -51,7 +52,7 @@ def __skt_options_forstplot(value_effect,df, lower, scale_lower, scale_upper, re
             range_scale=[np.log10(min(low_rng_min, 0.1, low_mix_min)), 
                              np.log10(max(up_rng_max,10, up_mix_max))]  
         
-            
+        # print(range_scale) if j == 0  else 0
         fig = go.Figure(go.Scatter( y = [],x = []))
         
         tick0 = 10**range_scale[0] + 0.1
@@ -206,6 +207,7 @@ def __skt_options_forstplot(value_effect,df, lower, scale_lower, scale_upper, re
 
 
 def __skt_mix_forstplot(df, lower, scale_lower, scale_upper, refer_name):
+    
     new_rows = pd.DataFrame(columns=df.columns)
     for idx in range(0, 380, 19):
         new_rows.loc[idx/19, 'Reference'] = df.loc[idx, 'Reference']
@@ -236,6 +238,7 @@ def __skt_mix_forstplot(df, lower, scale_lower, scale_upper, refer_name):
         else:
             range_scale=[np.log10(min(low_rng_min, 0.1, low_mix_min)), 
                              np.log10(max(up_rng_max,10, up_mix_max))] 
+        
         
         tick0 = 10**range_scale[0] + 0.1
         tick_end = 10**range_scale[1] - 1    
@@ -351,7 +354,6 @@ def __skt_mix_forstplot(df, lower, scale_lower, scale_upper, refer_name):
 
 
 def __skt_ab_forstplot(risk, value_effect, df,lower, scale_lower, scale_upper, refer_name):
-    
     # df = df.sort_values(by='Reference')
     new_rows = pd.DataFrame(columns=df.columns)
     for idx in range(0, 380, 19):
@@ -407,7 +409,7 @@ def __skt_ab_forstplot(risk, value_effect, df,lower, scale_lower, scale_upper, r
         # Insert 1 at the beginning of the array
         # tick_values = np.insert(tick_values, 0, 1)
         # dtick=(tick_end - tick0) / 9
-
+      
         fig.update_layout(
         xaxis=dict(range=range_scale,
                     # tickvals=tick_values

@@ -709,6 +709,17 @@ h6 {margin-top: 0;}
     --ag-header-cell-hover-background-color: #d55f4f!important;
 }
 
+/* Add custom styles for the detail table */
+.ag-theme-alpine .ag-details-grid .ag-header {
+    --ag-header-foreground-color: black !important;
+    --ag-header-background-color: #e7e8d1 !important; /* Custom color for detail table */
+    --ag-header-column-resize-handle-color: #b1b577 !important;
+    --ag-header-cell-hover-background-color: #ecede0 !important;
+    --ag-font-size: 14px !important;
+}
+
+
+
 #grid_treat_compare {
     --ag-header-foreground-color: black!important;
     --ag-header-background-color: #ffecb3 !important;

@@ -426,6 +426,7 @@ grid = dag.AgGrid(
                 "rowDragEntireRow": True,
                 "rowSelection": "multiple",
                 'getRowStyle': getRowStyle,
+                "detailCellClass": "ag-details-grid",
                 },
                 "detailColName": "Treatments",
                 "suppressCallback": True,

@@ -51,31 +51,38 @@ def __Change_Abs(toggle_value,value_effect, value_change,lower,rowData):
     df['ab_difference'] = ''
     df['rationality'] = 'Enter a reason'
 
+    # print(value_change[0]['value'], value_change[0]['colId']) if value_change is not None else 0
+    refer_name = None
     if value_change is not None and value_change[0]['value'] is not None and value_change[0]['value'] != 'Enter a value for lower' and value_change[0]['colId']=='Scale_lower':
+        refer_name = value_change[0]['data']['Reference']
         scale_lower = float(value_change[0]['value'])
         scale_upper = float(value_change[0]['data']['Scale_upper']) if value_change[0]['data']['Scale_upper'] != 'Enter a value for upper' else None
     elif value_change is not None and value_change[0]['value'] is not None:
+        refer_name = value_change[0]['data']['Reference']
         scale_lower = float(value_change[0]['data']['Scale_lower']) if value_change[0]['data']['Scale_lower'] != 'Enter a value for lower' else None
     else:
         scale_lower = None
+        refer_name = refer_name
 
     if value_change is not None and value_change[0]['value'] is not None and value_change[0]['value'] != 'Enter a value for upper' and value_change[0]['colId']=='Scale_upper':
+        refer_name = value_change[0]['data']['Reference']
         scale_upper = float(value_change[0]['value'])
         scale_lower = float(value_change[0]['data']['Scale_lower']) if value_change[0]['data']['Scale_lower'] != 'Enter a value for lower' else None
     elif value_change is not None and value_change[0]['value'] is not None:
+        refer_name = value_change[0]['data']['Reference']
         scale_upper = float(value_change[0]['data']['Scale_upper']) if value_change[0]['data']['Scale_upper'] != 'Enter a value for upper' else None
     else:
         scale_upper = None
+        refer_name = refer_name
 
     # if value_change is not None and value_change[0]['value'] is not None and (value_change[0]['value'] != 'Enter a value for upper' and value_change[0]['value'] != 'Enter a value for lower') and (value_change[0]['colId']=='Scale_upper' or value_change[0]['colId']=='Scale_lower'):
     if value_change is not None and value_change[0]['value'] is not None and value_change[0]['colId']=='risk':
         refer_name = value_change[0]['data']['Reference']
         risk = int(value_change[0]['value'])
     else:
-        refer_name = None
+        refer_name = refer_name
         risk = None
         
-    
     # if value_effect==[]:
     #         df = __skt_mix_forstplot(df,lower, scale_lower, scale_upper, refer_name)
     # elif all(effect in value_effect for effect in ['PI', 'direct', 'indirect']):
@@ -94,6 +101,7 @@ def __Change_Abs(toggle_value,value_effect, value_change,lower,rowData):
     # elif all(effect in ['direct', 'indirect'] for effect in value_effect):
     #         df = __skt_directin_forstplot(df,lower, scale_lower, scale_upper, refer_name)
     # print(df['risk'])
+    
     if toggle_value:
         df = __skt_ab_forstplot(risk, value_effect, df,lower, scale_lower, scale_upper, refer_name)
     else:
