@@ -38,16 +38,16 @@ def tab_data(years=YEARS_DEFAULT):
     return html.Div(
         [ 
             html.Div([
-                dcc.Slider(
-                    min=y_min,
-                    max=y_max,
-                    step=50,
-                    marks=set_slider_marks(y_min, y_max, years),
-                    value=datetime.date.today().year,  # ymax
-                    updatemode="drag",
-                    id="slider-year",
-                    tooltip=dict(placement="top"),
-                ),
+                # dcc.Slider(
+                    # min=y_min,
+                    # max=y_max,
+                    # step=50,
+                    # marks=set_slider_marks(y_min, y_max, years),
+                    # value=datetime.date.today().year,  # ymax
+                    # updatemode="drag",
+                    # id="slider-year",
+                    # tooltip=dict(placement="top"),
+                # ),
                 html.Div([ html.P("Click the slider to see the evolution of the evidence over time. The data table will be filtered accordingly in real-time.",
                               id='slider-instruction',),
                 html.A(

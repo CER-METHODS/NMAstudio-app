@@ -349,7 +349,6 @@ def home_layout():
         html.Div(id='main_page',
                         ### LEFT HALF OF THE PAGE
                          children=[
-
                             html.Div(  # NMA Graph
                                 [html.Div([dbc.Row([html.Div(Dropdown_graphlayout,
                                                              style={'display': 'inline-block', 'font-size': '11px'}),
@@ -525,21 +524,6 @@ def home_layout():
                                   html.Div([html.P(id='cytoscape-mouseTapEdgeData-output',  style={'margin-top':'-20px'},
                                                    className="info_box" )],
                                         )], className="info__container"),
-                           # html.Div([html.Button('Reset Project', id='reset_project', n_clicks=0, className="reset",
-                           #                       style={"font-type": "sans-serif"}),
-                        #    html.Div([html.A(html.Img(src="/assets/icons/reset.png",
-                        #                              style={'width': '40px', 'filter': 'invert()',
-                        #                                     "margin-bottom":"15px", "margin-left":"10px"}), ##DIV RESET  BUTTON
-                        #           id="reset_project", style={'display': 'inline-block'}),
-                        #              dbc.Tooltip("Reset project - uploaded data will be lost",
-                        #                          style={'color': 'black', 'font-size': 9,
-                        #                                 "margin-left": "5px",
-                        #                                 'letter-spacing': '0.2rem'},
-                        #                          placement='right',
-                        #                          target='reset_project'),
-                        #               ], style={"display":'inline-block', 'margin-left':'20px',
-                        #                         'margin-bottom':'2px'}),
-                        
                            html.Div(
                                 dbc.Col(
                                         [html.Span(f"Select outcome",className="selectbox", style={'display': 'inline-block', "text-align": 'right',
@@ -564,12 +548,19 @@ def home_layout():
                     id='all-control-tabs',style={'background-color':'white'},
                     children=[
                         dcc.Tabs(id='results_tabs', persistence=True, children=[
-
-                            dcc.Tab(id='data_tab', value= 'data_tab',style={'color':'grey','display': 'none', 'justify-content':'center', 'align-items':'center'},
+                                 dcc.Tab(id='data_tab', value= 'data_tab',
                                     selected_style={'color': 'grey', 'display': 'flex', 'justify-content': 'center','background-color': '#f5c198',
                                                     'align-items': 'center'},
                                     label='Data',
-                                    children=html.Div(className='control-tab', children=[
+                                    style={'overflowX': 'auto',
+                                           'overflowY': 'auto',
+                                           'height': '99%',
+                                           'color':'grey',
+                                           'display': 'none', 
+                                           'justify-content':'center', 
+                                           'align-items':'center'
+                                           },
+                                    children= html.Div(className='control-tab', children=
                                         dcc.Tabs(id='', value='new_data', vertical=False, persistence=True,
                                                  children=[
                                                      dcc.Tab(label='Converted Data', 
@@ -594,20 +585,9 @@ def home_layout():
                                                                                 'align-items': 'center','background-color': '#f5c198',
                                                                                 'font-size': '12px', 'padding': '0'},
                                                              ), 
-                                                 ])],
-                                                      style={'overflowX': 'auto',
-                                                             'overflowY': 'auto',
-                                                             'height': '99%',
-                                                             })
-                                    ),
-
-                            # dcc.Tab(style={'color':'grey', 'display': 'flex', 'justify-content':'center', 'align-items':'center'},
-                            #         selected_style={'color': 'grey', 'display': 'flex', 'justify-content': 'center',
-                            #                         'align-items': 'center'},
-                            #         label='Transitivity checks',
-                            #         children=html.Div(className='control-tab', children=[tab_trstvty])
-                            #        ),
-
+                                                 ])
+                                         )
+                            ),
                             dcc.Tab(id='forest_tab',value= 'forest_tab',
                                     style={'color':'grey', 'display': 'none', 'justify-content':'center', 'align-items':'center'},
                                     selected_style={'color': 'grey', 'display': 'flex', 'justify-content': 'center','background-color': '#f5c198',
@@ -638,26 +618,17 @@ def home_layout():
                                                         'height': '99%',
                                                              })
                                     ),
-                        #     dcc.Tab(style={'color':'grey','display': 'flex', 'justify-content':'center', 'align-items':'center'},
-                        #             selected_style={'color': 'grey', 'display': 'flex', 'justify-content': 'center',
-                        #                             'align-items': 'center'},
-                        #             label='Funnel plots',
-                        #             children=html.Div(className='control-tab', children=[tab_funnel])
-                        #     ),
                             dcc.Tab(id='ranking_tab',value= 'ranking_tab',style={'color':'grey', 'display': 'none', 'justify-content':'center', 'align-items':'center'},
                                     selected_style={'color': 'grey', 'display': 'flex', 'justify-content': 'center','background-color': '#f5c198',
                                                     'align-items': 'center'},
                                     label='Ranking plots',
                                     children=html.Div(className='control-tab', children=[tab_ranking])
-                            ),
-
-
-                        ],  colors={ "border": 'grey', "primary": "grey", "background": 'white',
-                                #     "background": '#e8eaeb',
+                            )
+                        ],  colors={ "border": 'grey', "primary": "grey", "background": 'white'
                                    }
                         ) #change border to CLR_BCKGRND to remove tabs borders
-                    ]),
-
+                    ]
+                    )
                 ]),
                 html.Br(),
             html.Div(id='one-half-3',className ="one-half-3 column", 

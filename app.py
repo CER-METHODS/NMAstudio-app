@@ -88,7 +88,7 @@ def get_new_layout():
                         #  'background-color':'#5c7780'
                          }),
                      dcc.Store(id='consts_STORAGE',  data={'today': TODAY, 'session_ID': SESSION_ID},
-                               storage_type='memory',
+                               storage_type='local',
                                ),
                      ])
 server = app.server
@@ -644,43 +644,43 @@ def get_image(net_download_activation, export):
 
 
 
-@app.callback([Output('cytoscape', 'elements'),
-               Output('modal-cytoscape', 'elements'),],
-              [
-               Input('net_data_STORAGE', 'data'),
-               Input('slider-year', 'value'),
-               Input('_outcome_select', 'value'),
-               Input('reset_project', 'n_clicks'),
-            #    Input('node_size_input', 'value'),
-               ])
-def update_layout_year_slider(net_data, slider_year, out_fun,reset_btn):
+# @app.callback([Output('cytoscape', 'elements'),
+               # Output('modal-cytoscape', 'elements'),],
+              # [
+               # # Input('net_data_STORAGE', 'data'),
+               # #CHAN~GED~ Input('slider-year', 'value'),
+               # Input('_outcome_select', 'value'),
+               # Input('reset_project', 'n_clicks'),
+            # #    Input('node_size_input', 'value'),
+               # ])
+# def update_layout_year_slider(net_data, slider_year, out_fun,reset_btn):
     
-    YEARS_DEFAULT = np.array([1963, 1990, 1997, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2010,
-                              2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021])
-    years_dft_max = YEARS_DEFAULT.max()
+    # YEARS_DEFAULT = np.array([1963, 1990, 1997, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2010,
+                              # 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021])
+    # years_dft_max = YEARS_DEFAULT.max()
 
 
-    reset_btn_triggered = False
-    triggered = [tr['prop_id'] for tr in dash.callback_context.triggered]
-    if 'reset_project.n_clicks' in triggered: reset_btn_triggered = True
+    # reset_btn_triggered = False
+    # triggered = [tr['prop_id'] for tr in dash.callback_context.triggered]
+    # if 'reset_project.n_clicks' in triggered: reset_btn_triggered = True
 
-    try:
-        net_datajs = pd.read_json(net_data[0], orient='split')
-    except:
-        net_datajs = pd.read_json(net_data[0], orient='split', encoding = 'utf-8')
+    # try:
+        # net_datajs = pd.read_json(net_data[0], orient='split')
+    # except:
+        # net_datajs = pd.read_json(net_data[0], orient='split', encoding = 'utf-8')
     
-    outcome = out_fun 
-    if outcome:
-        outcome = int(outcome)
-        net_data = pd.read_json(net_data[0], orient='split')
-        net_datajs2 = net_data[net_data.year <= slider_year] if not reset_btn_triggered else net_data[net_data.year <= years_dft_max]
-        elements = get_network_new(df=net_datajs2, i = outcome )
+    # outcome = out_fun 
+    # if outcome:
+        # outcome = int(outcome)
+        # net_data = pd.read_json(net_data[0], orient='split')
+        # net_datajs2 = net_data[net_data.year <= slider_year] if not reset_btn_triggered else net_data[net_data.year <= years_dft_max]
+        # elements = get_network_new(df=net_datajs2, i = outcome )
 
-    else:
-        net_datajs = net_datajs[net_datajs.year <= slider_year] if not reset_btn_triggered else net_datajs[net_datajs.year <= years_dft_max]
-        elements = get_network_new(df=net_datajs,i = 0)
+    # else:
+        # net_datajs = net_datajs[net_datajs.year <= slider_year] if not reset_btn_triggered else net_datajs[net_datajs.year <= years_dft_max]
+        # elements = get_network_new(df=net_datajs,i = 0)
 
-    return elements, elements
+    # return elements, elements
 
 ### ---------------------------------- FOREST PLOTS CALLBACKS ---------------------------------- ###
 
@@ -819,15 +819,15 @@ def update_boxplot(value, edges, net_data):
                Output('modal_league_table_legend', 'children'),
                Output('rob_vs_cinema', 'value'),
                Output('rob_vs_cinema_modal', 'value'),
-               Output('slider-year', 'min'),
-               Output('slider-year', 'max'),
-               Output('slider-year', 'marks'),
+               #CHANGED Output('slider-year', 'min'),
+               #CHANGED Output('slider-year', 'max'),
+               #CHANGED Output('slider-year', 'marks'),
                Output('data_and_league_table_DATA', 'data'),
                Output('datatable-raw-container', 'data'),
                Output('datatable-raw-container', 'columns')
                ],
               [               
-               Input('slider-year', 'value'),
+               # CHAN~GE~ Input('slider-year', 'value'),
                Input('cytoscape', 'selectedNodeData'),
                Input('cytoscape', 'selectedEdgeData'),
                Input('net_data_STORAGE', 'data'),
