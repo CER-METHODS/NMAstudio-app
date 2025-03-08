@@ -219,6 +219,14 @@ masterColumnDefs = [
         'border-right': 'solid 0.8px'}
      },
 
+      
+     {"headerName": "Range of the risk\n(in dataset)", 
+     "field": "risk_range",
+     "editable": True,
+     'cellStyle': {
+        'border-right': 'solid 0.8px'}
+     },
+
     {"headerName": "Risk per 1000", 
      "field": "risk",
      "editable": True,
@@ -232,13 +240,7 @@ masterColumnDefs = [
      'cellStyle': {
         'color': 'grey','border-right': 'solid 0.8px'}
      },
-     
-     {"headerName": "Range of the risk\n(in dataset)", 
-     "field": "risk_range",
-     "editable": True,
-     'cellStyle': {
-        'border-right': 'solid 0.8px'}
-     },
+    
      {"headerName": "Scale lower\n(forestplots)", 
      "field": "Scale_lower",
      'headerTooltip': 'This is for the forest plots in the nested table',
@@ -558,7 +560,7 @@ model_skt_stand2 = dbc.Modal(
             dbc.ModalBody(
                 [
                 html.Span('Treatment: FUM, Comparator: PBO',className='skt_span_info', id = 'treat_comp'),
-                html.Span('Randomize control studies: 3',className='skt_span_info', id = 'num_RCT'),
+                html.Span('Randomized controlled trial: 3',className='skt_span_info', id = 'num_RCT'),
                 html.Span('Total participants: 1929',className='skt_span_info', id = 'num_sample'), 
                 html.Span('Mean age: xxx', className='skt_span_info', id = 'mean_modif'),
                 ],className='skt_info_body'),
@@ -658,6 +660,7 @@ def switch_table():
                             style={'display': 'inline-block',
                                     'margin': 'auto',
                                     'font-size': '16px',
+                                    'font-weight': 'bold',
                                     'color': 'chocolate',
                                     'padding-left': '0px'}),
                             daq.ToggleSwitch(
@@ -676,6 +679,7 @@ def switch_table():
                                     style={'display': 'inline-block',
                                         'margin': 'auto',
                                         'color': 'green',
+                                        'font-weight': 'bold',
                                         'font-size': '16px',
                                         'padding-right': '0px'})],
                             style={'justify-content': 'center',
@@ -731,9 +735,10 @@ def skt_layout():
                                             dcc.Markdown('Instruction: Hover your mouse over the table header to see how you can interact with it.',
                                                 className="markdown_style_main",
                                                 style={
-                                                    "font-size": '20px',
+                                                    "font-size": '25px',
                                                     'text-align': 'start',
                                                     'font-family': 'math',
+                                                    "font-weight": 'bold',
                                                     'color':'rgb(184 80 66)',
                                                     'width': '90%'
                                                        }),
@@ -778,7 +783,7 @@ def skt_layout():
                                                                                                 ]),
                                                                      dcc.Textarea(value ='Patients: patients with psoriasis\n'+
                                                                                 'Primary outcome: PASI90\n'+
-                                                                                'Study design: randomized control study'
+                                                                                'Study design: randomized controlled trial'
                                                                                 ,className='skt_span1', style={'width':'160%'}),
                                                                             #   html.Span('Primary outcome: PASI90',className='skt_span1'), 
                                                                             #   html.Span('Study design: randomized control study', className='skt_span1'),
@@ -825,8 +830,8 @@ def skt_layout():
                                                             dbc.Col(dbc.Toast(
                                                                               [html.Span('Overall Info', className='study_design'),
                                                                               html.Span('Number of studies: 96',className='skt_span1'),
-                                                                              html.Span('Number of participents: 1020',className='skt_span1'), 
-                                                                              html.Span('Number of comparisions: 21', className='skt_span1'),
+                                                                              html.Span('Number of participants: 1020',className='skt_span1'), 
+                                                                              html.Span('Number of interventions: 20', className='skt_span1'),
                                                                               html.Span('Number of comparisons with direct evidence: 13', className='skt_span1'),
                                                                               html.Span('Number of comparisons without direct evidence: 8 \n', className='skt_span1',
                                                                                         #  style={'border-bottom': 'dashed 1px gray'}
@@ -834,7 +839,7 @@ def skt_layout():
                                                                               ], className='skt_studyinfo',headerClassName='headtab1'), style={'width':'35%'}),
                                                             dbc.Col(dbc.Toast(
                                                                               [
-                                                                              html.Span('Potential effect modifires Info',className='skt_span1', style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                              html.Span('Potential effect modifiers Info',className='skt_span1', style={'color': '#B85042', 'font-weight': 'bold'}),
                                                                               html.Span('Mean age: 45.3',className='skt_span1'),
                                                                               html.Span('Mean male percentage: 43.4%',className='skt_span1'),
                                                                               html.Button('Transitivity check', id='trans_button',className='sub-button',
@@ -865,43 +870,44 @@ def skt_layout():
                                                                                                 ],className='skt_studyinfo2', bodyClassName='slect_body',headerClassName='headtab1'),
                                                                             dbc.Col([dcc.Checklist(options= options_effects, value= ['PI', 'direct', 'indirect'], 
                                                                                           id='checklist_effects', style={'display': 'grid', 'align-items': 'end'}),
-                                                                            html.Div([
-                                                                                html.Div([ html.P("The forest plots in the table will be presented on a logarithmic scale.",
-                                                                                 id='logscale-instruction'),
-                                                                                html.A(
-                                                                                html.Img(
-                                                                                    src="/assets/icons/query.png",
-                                                                                    style={
-                                                                                        "width": "16px",
-                                                                                        # "float":"right",
-                                                                                        },
-                                                                                )),],id="query-logscale",),
-                                                                                html.P("log scale", id='',
-                                                                                        style={'display': 'inline-block',
-                                                                                                'font-size': '12px',
-                                                                                                'padding-left': '10px'}),
-                                                                                    daq.ToggleSwitch(id='nomal_vs_log',
-                                                                                                    color='', size=30,
-                                                                                                    labelPosition="bottom",
-                                                                                                    style={'display': 'inline-block',
-                                                                                                            'margin': 'auto',
-                                                                                                            'padding-left': '10px',
-                                                                                                            'padding-right': '10px'}),
-                                                                                    html.P('absolute scale', id='',
-                                                                                        style={'display': 'inline-block', 'margin': 'auto',
-                                                                                                'font-size': '12px',
-                                                                                                'padding-right': '0px'}),
-                                                                                    html.Div([ html.P("The forest plots in the table will be presented on a absolute scale.",
-                                                                                               id='abscale-instruction'),
-                                                                                    html.A(
-                                                                                    html.Img(
-                                                                                        src="/assets/icons/query.png",
-                                                                                        style={
-                                                                                            "width": "16px",
-                                                                                            # "float":"right",
-                                                                                            },
-                                                                                    )),],id="query-abscale",),
-                                                                                    ], style={'display': 'inline-block', 'margin-top': '0px'})])],
+                                                                            # html.Div([
+                                                                            #     html.Div([ html.P("The forest plots in the table will be presented on a logarithmic scale.",
+                                                                            #      id='logscale-instruction'),
+                                                                            #     html.A(
+                                                                            #     html.Img(
+                                                                            #         src="/assets/icons/query.png",
+                                                                            #         style={
+                                                                            #             "width": "16px",
+                                                                            #             # "float":"right",
+                                                                            #             },
+                                                                            #     )),],id="query-logscale",),
+                                                                            #     html.P("log scale", id='',
+                                                                            #             style={'display': 'inline-block',
+                                                                            #                     'font-size': '12px',
+                                                                            #                     'padding-left': '10px'}),
+                                                                            #         daq.ToggleSwitch(id='nomal_vs_log',
+                                                                            #                         color='', size=30,
+                                                                            #                         labelPosition="bottom",
+                                                                            #                         style={'display': 'inline-block',
+                                                                            #                                 'margin': 'auto',
+                                                                            #                                 'padding-left': '10px',
+                                                                            #                                 'padding-right': '10px'}),
+                                                                            #         html.P('absolute scale', id='',
+                                                                            #             style={'display': 'inline-block', 'margin': 'auto',
+                                                                            #                     'font-size': '12px',
+                                                                            #                     'padding-right': '0px'}),
+                                                                            #         html.Div([ html.P("The forest plots in the table will be presented on a absolute scale.",
+                                                                            #                    id='abscale-instruction'),
+                                                                            #         html.A(
+                                                                            #         html.Img(
+                                                                            #             src="/assets/icons/query.png",
+                                                                            #             style={
+                                                                            #                 "width": "16px",
+                                                                            #                 # "float":"right",
+                                                                            #                 },
+                                                                            #         )),],id="query-abscale",),
+                                                                            #         ], style={'display': 'inline-block', 'margin-top': '0px'})
+                                                                                    ])],
                                                                                             style={'display': 'grid', 'grid-template-columns': '1fr 1fr'})
                                                                                                 ],
                                                                     style={'width':'38%','margin-left': '1%', 'border': '1px dashed rgb(184, 80, 66)','display':'grid'}),
@@ -1072,9 +1078,10 @@ def skt_nonexpert():
                                             dcc.Markdown('Instruction: Hover your mouse over the table header to see how you can interact with it.',
                                                 className="markdown_style_main",
                                                 style={
-                                                    "font-size": '20px',
+                                                    "font-size": '25px',
                                                     'text-align': 'start',
                                                     'font-family': 'math',
+                                                    "font-weight": 'bold',
                                                     'color':'rgb(184 80 66)',
                                                     'width': '90%'
                                                        }),
@@ -1108,8 +1115,8 @@ def skt_nonexpert():
                                                                                                 )),],id="query-PICOS",)
                                                                                                 ]),
                                                                      dcc.Textarea(value ='Patients: patients with psoriasis\n'+
-                                                                                'Primary outcome: PASI90\n'+
-                                                                                'Study design: randomized control study'
+                                                                                'Primary outcome: PASI90, SAE\n'+
+                                                                                'Study design: randomized control trial'
                                                                                 ,className='skt_span1', style={'width':'200%'}),
                                                                             #   html.Span('Primary outcome: PASI90',className='skt_span1'), 
                                                                             #   html.Span('Study design: randomized control study', className='skt_span1'),
@@ -1118,13 +1125,13 @@ def skt_nonexpert():
                                                            dbc.Col(dbc.Toast(
                                                                               [html.Span('Overall Info', className='study_design'),
                                                                               html.Span('Number of studies: 96',className='skt_span1'),
-                                                                              html.Span('Number of interventions', className='skt_span1'),
-                                                                              html.Span('Number of participents: 1020',className='skt_span1'), 
-                                                                              html.Span('Number of comparisions: 21', className='skt_span1'),
+                                                                              html.Span('Number of interventions: 20', className='skt_span1'),
+                                                                              html.Span('Number of participants: 1020',className='skt_span1'), 
+                                                                              html.Span('Number of comparisons: 190', className='skt_span1'),
                                                                               ], className='skt_studyinfo',headerClassName='headtab1'), style={'width':'25%'}),
                                                             dbc.Col(dbc.Toast(
                                                                               [
-                                                                              html.Span('Potential effect modifires Info',className='skt_span1', style={'color': '#B85042', 'font-weight': 'bold'}),
+                                                                              html.Span('Potential effect modifiers Info',className='skt_span1', style={'color': '#B85042', 'font-weight': 'bold'}),
                                                                               html.Span('Mean age: 45.3',className='skt_span1'),
                                                                               html.Span('Mean male percentage: 43.4%',className='skt_span1'),
                                                                               html.Button('Distribution of modifiers', id='trans_button',className='sub-button',
@@ -1143,7 +1150,7 @@ def skt_nonexpert():
                                                             dbc.Col([
                                                                         dbc.Row([
                                                                             dbc.Row([html.Span('Interventions Diagram', className='inter_label'),
-                                                                            html.Div([html.P("Select nodes/edges to dispaly results for specific interventions or comparisons in the table below.",
+                                                                            html.Div([html.P("Select nodes/edges to display results for specific interventions or comparisons in the table below.",
                                                                                             id='diagram-instruction'),
                                                                                             html.A(
                                                                                                 html.Img(
@@ -1273,7 +1280,7 @@ for idx, column in enumerate(column_names):
     for row_idx in range(idx-1):
         treat1 = column
         treat2 = df_league['Treatment'][row_idx]
-        df_league.iloc[row_idx,idx] = f' {treat2} VS. {treat1} \n Randomize control studies: 3\n Total participants in arm: xxx \n Mean age: xxx \nMean male percentage: XXX'
+        df_league.iloc[row_idx,idx] = f' {treat2} VS. {treat1} \n Randomize control trial: 3\n Total participants in arm: xxx \n Mean age: xxx \nMean male percentage: XXX'
 
 for column_idx, column in enumerate(column_names):
     if column_idx < 1 or column_idx >19:

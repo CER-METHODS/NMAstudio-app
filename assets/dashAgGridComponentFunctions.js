@@ -345,18 +345,34 @@ dagcomponentfuncs.DMC_Button = function (props) {
 
 
 
+// dagcomponentfuncs.StudyLink = function (props) {
+//     return React.createElement(
+//         'a',
+//         {
+//             href: props.node.data.link,
+//             target: "_blank"
+//         },
+//         props.value
+//     );
+// };
+
+
 dagcomponentfuncs.StudyLink = function (props) {
     return React.createElement(
         'a',
         {
             href: props.node.data.link,
-            target: "_blank"
+            target: "_blank",
+            style: {
+                color: 'gray',
+                textDecoration: 'none'
+            },
+            onMouseEnter: (e) => e.target.style.color = 'green',
+            onMouseLeave: (e) => e.target.style.color = 'gray'
         },
         props.value
     );
 };
-
-
 
 
 

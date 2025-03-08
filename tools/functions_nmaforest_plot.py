@@ -281,8 +281,9 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
     df_second = df_second[df_second['Treatment'].isin(common_treatments)]
     df = df.sort_values(by='Treatment')
     df_second = df_second.sort_values(by='Treatment')
-
     df['size'] = df.Treatment.astype("category").cat.codes
+
+
     fig = px.scatter(df, x=df[effect_size], y=df_second[effect_size_2],
                  color=df.Treatment,
                  error_x_minus=df['lower_error_1'] if xlog else None,
@@ -292,9 +293,83 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
                  log_x=xlog,
                  log_y=xlog,
                  size_max = 10,
-                 color_discrete_sequence = px.colors.qualitative.Light24,
+                 color_discrete_sequence = None,
+                #  color_discrete_sequence = px.colors.qualitative.Light24,
                  range_x = [min(low_rng, 0.1), max([up_rng, 10])] if xlog else None
                  )
+    
+    # # Compute first occurrence indices for each treatment
+    # first_occurrence = df.reset_index().groupby('Treatment')['index'].first().to_dict()
+
+    # # Create color mapping based on treatment type and first occurrence index
+    # color_mapping = {}
+    # for treatment in df['Treatment'].unique():
+    #     if '+' in treatment:
+    #         color_seq = px.colors.sequential.Reds
+    #     else:
+    #         color_seq = px.colors.sequential.Blues
+    #     idx = first_occurrence[treatment]
+    #     color_mapping[treatment] = color_seq[idx % len(color_seq)]
+
+    # # Assign colors and size to the DataFrame
+    # df['color'] = df['Treatment'].map(color_mapping)
+    # df['size'] = df['Treatment'].astype("category").cat.codes
+
+    # import plotly.graph_objects as go
+    # # Prepare the scatter plot with individual traces for each data point
+    # fig = go.Figure()
+
+    # for i in range(len(df)):
+    #     # Add a scatter point with its error bars and color
+    #     fig.add_trace(
+    #         go.Scatter(
+    #             x=[df[effect_size].iloc[i]],
+    #             y=[df_second[effect_size_2].iloc[i]],
+    #             error_x=dict(
+    #                 type='data',
+    #                 symmetric=False,
+    #                 array=[df['CI_width_hf'].iloc[i] if xlog else df['CI_width'].iloc[i] if data else None],
+    #                 arrayminus=[df['lower_error_1'].iloc[i] if xlog else None],
+    #                 color=df['color'].iloc[i],
+    #             ),
+    #             error_y=dict(
+    #                 type='data',
+    #                 symmetric=False,
+    #                 array=[df_second['CI_width_hf'].iloc[i] if xlog else df_second['CI_width'].iloc[i] if data else None],
+    #                 arrayminus=[df_second['lower_error_2'].iloc[i] if xlog else None],
+    #                 color=df['color'].iloc[i],
+    #             ),
+    #             mode='markers',
+    #             marker=dict(
+    #                 size=10,
+    #                 color=df['color'].iloc[i],
+    #             ),
+    #             showlegend=False  # Suppress legend for individual points
+    #         )
+    #     )
+
+    # # Add custom legend using transparent scatter traces
+    # for treatment, color in color_mapping.items():
+    #     fig.add_trace(
+    #         go.Scatter(
+    #             x=[None],
+    #             y=[None],
+    #             mode='markers',
+    #             marker=dict(size=10, color=color),
+    #             name=treatment
+    #         )
+    #     )
+
+    # # Update axes to match log scale if required
+    # fig.update_layout(
+    #     xaxis=dict(type="log" if xlog else "linear"),
+    #     yaxis=dict(type="log" if xlog else "linear"),
+    # )
+
+  
+   
+        
+    
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
                   plot_bgcolor='rgba(0,0,0,0)',
                   autosize=True,

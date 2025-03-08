@@ -110,8 +110,9 @@ ColumnDefs_treat_compare = [
      "editable": False,
      "resizable": False,
      'cellStyle': {
-        'background-color': '#a6d4a6bd',
+      #   'background-color': '#a6d4a6bd',
         'color':'#04800f',
+        'font-weight':'bold'
         }
      },
     
@@ -138,9 +139,11 @@ ColumnDefs_treat_compare = [
      "editable": False,
      "resizable": False,
      'cellStyle': {
-        'background-color': '#ffc1078a',
+      #   'background-color': '#ffc1078a',
         'color':'#04800f',
         'white-space': 'pre',
+        'font-weight':'bold',
+        'border-right': 'solid 0.8px'
         }
      },
      {
@@ -280,15 +283,15 @@ modal_treat_compare = [
      "cellRenderer": "StudyLink",
      },
      
-     {"headerName": "NTC", 
-     "field": "ntc",
-     "suppressHeaderMenuButton": True,
-     "editable": False,
-     "resizable": False,
-     'cellStyle': {
-        'background-color': '#ffecb3',
-        }
-     },
+   #   {"headerName": "NTC", 
+   #   "field": "ntc",
+   #   "suppressHeaderMenuButton": True,
+   #   "editable": False,
+   #   "resizable": False,
+   #   'cellStyle': {
+   #      'background-color': '#ffecb3',
+   #      }
+   #   },
 
      {"headerName": "RR", 
      "field": "RR_ci",

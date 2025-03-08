@@ -139,7 +139,9 @@ def __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata):
     all_nodes_id = [el['data']['id'] for el in elements if 'target' not in el['data'].keys()]
     text = dbc.Toast([
         html.Span('Click a node to get the information of the corresponding treatment')],
-        style={'justify-items': 'center', 'aligin-items': 'center','text-align':'center'}
+        style={'justify-items': 'center', 
+               'aligin-items': 'center',
+               'text-align':'center','font-weight': 'bold'}
         )
 
     if slct_nodesdata:

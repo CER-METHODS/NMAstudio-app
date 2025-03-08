@@ -13,6 +13,32 @@ import rpy2.rinterface_lib as rlib
 from rpy2.robjects.conversion import localconverter
 #import plotly.express as px
 
+import rpy2.robjects.packages as rpackages
+from rpy2.robjects.vectors import StrVector
+
+
+# utils = rpackages.importr('base')
+
+# # import R's utility package
+# utils = rpackages.importr('utils')
+
+# # select a mirror for R packages
+# utils.chooseCRANmirror(ind=1) # select the first mirror in the list
+
+# # R package names
+# packnames = ("dplyr","tidyverse", "metafor","netmeta")
+
+# # R vector of strings
+# from rpy2.robjects.vectors import StrVector
+
+# # Selectively install what needs to be install.
+# # We are fancy, just because we can.
+# names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]
+# if len(names_to_install) > 0:
+#     utils.install_packages(StrVector(names_to_install))
+
+
+
 r = ro.r
 r['source']('R_Codes/all_R_functions.R')  # Loading the function we have defined in R.
 run_NetMeta_r = ro.globalenv['run_NetMeta_new']  # Get run_NetMeta from R

@@ -4,3 +4,6 @@ my_packages <- c("netmeta","dplyr","metafor","tidyverse")
     install.packages(p)}
  }
 invisible(sapply(my_packages, install_if_missing))
+
+
+# install.packages('tidyverse', repos = "http://cran.us.r-project.org")

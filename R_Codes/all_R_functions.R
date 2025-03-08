@@ -2,12 +2,18 @@
 # Objective :  compute NMA output via netmeta
 # Created by:  Silvia Metelli
 # Created on: 16/11/2020
+
+
+
 options(warn=-1)
-suppressMessages(library(netmeta))
 suppressMessages(library(dplyr))
+suppressMessages(library(tidyverse))
+
 suppressMessages(library(meta))
 suppressMessages(library(metafor))
-suppressMessages(library(tidyverse))
+
+suppressMessages(library(netmeta))
+
 
 
 iswhole <- function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
@@ -807,7 +813,7 @@ get_pairwise_data_long_new <- function(dat, num_outcome=1){
     sm <- dat[[paste0("effect_size", i)]][1] 
     if(sm %in% c('RR','OR')) {
 
-        pair_dat <- netmeta::pairwise(data=dat,
+        pair_dat <- meta::pairwise(data=dat,
                                        event=dat[[paste0("r", i)]],
                                        n=dat[[paste0("n", i)]],
                                        studlab=studlab,
@@ -823,7 +829,7 @@ get_pairwise_data_long_new <- function(dat, num_outcome=1){
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n2'] <- paste0("n2", i)
     }else {
         
-        pair_dat <- netmeta::pairwise(data=dat,
+        pair_dat <- meta::pairwise(data=dat,
                                             mean=dat[[paste0("y", i)]],
                                             sd=dat[[paste0("sd", i)]],
                                             n=dat[[paste0("n", i)]],
@@ -853,7 +859,6 @@ get_pairwise_data_long_new <- function(dat, num_outcome=1){
     return(final_dat1)
 }
 
-
 #----------------------------------- pairwise function to convert contrast data -----------------------------------------#
 
 
@@ -861,7 +866,7 @@ get_pairwise_data_contrast <- function(dat, outcome2=FALSE){
     sm1 <- dat$effect_size1[1]
     if(sm1 %in% c('RR','OR')){
 
-    pairwise_dat1 <- netmeta::pairwise(data=dat,
+    pairwise_dat1 <- meta::pairwise(data=dat,
                                        event=list(r1,r2),
                                        n=list(n1,n2),
                                        studlab=studlab,
@@ -869,7 +874,7 @@ get_pairwise_data_contrast <- function(dat, outcome2=FALSE){
                                        incr=0.5,
                                        sm=sm1)
     }else{
-      pairwise_dat1 <- netmeta::pairwise(data=dat,
+      pairwise_dat1 <- meta::pairwise(data=dat,
                                          mean=list(y1,y2),
                                          sd=list(sd1,sd2),
                                          n=list(n1,n2),
@@ -885,7 +890,7 @@ get_pairwise_data_contrast <- function(dat, outcome2=FALSE){
   if(outcome2==TRUE){
       sm2 <- dat$effect_size2[1]
       if(sm2 %in% c('RR','OR')){
-        pairwise_dat2 <- netmeta::pairwise(data=dat,
+        pairwise_dat2 <- meta::pairwise(data=dat,
                                            event=list(z1,z2),
                                            n=list(n2.1,n2.2),
                                            studlab=studlab,
@@ -893,7 +898,7 @@ get_pairwise_data_contrast <- function(dat, outcome2=FALSE){
                                            incr=0.5,
                                            sm=sm2)
       }else{
-        pairwise_dat2 <- netmeta::pairwise(data=dat,
+        pairwise_dat2 <- meta::pairwise(data=dat,
                                            mean=list(y2.1,y2.2),
                                            sd=list(sd1.2,sd2.2),
                                            n=list(n2.1, n2.2),

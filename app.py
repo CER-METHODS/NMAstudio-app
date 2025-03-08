@@ -36,8 +36,8 @@ from tools.functions_skt_boxplot import __show_boxplot
 from tools.functions_skt_others import __generate_skt_stylesheet, __generate_skt_stylesheet2
 from dash import ctx, no_update
 # --------------------------------------------------------------------------------------------------------------------#
-create_sessions_folders()
-clean_sessions_folders()
+# create_sessions_folders()
+# clean_sessions_folders()
 
 # Load extra layouts
 cyto.load_extra_layouts()
@@ -1770,7 +1770,7 @@ from tools.functions_skt_abs_forest import __Change_Abs
 @app.callback(
     Output("quickstart-grid", "rowData"),
     # Output("quickstart-grid", "style"),
-    Input("nomal_vs_log", "value"),
+    # Input("nomal_vs_log", "value"),
     Input("checklist_effects", "value"),
     Input("quickstart-grid", "cellValueChanged"),
     Input("range_lower", "value"),
@@ -1778,8 +1778,8 @@ from tools.functions_skt_abs_forest import __Change_Abs
     State("quickstart-grid", "rowData"),
 )
 
-def selected(toggle_value,value_effect, value_change,lower,rowData):
-    return __Change_Abs(toggle_value, value_effect, value_change,lower,rowData)
+def selected(value_effect, value_change,lower,rowData):
+    return __Change_Abs(value_effect, value_change,lower,rowData)
 
 
 
@@ -1851,7 +1851,7 @@ def display_sktinfo(cell):
         n_rct = df_n_rct.loc[(df_n_rct['Treatment'] == treat) & (df_n_rct['Reference'] == refer), 'k']
         # print(n_rct)
         n_rct_value = n_rct.iloc[0] if not n_rct.empty else np.NAN
-        num_RCT = f'Randomize control studies: {n_rct_value}'
+        num_RCT = f'Randomize controlled trials: {n_rct_value}'
 
         df_n_total = pd.read_csv('db/psoriasis_wide_complete.csv')
         set1 = {(treat, refer), (refer, treat)}

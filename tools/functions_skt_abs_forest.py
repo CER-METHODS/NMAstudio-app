@@ -2,7 +2,7 @@ import pandas as pd
 from tools.skt_layout import *
 from tools.functions_skt_forestplot import __skt_ab_forstplot, __skt_options_forstplot, __skt_mix_forstplot
 
-def __Change_Abs(toggle_value,value_effect, value_change,lower,rowData):
+def __Change_Abs(value_effect, value_change,lower,rowData):
     
     data = pd.read_csv('db/skt/final_all.csv')
     p_score = pd.read_csv('db/ranking/rank.csv')
@@ -102,13 +102,13 @@ def __Change_Abs(toggle_value,value_effect, value_change,lower,rowData):
     #         df = __skt_directin_forstplot(df,lower, scale_lower, scale_upper, refer_name)
     # print(df['risk'])
     
-    if toggle_value:
-        df = __skt_ab_forstplot(risk, value_effect, df,lower, scale_lower, scale_upper, refer_name)
+    # if toggle_value:
+    #     df = __skt_ab_forstplot(risk, value_effect, df,lower, scale_lower, scale_upper, refer_name)
+    # else:
+    if value_effect==[]:
+            df = __skt_mix_forstplot(df,lower, scale_lower, scale_upper, refer_name)
     else:
-        if value_effect==[]:
-                df = __skt_mix_forstplot(df,lower, scale_lower, scale_upper, refer_name)
-        else:
-                df = __skt_options_forstplot(value_effect,df,lower, scale_lower, scale_upper, refer_name)
+            df = __skt_options_forstplot(value_effect,df,lower, scale_lower, scale_upper, refer_name)
 
     grouped = df.groupby(["Reference", "risk", 'Scale_lower', 'Scale_upper'])
     rowData_effect = []
