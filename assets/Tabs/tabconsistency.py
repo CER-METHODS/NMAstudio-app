@@ -99,7 +99,7 @@ def tab_consistency(consistency_data=CONSISTENCY_DATA):
          'rule': 'background-color: rgba(0, 116, 217, 0.3) !important;'}]
     ),
     html.Br(),
-    html.Div([ html.Div([ html.P("Node-splitting model",
+    html.Div([ html.Div([ html.P("Side-splitting model",
                      style={'font-size': '12px', 'margin-top': '0.8%', 'display': 'inline-block'},
                      className="box__title"),html.Br(),
               html.P("Select edge(s) to display specific comparison(s)",

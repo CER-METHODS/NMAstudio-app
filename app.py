@@ -758,14 +758,13 @@ def TapEdgeData(edge):
               [Input('cytoscape', 'selectedNodeData'),
                Input('_outcome_select', 'value'),
                Input("forest_data_STORAGE", "data"),
-               Input('tapNodeData-fig', 'style')
+               Input('tapNodeData-fig', 'style'),
+               Input('add_pi', 'value')
                ],
               State("net_data_STORAGE", "data")
               )
-def TapNodeData_fig(data, outcome_idx, forest_data, style,net_storage):
-    return __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage)
-
-
+def TapNodeData_fig(data, outcome_idx, forest_data, style, pi, net_storage):
+    return __TapNodeData_fig(data, outcome_idx, forest_data,style, pi, net_storage)
 
 
 ### ----- display dibim forest plot on node click ------ ###
@@ -774,10 +773,12 @@ def TapNodeData_fig(data, outcome_idx, forest_data, style,net_storage):
                Input('forest_data_STORAGE', 'data'),
                Input('_outcome_select', 'value'),
                Input('biforest_outcome_select2', 'value'),
+               Input('_outcome_select', 'options'),
+               Input({'type': 'directionselectors', 'index': ALL}, "value")
                ]
               )
-def TapNodeData_fig_bidim(data, forest_data_store, out_idx1, out_idx2):
-    return __TapNodeData_fig_bidim(data, forest_data_store, out_idx1, out_idx2)
+def TapNodeData_fig_bidim(data, forest_data_store, out_idx1, out_idx2, options,directions):
+    return __TapNodeData_fig_bidim(data, forest_data_store, out_idx1, out_idx2, options, directions)
 
 
 ### - figures on edge click: pairwise forest plots  - ###
@@ -1853,7 +1854,7 @@ def display_sktinfo(cell):
         n_rct_value = n_rct.iloc[0] if not n_rct.empty else np.NAN
         num_RCT = f'Randomize controlled trials: {n_rct_value}'
 
-        df_n_total = pd.read_csv('db/psoriasis_wide_complete.csv')
+        df_n_total = pd.read_csv('db/psoriasis_wide_complete1.csv')
         set1 = {(treat, refer), (refer, treat)}
 
         # Extract relevant rows from the DataFrame

@@ -8,7 +8,6 @@ def __generate_stylesheet(node, slct_nodesdata, elements, slct_edgedata,
 
     nodes_color = (custom_nd_clr or DFLT_ND_CLR) if dd_nclr != 'Default' else DFLT_ND_CLR
     edges_color = (custom_edg_clr or 'grey') if dd_eclr != 'Default' else 'grey'
-   
     label_size=(label_size or None) if dd_eclr != 'Default' else None
     treat_name=(treat_name or None) if dd_eclr != 'Default' else None
 
@@ -20,7 +19,7 @@ def __generate_stylesheet(node, slct_nodesdata, elements, slct_edgedata,
     cls = dd_nclr == 'By class'
     edg_lbl = dd_eclr == 'Add label'
     FOLLOWER_COLOR, FOLLOWING_COLOR = DFLT_ND_CLR, DFLT_ND_CLR
-
+    
     n_cls = elements[-1]["data"]['n_class'] if "n_class" in elements[-1]["data"] and cls else 1
     stylesheet = get_stylesheet(pie=pie, classes=cls, n_class=n_cls, edg_lbl=edg_lbl, edg_col=edges_color,
                                 nd_col=nodes_color, node_size=node_size, edge_size=edge_size,label_size=label_size)

@@ -111,7 +111,7 @@ ColumnDefs_treat_compare = [
      "resizable": False,
      'cellStyle': {
       #   'background-color': '#a6d4a6bd',
-        'color':'#04800f',
+      #   'color':'#04800f',
         'font-weight':'bold'
         }
      },
@@ -140,7 +140,7 @@ ColumnDefs_treat_compare = [
      "resizable": False,
      'cellStyle': {
       #   'background-color': '#ffc1078a',
-        'color':'#04800f',
+      #   'color':'#04800f',
         'white-space': 'pre',
         'font-weight':'bold',
         'border-right': 'solid 0.8px'
@@ -235,7 +235,7 @@ treat_compare_grid = dag.AgGrid(
 ############################# Modal Grid ####################################################
 
 
-data_modal = pd.read_csv('db/psoriasis_wide_complete.csv')
+data_modal = pd.read_csv('db/psoriasis_wide_complete1.csv')
 df_modal = pd.DataFrame(data_modal)
 filtered_df = df_modal[((df_modal['treat1'] == 'ADA') & (df_modal['treat2'] == 'PBO')) |
                  ((df_modal['treat1'] == 'PBO') & (df_modal['treat2'] == 'ADA'))]
@@ -350,8 +350,8 @@ modal_treat_compare = [
      "resizable": False,
      'cellStyle':{
                 "styleConditions": [
-                {"condition": "params.value == 'High'", "style": {"backgroundColor": "rgb(90, 164, 105)", **style_certainty}},   
-                {"condition": "params.value == 'Low'", "style": {"backgroundColor": "#B85042", **style_certainty}},
+                {"condition": "params.value == 'High'", "style": {"backgroundColor": "#B85042", **style_certainty}},   
+                {"condition": "params.value == 'Low'", "style": {"backgroundColor": "rgb(90, 164, 105)", **style_certainty}},
                 {"condition": "params.value == 'Moderate'", "style": {"backgroundColor": "rgb(248, 212, 157)", **style_certainty}},       
                     ]}
      },

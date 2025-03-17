@@ -37,8 +37,8 @@ long_dat = pd.DataFrame(long_dat)
 
 range_ref_ab = long_dat.groupby('treat').apply(
     lambda group: pd.Series({
-        "min_value": (group["rpasi90m"] / group["nm"]).min() * 1000,
-        "max_value": (group["rpasi90m"] / group["nm"]).max() * 1000
+        "min_value": (group["rPASI90"] / group["n"]).min() * 1000,
+        "max_value": (group["rPASI90"] / group["n"]).max() * 1000
     })
 ).reset_index()
 
@@ -234,7 +234,7 @@ masterColumnDefs = [
         'color': 'grey','border-right': 'solid 0.8px'}
      },
      
-     {"headerName": "The rationality of the risk", 
+     {"headerName": "The rationality of selecting the risk", 
      "field": "rationality",
      "editable": True,
      'cellStyle': {

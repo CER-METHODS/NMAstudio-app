@@ -956,6 +956,8 @@ get_pairwise_data_contrast_new <- function(dat, num_outcome=1){
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'event2'] <- paste0("event2", i)
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n1'] <- paste0("n1", i)
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n2'] <- paste0("n2", i)
+        names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'treat_class1'] <- paste0("treat_class1", i)
+        names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'treat_class2'] <- paste0("treat_class2", i)
     }else {
         
         pair_dat <- netmeta::pairwise(data=dat,
@@ -974,6 +976,8 @@ get_pairwise_data_contrast_new <- function(dat, num_outcome=1){
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'event2'] <- paste0("event2", i)
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n1'] <- paste0("n1", i)
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n2'] <- paste0("n2", i)
+        names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'treat_class1'] <- paste0("treat_class1", i)
+        names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'treat_class2'] <- paste0("treat_class2", i)
         }
     }
     final_dat = reduce(pairwise_dat, full_join, by = c("studlab","treat1","treat2"))
