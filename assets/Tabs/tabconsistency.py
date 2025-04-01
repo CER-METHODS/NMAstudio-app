@@ -5,6 +5,8 @@ import dash_core_components as dcc
 from assets.storage import CONSISTENCY_DATA
 
 def tab_consistency(consistency_data=CONSISTENCY_DATA):
+    consistency_data['Q'] = consistency_data['Q'].round(2)
+    consistency_data['p-value'] = consistency_data['p-value'].round(3)
     return html.Div([
         html.Div([
        #      dbc.Col([
@@ -58,7 +60,7 @@ def tab_consistency(consistency_data=CONSISTENCY_DATA):
         id='consistency-table',
         export_format="csv",
         columns=[{"name": i, "id": i} for i in consistency_data.columns],
-        data=consistency_data.round(decimals=4).to_dict('records'),
+        data=consistency_data.to_dict('records'),
         style_cell={'backgroundColor': 'rgba(0,0,0,0.1)',
                 'color': 'black',
                 'textAlign': 'center',
@@ -99,7 +101,7 @@ def tab_consistency(consistency_data=CONSISTENCY_DATA):
          'rule': 'background-color: rgba(0, 116, 217, 0.3) !important;'}]
     ),
     html.Br(),
-    html.Div([ html.Div([ html.P("Node-splitting model",
+    html.Div([ html.Div([ html.P("Side-splitting model",
                      style={'font-size': '12px', 'margin-top': '0.8%', 'display': 'inline-block'},
                      className="box__title"),html.Br(),
               html.P("Select edge(s) to display specific comparison(s)",

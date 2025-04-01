@@ -65,25 +65,25 @@ tab_forests = dcc.Tabs(id='', value='tab1', vertical=False, persistence=True,
                                                     style={'font-size':'12px', 'margin-top':'0.8%',
                                                            'display': 'inline-block','flex-flow' : 'row nowrap',
                                                            'flex-grow': '0', 'justify-content': 'flex-start'}), style={'display': 'inline-block'}),
-                                    
-                                    #  dbc.Col(dbc.Row(
-                                    #              [html.P(f"Select outcomes",className="selectbox", 
-                                    #                      style={'display': 'flex', "text-align": 'right','align-items': 'center',
-                                    #                             'margin-right': '10px', 'font-size': 'small'}),
-                                    #              dcc.Dropdown(id='forest_outcome_select', searchable=True, placeholder="...", className="box", value=0,
-                                    #                            clearable=False, 
-                                    #                            style={'width': '80px',  # 'height': '30px',
-                                    #                                   "height": '30px',
-                                    #                                   'vertical-align': 'middle',
-                                    #                                   "font-family": "sans-serif",
-                                    #                                   'margin-bottom': '2px',
-                                    #                                   'display': 'inline-block',
-                                    #                                   'color': 'black',
-                                    #                                   'font-size': '10px','margin-left':'-7px'})], className='slect-out-row'),
-                                    #                                   className='slect-out-dropdown')
-                                                                      ],
-
-                                                                className='tab_row_all'),
+                                    html.Div([html.P("", 
+                                                        style={'display': 'inline-block',
+                                                                'font-size': '12px',
+                                                                'padding-left': '10px'}),
+                                                daq.ToggleSwitch(id='add_pi',
+                                                                    value=False,
+                                                                    color='', size=30,
+                                                                    labelPosition="bottom",
+                                                                    style={'display': 'inline-block',
+                                                                        'margin': 'auto',
+                                                                        'padding-left': '10px',
+                                                                        'padding-right': '10px'}),
+                                                html.P('Add prediction interval',
+                                                        style={'display': 'inline-block', 'margin': 'auto',
+                                                                'font-size': '12px',
+                                                                'padding-right': '0px'})
+                                                ],  style={'padding': '5px 5px 5px 5px',
+                                                            'display': 'inline-block', 'margin-top': '-2px' })
+                                                            ],className='tab_row_all'),
                                     html.Div([
                                      html.Div(dcc.Loading(
                                              dcc.Graph(
@@ -120,7 +120,7 @@ tab_forests = dcc.Tabs(id='', value='tab1', vertical=False, persistence=True,
                                                          'scale': 3.5
                                                          # Multiply title/legend/axis/canvas sizes by this factor
                                                      },
-                                                     'displaylogo': False})),style={'height': '450px', 'overflow':'scroll'}
+                                                     'displaylogo': False})),style={'height': '450px', 'width':'100%','overflow':'scroll'}
                                                      )])
                                         ])
 

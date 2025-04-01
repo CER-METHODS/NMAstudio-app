@@ -4,7 +4,7 @@ import numpy as np
 import dash_bootstrap_components as dbc, dash_html_components as html
 
 def get_skt_elements():
-    df = pd.read_csv('db/psoriasis_wide_complete.csv')
+    df = pd.read_csv('db/psoriasis_wide_complete1.csv')
     num_classes = None
     i=0
     df = df.dropna(subset=[f'TE{i+1}', f'seTE{i+1}'])

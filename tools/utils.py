@@ -283,9 +283,13 @@ def get_network(df):
 def get_network_new(df, i):
     num_classes = None
     df = df.dropna(subset=[f'TE{i+1}', f'seTE{i+1}'])
-    if "treat1_class" and "treat2_class" in df.columns:
+    # print(df.columns)
+    treat1_class = "treat_class1"
+    treat2_class = "treat_class2"
+
+    if treat1_class and treat2_class in df.columns:
         df_treat = df.treat1.dropna().append(df.treat2.dropna()).reset_index(drop=True)
-        df_class = df.treat1_class.dropna().append(df.treat2_class.dropna()).reset_index(drop=True)
+        df_class = df.treat_class1.dropna().append(df.treat_class2.dropna()).reset_index(drop=True)
         long_df_class = pd.concat([df_treat,df_class], axis=1).reset_index(drop=True)
         long_df_class = long_df_class.rename({long_df_class.columns[0]: 'treat', long_df_class.columns[1]: 'class'}, axis='columns')
         if not is_numeric_dtype(long_df_class.columns[1]):
@@ -306,7 +310,7 @@ def get_network_new(df, i):
     all_nodes_robs = df_n1.add(df_n2, fill_value=0).rename(('count')).unstack('rob', fill_value=0)
     all_nodes_sized = pd.concat([all_nodes_sized, all_nodes_robs], axis=1).reset_index()
 
-    if "treat1_class" and "treat2_class" in df.columns: all_nodes_sized = pd.concat([all_nodes_sized, all_nodes_class['class']], axis=1).reset_index(drop=True)
+    if treat1_class and treat2_class in df.columns: all_nodes_sized = pd.concat([all_nodes_sized, all_nodes_class['class']], axis=1).reset_index(drop=True)
 
     if isinstance(all_nodes_sized.columns[2], str):
         for c in {'1', '2', '3'}.difference(all_nodes_sized): all_nodes_sized[c] = 0
@@ -336,7 +340,7 @@ def get_network_new(df, i):
     # max_trsfrmd_size_nodes = np.sqrt(all_nodes_sized.iloc[:,1].max()) / 70
     # node_size = float(node_size) if node_size is not None else 0
 
-    if "treat1_class" and "treat2_class" in df.columns:
+    if treat1_class and treat2_class in df.columns:
         cy_nodes = [{"data": {"id": target,
                               "label": target,
                               "n_class": num_classes,

@@ -155,7 +155,7 @@ def display_modal_data(cell, rowdata, rowdata_modal):
         return rowdata_modal.to_dict("records")
     
     # Load modal data
-    df_modal = pd.read_csv('db/psoriasis_wide_complete.csv')
+    df_modal = pd.read_csv('db/psoriasis_wide_complete1.csv')
 
     # Check if the column is 'RR'
     if (cell.get('colId') == "RR" or cell.get('colId') == "RR_out2"):

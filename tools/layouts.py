@@ -301,6 +301,7 @@ def home_layout():
                                          'white-space': 'pre',
                                          'font-size': 'medium', 'color': 'chocolate'}),
                              dcc.Link(href = 'https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD011535/full', 
+                                      target="_blank",
                                   style={'justify-self':'center',
                                          'align-self': 'center',
                                          'color':'#0FA0CE', 

@@ -2,7 +2,7 @@ import numpy as np, pandas as pd
 import plotly.express as px, plotly.graph_objects as go
 
 
-def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
+def __TapNodeData_fig(data, outcome_idx, forest_data,style, pi, net_storage):
 
 
     if data:
@@ -60,18 +60,21 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
     # up_rng = np.log10(up_rng)
     # low_rng = np.log10(low_rng)
     # print(up_rng, low_rng)
+   
+
     if data:
         fig=px.scatter(df, x=effect_size, y="Treatment",
                         # error_x_minus=dict(type='data',color = colors[i],array='lower_error',visible=True),
-                    error_x_minus='lower_error_pre' if xlog else None,
-                    error_x='pre_width_hf' if xlog else 'pre_width',
+                    error_x_minus='lower_error_pre' if xlog and pi else None,
+                    error_x= ('pre_width_hf' if xlog else 'pre_width' )if pi else None,
                     log_x=xlog,
                     size_max=5,
                     range_x=[min(max(low_rng-0.2, 0.1), 0.9), up_rng+2] if xlog else None,
                     range_y=[-1, len(df.Treatment)],
                     size=df.WEIGHT)
-        fig.update_traces(marker=dict(color='red'),  # Set points to black
-                    error_x=dict(color='red'))
+        if pi:
+            fig.update_traces(marker=dict(color='red'),  # Set points to black
+                        error_x=dict(color='red'))
 
         fig.add_trace(go.Scatter(
             x=df[effect_size],  # All RR values from the dataframe
@@ -161,13 +164,18 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
                                  showlegend=False, mode='markers',
                                  yaxis="y2"))
 
+        if pi:
+            ticktext=[' ' + '{:.2f}   {:<17} {:<17}'.format(x,y,z)
+                                    for x, y, z in zip(df[effect_size].values, df['CI'].values, df['PI'].values)]
+        else:
+            ticktext=[' ' + '{:.2f}   {:<17}'.format(x,y)
+                                  for x, y in zip(df[effect_size].values, df['CI'].values)]
         fig.update_layout(
             autosize=True,
             width=1500,
             yaxis2=dict(tickvals = [*range(df.shape[0])],
-                        ticktext=[' ' + '{:.2f}   {:<17} {:<17}'.format(x,y,z)
-                                  for x, y, z in zip(df[effect_size].values, df['CI'].values, df['PI'].values)],
-                        showgrid=False,  zeroline=False,
+                        ticktext = ticktext,
+                        showgrid = False,  zeroline=False,
                         titlefont=dict(color='black'),
                         tickfont=dict(color='black'),
                         type='category',
@@ -188,11 +196,11 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
                            xref='paper', yref='y2 domain',
                            text='<b>95% CI</b>',
                            showarrow=False)
-        
-        fig.add_annotation(x=1.32, y=1, align='center',
-                           xref='paper', yref='y2 domain',
-                           text='<b>95% PI</b>',
-                           showarrow=False)
+        if pi:
+            fig.add_annotation(x=1.32, y=1, align='center',
+                            xref='paper', yref='y2 domain',
+                            text='<b>95% PI</b>',
+                            showarrow=False)
 
     else:
         fig.update_layout(clickmode='event+select',
@@ -220,7 +228,7 @@ def __TapNodeData_fig(data, outcome_idx, forest_data,style,net_storage):
 
 ###### BIDIMENSIONAL PLOT
 
-def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
+def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2,options, directions):
     """If click on node uses node as reference to produce both forest plots."""
     ##  ranking data used to check if second outcome is present (easier to check than using dataselectors)
     # df_ranking = pd.read_json(ranking_data, orient='split')
@@ -230,6 +238,12 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
     if not out_idx2:
          out_idx2 = 0
 
+    directions = directions if directions else ['beneficial', 'harmful']
+    direct1 = directions[out_idx1]
+    direct2 = directions[out_idx2]
+   
+    label1 = options[out_idx1]['label']
+    label2 = options[out_idx2]['label']
 
     if data:
         # if "pscore2" in df_ranking.columns:
@@ -240,18 +254,22 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
         df = forest_data[forest_data.Reference == treatment]
         
         effect_size = df.columns[1]
-        df['CI_width'] = df.CI_upper - df.CI_lower
         df['lower_error_1'] = df[effect_size] - df.CI_lower
-        df['CI_width_hf'] = df['CI_width'] / 2
+        df['CI_width'] = (df.CI_upper - df.CI_lower)/2
+        df['CI_width_hf'] = df.CI_upper - df[effect_size] 
         df['WEIGHT'] = round(df['WEIGHT'], 3)
+        CI_lower, CI_upper = df["CI_lower"].map('{:,.2f}'.format), df["CI_upper"].map('{:,.2f}'.format),
+        df['CI'] = '(' + CI_lower.astype(str) + ', ' + CI_upper.astype(str) + ')'
         df = df.sort_values(by=effect_size, ascending=False)
+        
         #second outcome
         df_second = forest_data_out2[forest_data_out2.Reference == treatment]
-        
         effect_size_2 = df_second.columns[1]
         df_second['CI_width'] = df_second.CI_upper - df_second.CI_lower
         df_second['lower_error_2'] = df_second[effect_size] - df_second.CI_lower
         df_second['CI_width_hf'] = df_second['CI_width'] / 2
+        CI_lower2, CI_upper2 = df_second["CI_lower"].map('{:,.2f}'.format), df_second["CI_upper"].map('{:,.2f}'.format),
+        df_second['CI'] = '(' + CI_lower2.astype(str) + ', ' + CI_upper2.astype(str) + ')'
         # else:
         #     effect_size = effect_size_2 = ''
         #     df = pd.DataFrame([[0] * 7], columns=['Treatment', effect_size, 'CI_lower', 'CI_upper', 'WEIGHT',
@@ -260,10 +278,10 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
         #                                                  'CI_width', 'CI_width_hf'])
     else:
             effect_size = effect_size_2 = ''
-            df = pd.DataFrame([[0] * 7], columns=['Treatment', effect_size, 'CI_lower', 'CI_upper', 'WEIGHT',
-                                                  'CI_width', 'CI_width_hf'])
-            df_second = pd.DataFrame([[0] * 7], columns=['Treatment', effect_size, 'CI_lower', 'CI_upper', 'WEIGHT',
-                                                         'CI_width', 'CI_width_hf'])
+            df = pd.DataFrame([[0] * 8], columns=['Treatment', effect_size, 'CI_lower', 'CI_upper', 'WEIGHT',
+                                                  'CI_width', 'CI_width_hf', 'CI'])
+            df_second = pd.DataFrame([[0] * 8], columns=['Treatment', effect_size, 'CI_lower', 'CI_upper', 'WEIGHT',
+                                                         'CI_width', 'CI_width_hf', 'CI'])
 
     xlog = effect_size in ('RR', 'OR')
     up_rng, low_rng = df.CI_upper.max(), df.CI_lower.min()
@@ -284,6 +302,15 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
     df['size'] = df.Treatment.astype("category").cat.codes
 
 
+    df['label1'] = [label1] * len(df)
+    df['label2'] = [label2] * len(df)
+    df['value1'] = ['' + '{:.2f} {:<17}'.format(x, y) 
+                    for x, y in zip(df[effect_size].values, df['CI'].values)]
+    df['value2'] = ['' + '{:.2f} {:<17}'.format(x, y) 
+                    for x, y in zip(df_second[effect_size].values, df_second['CI'].values)]
+
+
+    
     fig = px.scatter(df, x=df[effect_size], y=df_second[effect_size_2],
                  color=df.Treatment,
                  error_x_minus=df['lower_error_1'] if xlog else None,
@@ -294,80 +321,140 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
                  log_y=xlog,
                  size_max = 10,
                  color_discrete_sequence = None,
+                 custom_data=['Treatment','label1', 'label2', 'value1', 'value2'] if data else None, 
                 #  color_discrete_sequence = px.colors.qualitative.Light24,
-                 range_x = [min(low_rng, 0.1), max([up_rng, 10])] if xlog else None
+                #  range_x = [min(low_rng, 0.1), max([up_rng, 10])] if xlog else None,
+                 range_x=([max([up_rng, 10]), min(low_rng, 0.1)] if xlog else None) if direct1 == 'harmful' 
+                         else ([min(low_rng, 0.1), max([up_rng, 10])] if xlog else None),
+                 range_y=([max(df_second[effect_size_2]), min(df_second[effect_size_2])] if direct2 == 'harmful'
+                         else None)
                  )
+    if data:
+         fig.update_traces(
+                hovertemplate=(
+                    "<b>%{customdata[0]}</b><br>" +  # Use color dimension for Treatment name
+                    "%{customdata[1]}: %{customdata[3]}<br>" +
+                    "%{customdata[2]}: %{customdata[4]}<extra></extra>"
+                )
+            )
     
     # # Compute first occurrence indices for each treatment
     # first_occurrence = df.reset_index().groupby('Treatment')['index'].first().to_dict()
 
-    # # Create color mapping based on treatment type and first occurrence index
     # color_mapping = {}
+
+    # # Define blue and red palettes with subsets to avoid overly light colors
+    # blue_palettes = (
+    #     px.colors.sequential.Blues[2::2] +       # Skip lighter blues
+    #     px.colors.sequential.ice[2::2]           # Diverse blues from Dark24 palette
+    # )
+
+    # red_palettes = (
+    #     px.colors.sequential.Reds[1::]+
+    #     px.colors.sequential.Burg[1::]
+    # )
+    # # Use a qualitative palette with more blues (e.g., 'Dark24' or 'Light24')
     # for treatment in df['Treatment'].unique():
     #     if '+' in treatment:
-    #         color_seq = px.colors.sequential.Reds
+    #         # Use Reds from a qualitative palette
+    #         color_seq = red_palettes  # Reds subset
     #     else:
-    #         color_seq = px.colors.sequential.Blues
+    #         # Use Blues from a qualitative palette
+    #         color_seq = blue_palettes  # Blues subset
+        
     #     idx = first_occurrence[treatment]
     #     color_mapping[treatment] = color_seq[idx % len(color_seq)]
+    
+
 
     # # Assign colors and size to the DataFrame
     # df['color'] = df['Treatment'].map(color_mapping)
     # df['size'] = df['Treatment'].astype("category").cat.codes
+ 
+    # # Example data (replace with your actual data)
+    # x_min, x_max = min(df['CI_lower']), max(df['CI_upper'])
+    # y_min, y_max = min(df_second['CI_lower']), max(df_second['CI_upper'])
+
+    # # Create log-spaced ticks starting from 1 and including 1
+    # x_ticks = np.logspace(np.log10(x_min), np.log10(x_max), 10)  # 10 ticks from 1 to x_max
+    # y_ticks = np.logspace(np.log10(y_min), np.log10(y_max), 10)  # 10 ticks from 1 to y_max
+
+    # # # Ensure that 1 is included as the first tick
+    # # if 1 not in x_ticks:
+    # #     x_ticks = np.insert(x_ticks, 0, 1)
+
+    # # if 1 not in y_ticks:
+    # #     y_ticks = np.insert(y_ticks, 0, 1)
+
+    # # Format the ticks for better readability
+    # x_ticktext = [f'{val:.2f}' for val in x_ticks]
+    # y_ticktext = [f'{val:.2f}' for val in y_ticks]
 
     # import plotly.graph_objects as go
     # # Prepare the scatter plot with individual traces for each data point
     # fig = go.Figure()
+    
+    # # Add a temporary column to identify treatments with '+'
+    # df['is_plus'] = df['Treatment'].str.contains(r'\+').astype(int)
 
-    # for i in range(len(df)):
-    #     # Add a scatter point with its error bars and color
+    # # Sort the DataFrame: treatments without '+' first, then those with '+'
+    # df = df.sort_values(by='is_plus').drop(columns='is_plus')
+    
+    # # After sorting the DataFrame, create ordered treatment list
+    # treatment_order = df['Treatment'].unique()  # Gets treatments in sorted order
+
+    # # Then group with sort=False
+    # grouped = df.groupby('Treatment', sort=False)  # <-- Add sort=False here
+
+  
+    # for treatment in treatment_order:
+    #     group = grouped.get_group(treatment)  # Get group for this treatment
+    #     color = color_mapping[treatment]
+    #     if df_second.loc[df_second['Treatment'] == treatment, effect_size_2].empty:
+    #         continue
+    #     # Add a single trace for all points in this treatment group
     #     fig.add_trace(
     #         go.Scatter(
-    #             x=[df[effect_size].iloc[i]],
-    #             y=[df_second[effect_size_2].iloc[i]],
+    #             x=group[effect_size],
+    #             y = df_second.loc[df_second['Treatment'] == treatment, effect_size_2],  # Ensure alignment with df_second
     #             error_x=dict(
     #                 type='data',
     #                 symmetric=False,
-    #                 array=[df['CI_width_hf'].iloc[i] if xlog else df['CI_width'].iloc[i] if data else None],
-    #                 arrayminus=[df['lower_error_1'].iloc[i] if xlog else None],
-    #                 color=df['color'].iloc[i],
+    #                 array=group['CI_width_hf'] if xlog else group['CI_width'] if data else None,
+    #                 arrayminus=group['lower_error_1'] if xlog else None,
+    #                 color=color,
     #             ),
     #             error_y=dict(
     #                 type='data',
     #                 symmetric=False,
-    #                 array=[df_second['CI_width_hf'].iloc[i] if xlog else df_second['CI_width'].iloc[i] if data else None],
-    #                 arrayminus=[df_second['lower_error_2'].iloc[i] if xlog else None],
-    #                 color=df['color'].iloc[i],
+    #                 array=df_second.loc[df_second['Treatment'] == treatment, 'CI_width_hf'] if xlog else df_second.loc[df_second['Treatment'] == treatment, 'CI_width'] if data else None,
+    #                 arrayminus=df_second.loc[df_second['Treatment'] == treatment, 'lower_error_2'] if xlog else None,
+    #                 color=color,
     #             ),
     #             mode='markers',
     #             marker=dict(
     #                 size=10,
-    #                 color=df['color'].iloc[i],
+    #                 color=color,
     #             ),
-    #             showlegend=False  # Suppress legend for individual points
-    #         )
-    #     )
-
-    # # Add custom legend using transparent scatter traces
-    # for treatment, color in color_mapping.items():
-    #     fig.add_trace(
-    #         go.Scatter(
-    #             x=[None],
-    #             y=[None],
-    #             mode='markers',
-    #             marker=dict(size=10, color=color),
-    #             name=treatment
+    #             name=treatment,  # Name the trace (appears in legend)
+    #             showlegend=True  # Ensure legend is shown for this trace
     #         )
     #     )
 
     # # Update axes to match log scale if required
     # fig.update_layout(
-    #     xaxis=dict(type="log" if xlog else "linear"),
-    #     yaxis=dict(type="log" if xlog else "linear"),
+    #     xaxis=dict(
+    #         type="log" if xlog else "linear",
+    #         tickvals=x_ticks,
+    #         ticktext=x_ticktext,
+    #     ),
+    #     yaxis=dict(
+    #         type="log" if xlog else "linear",
+    #         tickvals=y_ticks,
+    #         ticktext=y_ticktext,
+    #     )
     # )
 
-  
-   
         
     
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
@@ -401,8 +488,8 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2):
     fig.update_layout(clickmode='event+select',
                   font_color="black",
                   margin=dict(l=10, r=10, t=12, b=80),
-                  xaxis=dict(showgrid=False, tick0=0, title=f'Click to enter x label ({effect_size})'),
-                  yaxis=dict(showgrid=False, title=f'Click to enter y label ({effect_size_2})'),
+                  xaxis=dict(showgrid=False, tick0=0, title=f'{label1} ({effect_size})'),
+                  yaxis=dict(showgrid=False, title=f'{label2} ({effect_size_2})'),
                   title_text='  ', title_x=0.02, title_y=.98, title_font_size=14,
                   )
     if not data:

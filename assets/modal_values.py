@@ -22,14 +22,16 @@ options_outcomes = [dict(label='continuous', value='continuous'),
 
 Input_color = dcc.Input(id="node_color_input",
                 type="text",
-                style={'background-color':'#40515e','margin-left':'-px', 'font-size':'10.5px', 'padding-left':'-2px',
-                       'color':'white'},
+                style={
+              #       'background-color':'#40515e',
+                       'margin-left':'-px', 'font-size':'10.5px', 'padding-left':'-2px'},
                 placeholder="Type color name / Hex")
 
 Input_color_edge = dcc.Input(id="edge_color_input",
                 type="text",
-                style={'background-color':'#40515e','margin-left':'-px', 'font-size':'10.5px', 'padding-left':'-2px',
-                       'color':'white'},
+                style={
+              #       'background-color':'#40515e',
+                       'margin-left':'-px', 'font-size':'10.5px', 'padding-left':'-2px'},
                 placeholder="Type color name / Hex")
 
 
@@ -37,13 +39,17 @@ modal = dbc.Modal([dbc.ModalHeader("Node color selection"),
                    dbc.ModalBody(Input_color),
                    dbc.ModalFooter(dbc.Button("Close", id="close_modal_dd_nclr_input", n_clicks=0, className="ml-auto"))
                   ],
-            id="modal",style={'background-color':'#40515e','margin-left':'-px', 'font-size':'10.5px', 'padding-left':'-2px'})
+            id="modal",style={
+              #   'background-color':'#40515e',
+                'margin-left':'-px', 'font-size':'10.5px', 'padding-left':'-2px'})
 
 modal_edges = dbc.Modal([dbc.ModalHeader("Edge color selection"),
                    dbc.ModalBody(Input_color_edge),
                    dbc.ModalFooter(dbc.Button("Close", id="close_modal_dd_eclr_input", n_clicks=0, className="ml-auto"))
                   ],
-            id="modal_edge",style={'background-color':'#40515e','margin-left':'-px', 'font-size':'10.5px', 'padding-left':'-2px'})
+            id="modal_edge",style={
+              #   'background-color':'#40515e',
+                'margin-left':'-px', 'font-size':'10.5px', 'padding-left':'-2px'})
 
 file_upload_controls = [html.Br(),
                        dbc.Col([html.P("Note: before uploading your data, read our tutorial for details on variable requirements", className="graph__title2",
@@ -304,8 +310,10 @@ modal_data_table = dbc.Modal([
                            ]),
                             dbc.Button("Close", id="close-data-expanded", className="ml-auto")])
                              ],
-                             id="modal_data_table", centered=False, style={'background-color':'#40515e',
-                                                                           "max-width": "none", "width": "90%"})
+                             id="modal_data_table", centered=False, 
+                             style={
+                            #      'background-color':'#40515e',
+                                  "max-width": "none", "width": "90%"})
 
 
 
@@ -352,7 +360,9 @@ modal_league_table = dbc.Modal([
                                   ]),
                          dbc.Button("Close", id="close-league-expanded", className="ml-auto")])
                      ],
-                     id="modal_league_table", centered=False, style={'background-color': '#40515e',
+                     id="modal_league_table", centered=False, 
+                     style={
+                     #     'background-color': '#40515e',
                      "max-width": "none", "width": "90%"})
 
 cytoscape_main = cyto.Cytoscape(id='cytoscape', responsive=True, autoRefreshLayout=False,
@@ -386,23 +396,22 @@ modal_network = dbc.Modal([
                                            id="btn-get-png-modal", style={'display': 'inline-block'}),
                          dbc.Button("Close", id="close-network-expanded", className="ml-auto")])
                      ],
-                     id="modal_network", centered=False, style={'background-color': '#40515e',
+                     id="modal_network", centered=False, 
+                     style={
+                     # 'background-color': '#40515e',
                      "max-width": "none", "width": "70%",  "max-height":"100%", "height":"99%"})
 
 
 
 modal_info = dbc.Toast([
                    dbc.ModalHeader([html.P("Overall Information",style={'font':'caption',
-                                                                        'margin-top': '-12px',
-                                                                        'margin-left': '-3px',
                                                                         'color':'black',
                                                                         }),
                                    html.Img(src="/assets/icons/cancel.png", 
                                             style={"width": "30px",
                                                    "float":"right",
-                                                   'margin-top': '-27px','margin-right': '-60px','width':'18px'}, id ='close_modal_info')], 
+                                                  'width':'18px'}, id ='close_modal_info')], 
                                    style={
-                                       'height':'24px',
                                        'background-color':'#c4c7c9'
                                    }),
                    dbc.ModalBody([html.P( id='numstudies'),
@@ -418,6 +427,7 @@ modal_info = dbc.Toast([
             id="modal_info",style={'background-color':'white',
                                    'font-size':'10.5px', 
                                    'position':'absolute',
-                                   'width':'200px'
+                                   # 'width':'200px',
+                                   'z-index':'1000'
                                    })
 

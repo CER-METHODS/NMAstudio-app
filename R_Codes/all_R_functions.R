@@ -325,8 +325,15 @@ league_rank_new <- function(dat, i){
     ne <- netsplit(nma_primary)
     comparison <- ne$compare.random$comparison[!is.na(ne$compare.random$p)]
     direct <- exp(ne$direct.random$TE[!is.na(ne$compare.random$p)])
+    di_lower <- exp(ne$direct.random$lower[!is.na(ne$compare.random$p)])
+    di_upper <- exp(ne$direct.random$lower[!is.na(ne$compare.random$p)])
     indirect <- exp(ne$indirect.random$TE[!is.na(ne$compare.random$p)])
+    indi_lower <- exp(ne$indirect.random$lower[!is.na(ne$compare.random$p)])
+    indi_upper <- exp(ne$indirect.random$lower[!is.na(ne$compare.random$p)])
     p <- ne$compare.random$p[!is.na(ne$compare.random$p)]
+    direct <-  paste0(round(direct, 2), " (", round(di_lower, 2), ", ", round(di_upper, 2), ")")
+    indirect <-  paste0(round(indirect, 2), " (", round(indi_lower, 2), ", ", round(indi_upper, 2), ")")
+
     df_cons <- data.frame(comparison, direct, indirect, p)
     colnames(df_cons) <- c("comparison", "direct", "indirect", "p-value")
     comp_all <- ne$compare.random$comparison
@@ -956,6 +963,8 @@ get_pairwise_data_contrast_new <- function(dat, num_outcome=1){
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'event2'] <- paste0("event2", i)
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n1'] <- paste0("n1", i)
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n2'] <- paste0("n2", i)
+        names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'treat_class1'] <- paste0("treat_class1", i)
+        names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'treat_class2'] <- paste0("treat_class2", i)
     }else {
         
         pair_dat <- netmeta::pairwise(data=dat,
@@ -974,6 +983,8 @@ get_pairwise_data_contrast_new <- function(dat, num_outcome=1){
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'event2'] <- paste0("event2", i)
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n1'] <- paste0("n1", i)
         names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'n2'] <- paste0("n2", i)
+        names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'treat_class1'] <- paste0("treat_class1", i)
+        names(pairwise_dat[[i]])[names(pairwise_dat[[i]]) == 'treat_class2'] <- paste0("treat_class2", i)
         }
     }
     final_dat = reduce(pairwise_dat, full_join, by = c("studlab","treat1","treat2"))

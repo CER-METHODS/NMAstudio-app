@@ -37,8 +37,8 @@ long_dat = pd.DataFrame(long_dat)
 
 range_ref_ab = long_dat.groupby('treat').apply(
     lambda group: pd.Series({
-        "min_value": (group["rpasi90m"] / group["nm"]).min() * 1000,
-        "max_value": (group["rpasi90m"] / group["nm"]).max() * 1000
+        "min_value": (group["rPASI90"] / group["nPASI90"]).min() * 1000,
+        "max_value": (group["rPASI90"] / group["nPASI90"]).max() * 1000
     })
 ).reset_index()
 
@@ -234,7 +234,7 @@ masterColumnDefs = [
         'color': 'grey','border-right': 'solid 0.8px'}
      },
      
-     {"headerName": "The rationality of the risk", 
+     {"headerName": "The rationality of selecting the risk", 
      "field": "rationality",
      "editable": True,
      'cellStyle': {
@@ -948,7 +948,7 @@ CONT = '/assets/icons/contrain.png'
 VISIT = '/assets/icons/visit.png'
 COST = '/assets/icons/cost.png'
 RANK = '/assets/ranking.png'
-from tools.functions_chatbot import render_chatbot
+# from tools.functions_chatbot import render_chatbot
 
 
 model_skt_compare_simple = dbc.Modal(
@@ -1184,7 +1184,7 @@ def skt_nonexpert():
                                                                             stylesheet=skt_stylesheet()), 
                                                                             style={'border-right': '3px solid #B85042',
                                                                                     'width': '50%'}),
-                                                                            dbc.Col(render_chatbot(), style={'width':'50%','justify-items': 'center',"height": "500px"})
+                                                                            # dbc.Col(render_chatbot(), style={'width':'50%','justify-items': 'center',"height": "500px"})
                                                                             # dbc.Col([
                                                                             #     # html.Span('Interventions practical issues',className='skt_span1', 
                                                                             #     #               style={'color': '#B85042', 'font-weight': 'bold'}),
@@ -1226,7 +1226,8 @@ def skt_nonexpert():
                                                       html.Br(),
                                                       dbc.Row(
                                                         [dbc.Col(
-                                                            [model_skt_compare_simple,
+                                                            [
+                                                                model_skt_compare_simple,
                                                                 # dbc.Row([dbc.Col([
                                                                 # html.Span('Absolute Values for Comparators (per 1000)',className='skt_span1', 
                                                                 #         style={'color': '#B85042', 'font-weight': 'bold'}),
