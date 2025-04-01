@@ -11,8 +11,8 @@ def __Change_Abs(value_effect, value_change,lower,rowData):
 
     range_ref_ab = long_dat.groupby('treat').apply(
         lambda group: pd.Series({
-            "min_value": (group["rPASI90"] / group["n"]).min() * 1000,
-            "max_value": (group["rPASI90"] / group["n"]).max() * 1000
+            "min_value": (group["rPASI90"] / group["nPASI90"]).min() * 1000,
+            "max_value": (group["rPASI90"] / group["nPASI90"]).max() * 1000
         })
     ).reset_index()
 

@@ -238,10 +238,10 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2,options, 
     if not out_idx2:
          out_idx2 = 0
 
-    directions = directions if directions else [0, 1]
+    directions = directions if directions else ['beneficial', 'harmful']
     direct1 = directions[out_idx1]
     direct2 = directions[out_idx2]
-
+   
     label1 = options[out_idx1]['label']
     label2 = options[out_idx2]['label']
 
@@ -324,9 +324,9 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2,options, 
                  custom_data=['Treatment','label1', 'label2', 'value1', 'value2'] if data else None, 
                 #  color_discrete_sequence = px.colors.qualitative.Light24,
                 #  range_x = [min(low_rng, 0.1), max([up_rng, 10])] if xlog else None,
-                 range_x=([max([up_rng, 10]), min(low_rng, 0.1)] if xlog else None) if direct1 == 1 
+                 range_x=([max([up_rng, 10]), min(low_rng, 0.1)] if xlog else None) if direct1 == 'harmful' 
                          else ([min(low_rng, 0.1), max([up_rng, 10])] if xlog else None),
-                 range_y=([max(df_second[effect_size_2]), min(df_second[effect_size_2])] if direct2 == 1 
+                 range_y=([max(df_second[effect_size_2]), min(df_second[effect_size_2])] if direct2 == 'harmful'
                          else None)
                  )
     if data:
