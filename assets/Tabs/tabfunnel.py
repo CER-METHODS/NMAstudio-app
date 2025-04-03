@@ -1,5 +1,8 @@
 import dash_core_components as dcc, dash_html_components as html, dash_bootstrap_components as dbc
 import dash_daq as daq
+from assets.Tabs.saveload_modal_button import saveload_modal
+from assets.Infos.funnelInfo import infoFunnel
+
 
 tab_funnel = html.Div([dbc.Row([dbc.Col(html.P("Click on a node to choose reference", #Click treatment sequentially to get desired ordering",
                                          className="graph__title2",
@@ -8,7 +11,8 @@ tab_funnel = html.Div([dbc.Row([dbc.Col(html.P("Click on a node to choose refere
                                                 'font-size': '12px',
                                                 'margin-bottom': '-10px'})),
                                 ]),
-              
+# Uncomment to activate info box funnel 
+                       # infoFunnel,
                        dcc.Loading(
                            dcc.Graph(
                                id='funnel-fig',
