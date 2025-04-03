@@ -20,7 +20,7 @@ the following:
 
 Create nmastudio environment and install requirements:
 ```bash
-conda env create -f environment.yml
+conda env create -f requirements.yml
 ```
 
 Activate environment
