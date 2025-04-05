@@ -116,9 +116,9 @@ SKTPAGE = Sktpage()
 def display_page(pathname):
     if pathname == '/home':  return RealHomepage
     elif pathname == '/results':  return HOMEPAGE
-    # elif pathname == '/skt': return SKTPAGE,
-    # elif pathname == '/doc': return doc_layout
-    # elif pathname == '/news': return news_layout
+    elif pathname == '/skt': return SKTPAGE,
+    elif pathname == '/doc': return doc_layout
+    elif pathname == '/news': return news_layout
 
     else:  return RealHomepage
 
@@ -380,16 +380,30 @@ def update_options(search_value_format, contents, filename):
 
 @app.callback([Output("number-outcomes-input", "style"),
               Output("arrow_step_3", "style")],
-              Input({'type': 'dataselectors_1', 'index': ALL}, 'value'),
+              Input("radio-format", "value"),
+              Input({'type': 'dataselectors_1', 'index': ALL}, 'value')
               )
-def modal_ENABLE_UPLOAD_button(dataselectors):
-    if len(dataselectors):
-        if all(dataselectors):
-            return {"display": 'grid', 'justify-content': 'center',}, {'display':'grid', 'justify-content': 'center'}
+def modal_ENABLE_UPLOAD_button(format,dataselectors):
+    if format == 'long':
+        idx = 2
+    else: idx = 3
+    
+    show_style = {'display': 'grid', 'justify-content': 'center'}
+    hide_style = {'display': 'none', 'justify-content': 'center'}
+
+    filtered_values = [val for i,val in enumerate(dataselectors) if i != idx]
+    
+    if len(filtered_values):
+        if all(filtered_values):
+            return show_style, show_style
         else:
-            return {"display": 'none'}, {'display':'none', 'justify-content': 'center'}
+            return hide_style, hide_style
     else:
-        return {"display": 'none'}, {'display':'none', 'justify-content': 'center'}
+        return hide_style, hide_style
+
+
+
+
 
 @app.callback(
         Output('num_outcomes_button', 'disabled'),
@@ -403,12 +417,12 @@ def enable(value):
 
 
 @app.callback(Output("select_effect_modifier", "children"),
-              [Input("radio-format", "value")],
-              [State('datatable-upload2', 'contents'),
-              State('datatable-upload2', 'filename')]
+            #   [Input("radio-format", "value")],
+              [Input('datatable-upload2', 'contents'),
+              Input('datatable-upload2', 'filename')]
              )
-def update_options(search_value_format, contents, filename):
-    return __effect_modifier_options(search_value_format, contents, filename)
+def update_options(contents, filename):
+    return __effect_modifier_options(contents, filename)
 
 
 
@@ -461,24 +475,27 @@ def enable(value):
     return True
 
 
-@app.callback([
-               Output("upload_original_data", "style"),
-               Output("arrow_protocol", "style")
-               ],
-               [Input('protocol-link', 'value'),
-                Input("protocol_link_button", "n_clicks")
-                ]
-              )
-def is_data_file_uploaded(value,click):
-    show_DIV_style = {'display': 'grid', 'justify-content': 'center'}
-    donot_show_DIV_style = {'display': 'none', 'justify-content': 'center'}
-    arrow1_show={'display':'grid', 'justify-content': 'center'}
-    arrow1_notshow={'display':'none', 'justify-content': 'center'}
 
-    if value and click:
-        return  show_DIV_style,  arrow1_show
+@app.callback(
+    [
+        Output("upload_original_data", "style"),
+        Output("arrow_protocol", "style")
+    ],
+    [
+        Input("protocol-link", "value"),
+        Input("protocol_link_button", "n_clicks"),
+        Input("skip_link_button", "n_clicks")
+    ]
+)
+def toggle_upload_display(value, link_clicks, skip_clicks):
+    show_style = {'display': 'grid', 'justify-content': 'center'}
+    hide_style = {'display': 'none', 'justify-content': 'center'}
+  
+    if (value and link_clicks) or (skip_clicks):
+        return show_style, show_style
     else:
-        return  donot_show_DIV_style, arrow1_notshow
+        return hide_style, hide_style
+
 
 
 @app.callback(
@@ -488,9 +505,57 @@ def is_data_file_uploaded(value,click):
                State("show_protocol_link", "href"),   
               )
 def is_data_file_uploaded(value,click, link):
-    if value and click:
+    if not click:
+        return link
+    elif value and click:
         return value
-    else: return link
+    else: 
+        return 'not provided'
+
+
+@app.callback(
+    Output("warning_message", "children"),
+    [
+        Input('protocol-link', 'value'),
+        Input('submit_modal_data', 'n_clicks'),
+        Input("radio-format", "value"),
+        Input({'type': 'dataselectors_1', 'index': ALL}, 'value'),
+    ],
+    State('no_effect_modifier', 'value'),
+    prevent_initial_call=True
+)
+def is_data_file_uploaded(protocol_value, click, format, variables, no_modifier):
+    if not click:
+        return ''
+
+    idx = 2 if format == 'long' else 3
+    rob = variables[idx]
+    
+    style = {
+        'justify-self': 'center',
+        'align-self': 'center',
+        'white-space': 'pre',
+        'font-size': 'medium',
+        'color': 'red'
+    }
+
+    messages = []
+
+    if not rob:
+        messages.append('The risk of bias information is not provided.')
+
+    if not protocol_value:
+        messages.append('The protocol link is not provided.')
+
+    if no_modifier:
+        messages.append('The potential modifiers are not provided. The boxplots cannot be generated for transitivity check.')
+
+    if messages:
+        return html.Span(f"Warning!\n" + "\n".join(messages), style=style)
+    
+    return ''
+
+
 
 
 
@@ -1766,217 +1831,217 @@ def results_display(selected):
 ############################ SKT TOOL ##############################
 
 
-# from tools.functions_skt_abs_forest import __Change_Abs
+from tools.functions_skt_abs_forest import __Change_Abs
 
-# @app.callback(
-#     Output("quickstart-grid", "rowData"),
-#     # Output("quickstart-grid", "style"),
-#     # Input("nomal_vs_log", "value"),
-#     Input("checklist_effects", "value"),
-#     Input("quickstart-grid", "cellValueChanged"),
-#     Input("range_lower", "value"),
-#     # Input("range_upper", "value"),
-#     State("quickstart-grid", "rowData"),
-# )
+@app.callback(
+    Output("quickstart-grid", "rowData"),
+    # Output("quickstart-grid", "style"),
+    # Input("nomal_vs_log", "value"),
+    Input("checklist_effects", "value"),
+    Input("quickstart-grid", "cellValueChanged"),
+    Input("range_lower", "value"),
+    # Input("range_upper", "value"),
+    State("quickstart-grid", "rowData"),
+)
 
-# def selected(value_effect, value_change,lower,rowData):
-#     return __Change_Abs(value_effect, value_change,lower,rowData)
-
-
-
-# app.clientside_callback(
-#     """(id) => {
-#         dash_ag_grid.getApiAsync(id).then((grid) => {
-#             grid.addEventListener('rowGroupOpened', (em) => {
-#                 if (em.node.detailNode && em.expanded) {
-#                     gridDetail = em.node.detailNode.detailGridInfo
-#                     gridDetail.api.addEventListener('cellClicked', 
-#                     (ed) => {
-#                     const newChange = {...ed, node: {id:`${gridDetail.id} - ${ed.node.id}`}}
-#                     em.api.getGridOption('onCellClicked')(newChange)
-#                     })
-#                 }
-#             })
-#         })
-#         return window.dash_clientside.no_update
-#     }""",
-#     Output('forest-fig-pairwise', 'id'),
-#     Input('quickstart-grid', 'id')
-# )
+def selected(value_effect, value_change,lower,rowData):
+    return __Change_Abs(value_effect, value_change,lower,rowData)
 
 
-# @app.callback(
-#     Output("modal_forest", "is_open"), 
-#     Input("quickstart-grid", "cellClicked"),
-#     Input("close_forest", "n_clicks"),
-# )
 
-# def display_forestplot(cell, _):
-#     if ctx.triggered_id == "close_forest":
-#         return False
-#     if cell is not None and len(cell) != 0 and 'colId' in cell and cell['colId'] == "direct" and cell['value'] is not None and cell['value']!= '':
-#         return True
-#     return no_update
-
-
-# @app.callback(
-#    [ Output('forest-fig-pairwise', 'figure'),
-#     Output('forest-fig-pairwise', 'style')],
-#     [Input("quickstart-grid", "cellClicked"),
-#     Input('forest-fig-pairwise', 'style')]
-# )
-
-# def show_forest_plot(cell, style_pair):
-#     # print(cell)
-#     return __show_forest_plot(cell, style_pair)
+app.clientside_callback(
+    """(id) => {
+        dash_ag_grid.getApiAsync(id).then((grid) => {
+            grid.addEventListener('rowGroupOpened', (em) => {
+                if (em.node.detailNode && em.expanded) {
+                    gridDetail = em.node.detailNode.detailGridInfo
+                    gridDetail.api.addEventListener('cellClicked', 
+                    (ed) => {
+                    const newChange = {...ed, node: {id:`${gridDetail.id} - ${ed.node.id}`}}
+                    em.api.getGridOption('onCellClicked')(newChange)
+                    })
+                }
+            })
+        })
+        return window.dash_clientside.no_update
+    }""",
+    Output('forest-fig-pairwise', 'id'),
+    Input('quickstart-grid', 'id')
+)
 
 
-# @app.callback(
-#     Output("treat_comp", "children"),
-#     Output("num_RCT", "children"), 
-#     Output("num_sample", "children"),
-#     Output("mean_modif", "children"), 
-#     Input("quickstart-grid", "cellClicked"),
-# )
+@app.callback(
+    Output("modal_forest", "is_open"), 
+    Input("quickstart-grid", "cellClicked"),
+    Input("close_forest", "n_clicks"),
+)
 
-# def display_sktinfo(cell):
-#     treat_comp, num_RCT, num_sample, mean_modif = '','','',''
-#     if  cell is not None and len(cell) != 0 and 'colId' in cell and cell['colId'] == "Treatment" and cell['value'] is not None and cell['value']!= '':
-#         df_n_rct = pd.read_csv('db/skt/final_all.csv')
-#         dic_data =cell
-#         treat = dic_data['value']
-#         # idx = dic_data['rowIndex']
-#         refer = dic_data['rowId'].split('_')[1].split(' ')[0]
-#         treat_comp = f'Treatment: {treat}, Comparator: {refer}'
+def display_forestplot(cell, _):
+    if ctx.triggered_id == "close_forest":
+        return False
+    if cell is not None and len(cell) != 0 and 'colId' in cell and cell['colId'] == "direct" and cell['value'] is not None and cell['value']!= '':
+        return True
+    return no_update
+
+
+@app.callback(
+   [ Output('forest-fig-pairwise', 'figure'),
+    Output('forest-fig-pairwise', 'style')],
+    [Input("quickstart-grid", "cellClicked"),
+    Input('forest-fig-pairwise', 'style')]
+)
+
+def show_forest_plot(cell, style_pair):
+    # print(cell)
+    return __show_forest_plot(cell, style_pair)
+
+
+@app.callback(
+    Output("treat_comp", "children"),
+    Output("num_RCT", "children"), 
+    Output("num_sample", "children"),
+    Output("mean_modif", "children"), 
+    Input("quickstart-grid", "cellClicked"),
+)
+
+def display_sktinfo(cell):
+    treat_comp, num_RCT, num_sample, mean_modif = '','','',''
+    if  cell is not None and len(cell) != 0 and 'colId' in cell and cell['colId'] == "Treatment" and cell['value'] is not None and cell['value']!= '':
+        df_n_rct = pd.read_csv('db/skt/final_all.csv')
+        dic_data =cell
+        treat = dic_data['value']
+        # idx = dic_data['rowIndex']
+        refer = dic_data['rowId'].split('_')[1].split(' ')[0]
+        treat_comp = f'Treatment: {treat}, Comparator: {refer}'
         
-#         n_rct = df_n_rct.loc[(df_n_rct['Treatment'] == treat) & (df_n_rct['Reference'] == refer), 'k']
-#         # print(n_rct)
-#         n_rct_value = n_rct.iloc[0] if not n_rct.empty else np.NAN
-#         num_RCT = f'Randomize controlled trials: {n_rct_value}'
+        n_rct = df_n_rct.loc[(df_n_rct['Treatment'] == treat) & (df_n_rct['Reference'] == refer), 'k']
+        # print(n_rct)
+        n_rct_value = n_rct.iloc[0] if not n_rct.empty else np.NAN
+        num_RCT = f'Randomize controlled trials: {n_rct_value}'
 
-#         df_n_total = pd.read_csv('db/psoriasis_wide_complete1.csv')
-#         set1 = {(treat, refer), (refer, treat)}
+        df_n_total = pd.read_csv('db/psoriasis_wide_complete1.csv')
+        set1 = {(treat, refer), (refer, treat)}
 
-#         # Extract relevant rows from the DataFrame
-#         dat_extract = df_n_total[
-#             df_n_total.apply(lambda row: (row['treat1'], row['treat2']) in set1, axis=1)
-#         ]
-#         # Calculate the total
-#         n_total = dat_extract['n11'].sum() + dat_extract['n21'].sum()
-#         num_sample = f'Total participants: {n_total}'
+        # Extract relevant rows from the DataFrame
+        dat_extract = df_n_total[
+            df_n_total.apply(lambda row: (row['treat1'], row['treat2']) in set1, axis=1)
+        ]
+        # Calculate the total
+        n_total = dat_extract['n11'].sum() + dat_extract['n21'].sum()
+        num_sample = f'Total participants: {n_total}'
 
-#         mean_age = round(dat_extract['age'].mean(), 2)
-#         mean_gender = round((dat_extract['male'] / (dat_extract['n11'] + dat_extract['n21'])).mean(), 2)
-
-
-#         mean_modif = f'Mean age: {mean_age}\nMean male percentage: {mean_gender}'
+        mean_age = round(dat_extract['age'].mean(), 2)
+        mean_gender = round((dat_extract['male'] / (dat_extract['n11'] + dat_extract['n21'])).mean(), 2)
 
 
-
-#     return treat_comp, num_RCT, num_sample, mean_modif
+        mean_modif = f'Mean age: {mean_age}\nMean male percentage: {mean_gender}'
 
 
 
-
-# @app.callback(
-#     Output("modal_transitivity", "is_open"), 
-#     Input("trans_button", "n_clicks"),
-#     Input("close_trans", "n_clicks"),
-# )
-
-# def display_forestplot(cell, _):
-#     if ctx.triggered_id == "close_trans":
-#         return False
-#     if ctx.triggered_id == "trans_button":
-#         return True
-#     return no_update
-
-
-# @app.callback(Output('boxplot_skt', 'figure'),
-#               Input('ddskt-trans', 'value'),)
-# def update_boxplot(value):
-#     return __show_boxplot(value)
-
-
-# @app.callback([Output('cytoscape_skt', 'stylesheet'),
-#                Output('trigger_info', 'children')],
-#               [Input('cytoscape_skt', 'tapNode'),
-#                Input('cytoscape_skt', 'selectedNodeData'),
-#                Input('cytoscape_skt', 'elements'),
-#                Input('cytoscape_skt', 'selectedEdgeData')
-#                ]
-#               )
-# def generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata ):
-#     return __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata)
+    return treat_comp, num_RCT, num_sample, mean_modif
 
 
 
 
-# @app.callback(Output('cytoscape_skt2', 'stylesheet'),
-#               [Input('cytoscape_skt2', 'tapNode'),
-#                Input('cytoscape_skt2', 'selectedNodeData'),
-#                Input('cytoscape_skt2', 'elements'),
-#                Input('cytoscape_skt2', 'selectedEdgeData')
-#                ]
-#               )
-# def generate_skt_stylesheet2(node, slct_nodesdata, elements, slct_edgedata ):
-#     return __generate_skt_stylesheet2(node, slct_nodesdata, elements, slct_edgedata)
+@app.callback(
+    Output("modal_transitivity", "is_open"), 
+    Input("trans_button", "n_clicks"),
+    Input("close_trans", "n_clicks"),
+)
+
+def display_forestplot(cell, _):
+    if ctx.triggered_id == "close_trans":
+        return False
+    if ctx.triggered_id == "trans_button":
+        return True
+    return no_update
+
+
+@app.callback(Output('boxplot_skt', 'figure'),
+              Input('ddskt-trans', 'value'),)
+def update_boxplot(value):
+    return __show_boxplot(value)
+
+
+@app.callback([Output('cytoscape_skt', 'stylesheet'),
+               Output('trigger_info', 'children')],
+              [Input('cytoscape_skt', 'tapNode'),
+               Input('cytoscape_skt', 'selectedNodeData'),
+               Input('cytoscape_skt', 'elements'),
+               Input('cytoscape_skt', 'selectedEdgeData')
+               ]
+              )
+def generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata ):
+    return __generate_skt_stylesheet(node, slct_nodesdata, elements, slct_edgedata)
+
+
+
+
+@app.callback(Output('cytoscape_skt2', 'stylesheet'),
+              [Input('cytoscape_skt2', 'tapNode'),
+               Input('cytoscape_skt2', 'selectedNodeData'),
+               Input('cytoscape_skt2', 'elements'),
+               Input('cytoscape_skt2', 'selectedEdgeData')
+               ]
+              )
+def generate_skt_stylesheet2(node, slct_nodesdata, elements, slct_edgedata ):
+    return __generate_skt_stylesheet2(node, slct_nodesdata, elements, slct_edgedata)
 
 
 
 
 
-# @app.callback(
-#     Output("skt_modal_copareinfo", "is_open"), 
-#     Input("quickstart-grid", "cellClicked"),
-#     Input("close_compare", "n_clicks"),
-# )
+@app.callback(
+    Output("skt_modal_copareinfo", "is_open"), 
+    Input("quickstart-grid", "cellClicked"),
+    Input("close_compare", "n_clicks"),
+)
 
-# def display_sktinfo(cell, _):
-#     if ctx.triggered_id == "close_compare":
-#         return False
-#     if cell is None or len(cell) == 0:  
-#         return False
-#     else:
-#         if ('colId' in cell and cell['colId'] == "Treatment" and cell['value']is not None):
-#             return True
-#     return no_update
+def display_sktinfo(cell, _):
+    if ctx.triggered_id == "close_compare":
+        return False
+    if cell is None or len(cell) == 0:  
+        return False
+    else:
+        if ('colId' in cell and cell['colId'] == "Treatment" and cell['value']is not None):
+            return True
+    return no_update
 
 
-# @app.callback([Output('routine', 'style'),
-#                Output('cont', 'style'),
-#                Output('side', 'style'),
-#                Output('visit', 'style'),
-#                Output('cost', 'style'),],
-#               [
-#             #    Input('routine', 'style'),
-#             #    Input('cont', 'style'),
-#             #    Input('side', 'style'),
-#             #    Input('visit', 'style'),
-#             #    Input('cost', 'style'),
-#                Input('routine', 'n_clicks'),
-#                Input('cont', 'n_clicks'),
-#                Input('side', 'n_clicks'),
-#                Input('visit', 'n_clicks'),
-#                Input('cost', 'n_clicks'),
-#                ]
-#               )
-# def image_color_change(style_routine, style_count,style_side,style_visit,style_cost):
-#     style_selected = {'justify-self':'center', "filter":'drop-shadow(2px 4px 6px red)'}
-#     style_unselected = {'justify-self':'center', "filter":'grayscale(1)'}
-#     defalut_style = {'justify-self':'center'}
-#     if ctx.triggered_id == "routine":
-#         return [style_selected]+[style_unselected]*4
-#     if ctx.triggered_id == "cont":
-#         return [style_unselected]+[style_selected]+[style_unselected]*3
-#     if ctx.triggered_id == "side":
-#         return [style_unselected]*2+[style_selected]+[style_unselected]*2
-#     if ctx.triggered_id == "visit":
-#         return [style_unselected]*3+[style_selected]+[style_unselected]
-#     if ctx.triggered_id == "cost":
-#         return [style_unselected]*4+[style_selected]
-#     else:
-#         return [defalut_style]*5
+@app.callback([Output('routine', 'style'),
+               Output('cont', 'style'),
+               Output('side', 'style'),
+               Output('visit', 'style'),
+               Output('cost', 'style'),],
+              [
+            #    Input('routine', 'style'),
+            #    Input('cont', 'style'),
+            #    Input('side', 'style'),
+            #    Input('visit', 'style'),
+            #    Input('cost', 'style'),
+               Input('routine', 'n_clicks'),
+               Input('cont', 'n_clicks'),
+               Input('side', 'n_clicks'),
+               Input('visit', 'n_clicks'),
+               Input('cost', 'n_clicks'),
+               ]
+              )
+def image_color_change(style_routine, style_count,style_side,style_visit,style_cost):
+    style_selected = {'justify-self':'center', "filter":'drop-shadow(2px 4px 6px red)'}
+    style_unselected = {'justify-self':'center', "filter":'grayscale(1)'}
+    defalut_style = {'justify-self':'center'}
+    if ctx.triggered_id == "routine":
+        return [style_selected]+[style_unselected]*4
+    if ctx.triggered_id == "cont":
+        return [style_unselected]+[style_selected]+[style_unselected]*3
+    if ctx.triggered_id == "side":
+        return [style_unselected]*2+[style_selected]+[style_unselected]*2
+    if ctx.triggered_id == "visit":
+        return [style_unselected]*3+[style_selected]+[style_unselected]
+    if ctx.triggered_id == "cost":
+        return [style_unselected]*4+[style_selected]
+    else:
+        return [defalut_style]*5
 
 
 #########unitil here#############
@@ -2188,124 +2253,124 @@ def results_display(selected):
 
 #########unitil here#############
 
-# @app.callback(
-#     Output("skt_modal_compare_simple", "is_open"), 
-#     Input("grid_treat_compare", "cellClicked"),
-#     Input("close_compare_simple", "n_clicks"),
-# )
+@app.callback(
+    Output("skt_modal_compare_simple", "is_open"), 
+    Input("grid_treat_compare", "cellClicked"),
+    Input("close_compare_simple", "n_clicks"),
+)
 
-# def display_sktinfo(cell, _):
-#     if ctx.triggered_id == "close_compare_simple":
-#         return False
-#     if cell is None or len(cell) == 0:  
-#         return False
-#     else:
-#         if ('colId' in cell and (cell['colId'] == "RR"or cell['colId'] == "RR_out2") and cell['value']is not None):
-#             return True
-#     return no_update
-
-
-
-# from tools.functions_modal_info import display_modal_barplot
-
-# @app.callback(
-#     Output("barplot_compare", "figure"),
-#     Output("modal_info_head", "children"),
-#     Input("grid_treat_compare", "cellClicked"), 
-#     Input("simple_abvalue", "value"),
-#     State('grid_treat_compare','rowData')
-# )
-
-# def display_sktinfo(cell,value,rowdata):
-#     return display_modal_barplot(cell,value,rowdata)
+def display_sktinfo(cell, _):
+    if ctx.triggered_id == "close_compare_simple":
+        return False
+    if cell is None or len(cell) == 0:  
+        return False
+    else:
+        if ('colId' in cell and (cell['colId'] == "RR"or cell['colId'] == "RR_out2") and cell['value']is not None):
+            return True
+    return no_update
 
 
 
-# from tools.functions_modal_info import display_modal_text
-# @app.callback(
-#     # Output("risk_range", "children"),
-#     Output("text_info_col", "children"),
-#     Input("grid_treat_compare", "cellClicked"), 
-#     Input("simple_abvalue", "value"),
-#     State('grid_treat_compare','rowData')
-# )
+from tools.functions_modal_info import display_modal_barplot
 
-# def display_textinfo(cell,value,rowdata):
-#     return display_modal_text(cell,value,rowdata)
+@app.callback(
+    Output("barplot_compare", "figure"),
+    Output("modal_info_head", "children"),
+    Input("grid_treat_compare", "cellClicked"), 
+    Input("simple_abvalue", "value"),
+    State('grid_treat_compare','rowData')
+)
 
-# from tools.functions_modal_info import display_modal_data
-
-# @app.callback(
-#     Output("modal_treat_compare", "rowData"),
-#     Input("grid_treat_compare", "cellClicked"), 
-#     # Input("simple_abvalue", "value"),
-#     State('grid_treat_compare','rowData'),
-#     State('modal_treat_compare','rowData')
-# )
-
-# def display_modaldata(cell,rowdata,rowdata_modal):
-#     return display_modal_data(cell,rowdata,rowdata_modal)
+def display_sktinfo(cell,value,rowdata):
+    return display_modal_barplot(cell,value,rowdata)
 
 
 
-# @app.callback(
-#     Output("quickstart-grid", "dashGridOptions"),
-#     Input("grid-printer-layout-btn", "n_clicks"),
-#     Input("grid-regular-layout-btn", "n_clicks"),
-#     State("quickstart-grid", "dashGridOptions")
-# )
-# def toggle_layout(print, regular, options): 
-#     if ctx.triggered_id == "grid-printer-layout-btn":
-#         options['domLayout']="print"
-#         return  options
-#     options['domLayout']=None
-#     return  options
+from tools.functions_modal_info import display_modal_text
+@app.callback(
+    # Output("risk_range", "children"),
+    Output("text_info_col", "children"),
+    Input("grid_treat_compare", "cellClicked"), 
+    Input("simple_abvalue", "value"),
+    State('grid_treat_compare','rowData')
+)
+
+def display_textinfo(cell,value,rowdata):
+    return display_modal_text(cell,value,rowdata)
+
+from tools.functions_modal_info import display_modal_data
+
+@app.callback(
+    Output("modal_treat_compare", "rowData"),
+    Input("grid_treat_compare", "cellClicked"), 
+    # Input("simple_abvalue", "value"),
+    State('grid_treat_compare','rowData'),
+    State('modal_treat_compare','rowData')
+)
+
+def display_modaldata(cell,rowdata,rowdata_modal):
+    return display_modal_data(cell,rowdata,rowdata_modal)
+
+
+
+@app.callback(
+    Output("quickstart-grid", "dashGridOptions"),
+    Input("grid-printer-layout-btn", "n_clicks"),
+    Input("grid-regular-layout-btn", "n_clicks"),
+    State("quickstart-grid", "dashGridOptions")
+)
+def toggle_layout(print, regular, options): 
+    if ctx.triggered_id == "grid-printer-layout-btn":
+        options['domLayout']="print"
+        return  options
+    options['domLayout']=None
+    return  options
 
 
 #####################chatbot#######################################################
 
-# from tools.functions_chatbot import *
+from tools.functions_chatbot import *
 
-# @app.callback(
-#     Output(component_id="display-conversation", component_property="children"), 
-#     Input(component_id="store-conversation", component_property="data")
-# )
-# def update_display(chat_history):
-#     return [
-#         render_textbox(x, box="human") if i % 2 == 0 else render_textbox(x, box="AI")
-#         for i, x in enumerate(chat_history.split("<split>")[:-1])
-#     ]
+@app.callback(
+    Output(component_id="display-conversation", component_property="children"), 
+    Input(component_id="store-conversation", component_property="data")
+)
+def update_display(chat_history):
+    return [
+        render_textbox(x, box="human") if i % 2 == 0 else render_textbox(x, box="AI")
+        for i, x in enumerate(chat_history.split("<split>")[:-1])
+    ]
 
-# @app.callback(
-#     Output(component_id="user-input", component_property="value"),
-#     Input(component_id="submit", component_property="n_clicks"), 
-#     Input(component_id="user-input", component_property="n_submit"),
-# )
-# def clear_input(n_clicks, n_submit):
-#     return ""
+@app.callback(
+    Output(component_id="user-input", component_property="value"),
+    Input(component_id="submit", component_property="n_clicks"), 
+    Input(component_id="user-input", component_property="n_submit"),
+)
+def clear_input(n_clicks, n_submit):
+    return ""
 
-# @app.callback(
-#     Output(component_id="store-conversation", component_property="data"), 
-#     Output(component_id="loading-component", component_property="children"),
-#     Input(component_id="submit", component_property="n_clicks"), 
-#     Input(component_id="user-input", component_property="n_submit"),
-#     State(component_id="user-input", component_property="value"), 
-#     State(component_id="store-conversation", component_property="data"),
-# )
-# def run_chatbot(n_clicks, n_submit, user_input, chat_history):
-#     if n_clicks == 0 and n_submit is None:
-#         return "", None
+@app.callback(
+    Output(component_id="store-conversation", component_property="data"), 
+    Output(component_id="loading-component", component_property="children"),
+    Input(component_id="submit", component_property="n_clicks"), 
+    Input(component_id="user-input", component_property="n_submit"),
+    State(component_id="user-input", component_property="value"), 
+    State(component_id="store-conversation", component_property="data"),
+)
+def run_chatbot(n_clicks, n_submit, user_input, chat_history):
+    if n_clicks == 0 and n_submit is None:
+        return "", None
 
-#     if user_input is None or user_input == "":
-#         return chat_history, None
+    if user_input is None or user_input == "":
+        return chat_history, None
     
-#     chat_history += f"Human: {user_input}<split>ChatBot: "
-#     # result_ai = conversation.predict(input=user_input)
-#     # model_output = result_ai.strip()
-#     result_ai = chain.invoke({"text": f"base on {chat_history},{user_input}. Please generate less than 100 words (20-50 wloud be good) and be concise and clear. avoiding the use of bullet points, asterisks (*), or any special formatting."})
-#     model_output = result_ai.content
-#     chat_history += f"{model_output}<split>"
-#     return chat_history, None
+    chat_history += f"Human: {user_input}<split>ChatBot: "
+    # result_ai = conversation.predict(input=user_input)
+    # model_output = result_ai.strip()
+    result_ai = chain.invoke({"text": f"base on {chat_history},{user_input}. Please generate less than 100 words (20-50 wloud be good) and be concise and clear. avoiding the use of bullet points, asterisks (*), or any special formatting."})
+    model_output = result_ai.content
+    chat_history += f"{model_output}<split>"
+    return chat_history, None
 
 
 

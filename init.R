@@ -7,3 +7,5 @@ invisible(sapply(my_packages, install_if_missing))
 
 
 # install.packages('tidyverse', repos = "http://cran.us.r-project.org")
+# import rpy2.robjects as robjects \nprint(robjects.r['version'])
+# from rpy2.robjects.packages import importr\nbase = importr('base')\nprint(base._libPaths())

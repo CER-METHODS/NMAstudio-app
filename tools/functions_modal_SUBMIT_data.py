@@ -5,7 +5,7 @@ import numpy as np
 from assets.storage import DEFAULT_DATA
 from tools.utils import adjust_data, parse_contents
 from collections import OrderedDict
-from tools.utils import get_network, get_network_new
+from tools.utils import get_network_new
 import secrets
 from dash import html
 
@@ -257,7 +257,7 @@ def __data_trans(
         if search_value_format == 'iv':
             
             studlab, treat1, treat2, rob, year = overall_variables[0:]
-            var_dict1 = {studlab: 'studlab', treat1: 'treat1', treat2: 'treat2', rob: 'rob', year: 'year'}
+            var_dict1 = {studlab: 'studlab', treat1: 'treat1', treat2: 'treat2', rob: 'rob', year: 'year'} if rob else {studlab: 'studlab', treat1: 'treat1', treat2: 'treat2', year: 'year'}
             iv_data = [[] for _ in range(number_outcomes)]  # Initialize as a list of lists
             
             for i in range(number_outcomes):
@@ -282,7 +282,7 @@ def __data_trans(
 
         elif search_value_format == 'contrast':
             studlab, treat1, treat2, rob, year = overall_variables[0:]
-            var_dict1 = {studlab: 'studlab', treat1: 'treat1', treat2: 'treat2', rob: 'rob', year: 'year'}
+            var_dict1 = {studlab: 'studlab', treat1: 'treat1', treat2: 'treat2', rob: 'rob', year: 'year'} if rob else  {studlab: 'studlab', treat1: 'treat1', treat2: 'treat2', year: 'year'}
             len_n = [6 if type_i=='continuous' else 4 for type_i in outcome_type]
             len_ci = [sum(len_n[:i_n+1]) for i_n in range(len(len_n))]
             iv_data =[variableselectors[i:j] for i, j in zip([0] + len_ci[:-1], len_ci)]
@@ -314,7 +314,7 @@ def __data_trans(
         else:
 
             studlab, treat, rob, year = overall_variables[0:]
-            var_dict1 = {studlab: 'studlab', treat: 'treat',rob: 'rob', year: 'year'}
+            var_dict1 = {studlab: 'studlab', treat: 'treat',rob: 'rob', year: 'year'} if rob else {studlab: 'studlab', treat: 'treat', year: 'year'}
             len_n = [3 if type_i=='continuous' else 2 for type_i in outcome_type]
             len_ci = [sum(len_n[:i_n+1]) for i_n in range(len(len_n))]
             long_data =[variableselectors[i:j] for i, j in zip([0] + len_ci[:-1], len_ci)]
@@ -345,6 +345,8 @@ def __data_trans(
 
 
         data_user.rename(columns=var_dict, inplace=True)
+        if not rob: data_user['rob'] = np.nan 
+
         var_outs = pd.Series(var_outcomes, index=var_outcomes.keys())
         
         
@@ -374,6 +376,8 @@ def __data_trans(
         
         try:
             data = adjust_data(data_user, search_value_format, number_outcomes)
+            if 'rob1' in data.columns: data['rob'] = data['rob1']
+
             TEMP_net_data_STORAGE = [data.to_json(orient='split')]
             # data.to_csv('db/update_dat.csv', encoding='utf-8')
      

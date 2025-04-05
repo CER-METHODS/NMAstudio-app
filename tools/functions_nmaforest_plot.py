@@ -239,11 +239,14 @@ def __TapNodeData_fig_bidim(data, forest_data_store,out_idx1, out_idx2,options, 
          out_idx2 = 0
 
     directions = directions if directions else ['beneficial', 'harmful']
-    direct1 = directions[out_idx1]
-    direct2 = directions[out_idx2]
    
+
+    direct1 = directions[out_idx1]
+    direct2 = directions[out_idx2] if out_idx2 < len(directions) else directions[out_idx1]
+   
+
     label1 = options[out_idx1]['label']
-    label2 = options[out_idx2]['label']
+    label2 = options[out_idx2]['label'] if out_idx2 < len(options) else options[out_idx1]['label']
 
     if data:
         # if "pscore2" in df_ranking.columns:

@@ -285,12 +285,12 @@ def __selectbox1_options(search_value_format, contents, filename):
     if search_value_format is None: return None, {'display':'none', 'justify-content': 'center'}, {'display':'none', 'justify-content': 'center'}
     col_vars = [[]] 
     if search_value_format == 'long':
-        col_vars[0] = ['study ID', 'treat', 'rob', 'year']
+        col_vars[0] = ['study ID', 'treat', 'rob (optional)', 'year']
     elif search_value_format == 'contrast':
-        col_vars[0] = ['studlab', 'treat 1', 'treat 2', 'rob', 'year']
+        col_vars[0] = ['studlab', 'treat 1', 'treat 2', 'rob (optional)', 'year']
         
     elif search_value_format == 'iv':
-        col_vars[0] = ['studlab', 'treat 1', 'treat 2', 'rob', 'year']
+        col_vars[0] = ['studlab', 'treat 1', 'treat 2', 'rob (optional)', 'year']
         
     
     vars_names = [[f'{search_value_format}.{c}' for c in col_vars[0]]]
@@ -537,12 +537,12 @@ def __variable_selection(number_outcomes,outcometype, data_format, contents, fil
 
 
 
-def __effect_modifier_options(search_value_format,contents, filename):
+def __effect_modifier_options(contents, filename):
     
-    if search_value_format is None: 
+    if contents is None: 
+        
         return None
-    # if search_value_outcome1 is None: 
-    #     return None
+    
     else: 
         data_user = parse_contents(contents, filename)
         options_var = [{'label': '{}'.format(col, col), 'value': col} for col in data_user.columns]   

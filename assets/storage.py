@@ -1,7 +1,7 @@
 # from assets.modal_values import *
 import dash_core_components as dcc
 import pandas as pd
-from tools.utils import get_network, get_network_new
+from tools.utils import  get_network_new
 from tools.PATHS import SESSION_TYPE
 from collections import OrderedDict
 
