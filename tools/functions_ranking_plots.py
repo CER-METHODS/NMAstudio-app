@@ -55,7 +55,7 @@ from functools import lru_cache
 #     return fig, fig2
 
 
-def __ranking_plot(ranking_data, out_number, out_idx1, out_idx2,net_data):
+def __ranking_plot(ranking_data, out_number, out_idx1, options, out_idx2,net_data):
 
     df = pd.read_json(ranking_data[0], orient='split')
     # merged_ranking_data = df
@@ -72,7 +72,12 @@ def __ranking_plot(ranking_data, out_number, out_idx1, out_idx2,net_data):
     
     df = df.rename(columns={'pscore': 'pscore1'})
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]  # Remove unnamed columns
-    outcomes = tuple(f"Outcome {i+1}" for i in range(out_number))
+
+    label1 = options[out_idx1]['label']
+    label2 = options[out_idx2]['label'] if out_idx2 < len(options) else options[out_idx1]['label']
+    outcomes = (label1, label2)
+    # outcomes = tuple(f"Outcome {i+1}" for i in range(out_number))
+    
     net_storage = pd.read_json(net_data[0], orient='split')
     
 
@@ -106,7 +111,7 @@ def __ranking_plot(ranking_data, out_number, out_idx1, out_idx2,net_data):
         fig2.update_layout(paper_bgcolor='rgba(0,0,0,0)',  # transparent bg
                     plot_bgcolor='rgba(0,0,0,0)')
     else:
-        fig2 = __ranking_scatter(df, net_data, outcome_direction[out_idx1], outcome_direction[out_idx2], out_idx1, out_idx2)
+        fig2 = __ranking_scatter(df, net_data, outcome_direction[out_idx1], outcome_direction[out_idx2], out_idx1, out_idx2, outcomes)
 
     return fig, fig2
 
@@ -246,7 +251,7 @@ def __ranking_heatmap(treatments, pscores, outcomes, z_text):
 
 
 
-def __ranking_scatter(df, net_data, outcome_direction_1, outcome_direction_2, out_idx1, out_idx2):
+def __ranking_scatter(df, net_data, outcome_direction_1, outcome_direction_2, out_idx1, out_idx2, outcomes):
     net_data = pd.read_json(net_data[0], orient='split')
     
     if out_idx1 != out_idx2:
@@ -279,6 +284,10 @@ def __ranking_scatter(df, net_data, outcome_direction_1, outcome_direction_2, ou
                           color="Trt groups", size='node weight',
                           hover_data=["treatment"],
                           text='treatment')
+        fig2.update_layout(
+                            xaxis_title=f"{outcomes[0]}",
+                            yaxis_title=f"{outcomes[1]}"
+                        )
 
         fig2.update_layout(coloraxis_showscale=True,
                            showlegend=False,

@@ -1107,10 +1107,11 @@ def Tap_funnelplot(node, outcome_idx, funnel_data):
               Input('number-outcomes', 'value'),
             #   Input("submit_modal_data", "n_clicks_timestamp"),
               Input("_outcome_select", "value"),
+              Input("_outcome_select", "options"),
               Input("ranking_outcome_select2", "value"),
               State('net_data_STORAGE', 'data'))
-def ranking_plot(ranking_data, out_number, out_idx1, out_idx2,net_data):
-    return __ranking_plot(ranking_data, out_number, out_idx1,out_idx2,net_data)
+def ranking_plot(ranking_data, out_number, out_idx1, options, out_idx2,net_data):
+    return __ranking_plot(ranking_data, out_number, out_idx1, options, out_idx2,net_data)
 
 ###############################################################################
 ################### Bootstrap Dropdowns callbacks #############################

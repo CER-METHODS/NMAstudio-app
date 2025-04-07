@@ -1,7 +1,7 @@
 import dash_core_components as dcc, dash_html_components as html, dash_bootstrap_components as dbc
 from assets.storage import OPTIONS_VAR
 
-OPTIONS = [{'label': '{}'.format(col), 'value': col} for col in ['age', 'male', 'bmi', 'weight']]
+OPTIONS = [{'label': '{}'.format(col), 'value': col} for col in ['age', 'male_percentage', 'bmi', 'weight']]
 
 tab_trstvty = html.Div([html.Div([dbc.Row([html.P("Choose effect modifier:", className="graph__title2",
                                          style={'display': 'inline-block',
