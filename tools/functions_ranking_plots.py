@@ -73,9 +73,9 @@ def __ranking_plot(ranking_data, out_number, out_idx1, options, out_idx2,net_dat
     df = df.rename(columns={'pscore': 'pscore1'})
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]  # Remove unnamed columns
 
-    label1 = options[out_idx1]['label']
-    label2 = options[out_idx2]['label'] if out_idx2 < len(options) else options[out_idx1]['label']
-    outcomes = (label1, label2)
+    
+
+    outcomes = tuple(f"{options[i]['label']}" for i in range(out_number))
     # outcomes = tuple(f"Outcome {i+1}" for i in range(out_number))
     
     net_storage = pd.read_json(net_data[0], orient='split')
@@ -106,12 +106,16 @@ def __ranking_plot(ranking_data, out_number, out_idx1, options, out_idx2,net_dat
     fig = __ranking_heatmap(treatments, pscores, outcomes, z_text)
 
     ######################### scatter plot #########################
+    label1 = options[out_idx1]['label']
+    label2 = options[out_idx2]['label'] if out_idx2 < len(options) else options[out_idx1]['label']
+    outcomes2 = (label1, label2)
+
     if out_number < 2:
         fig2 = px.scatter()
         fig2.update_layout(paper_bgcolor='rgba(0,0,0,0)',  # transparent bg
                     plot_bgcolor='rgba(0,0,0,0)')
     else:
-        fig2 = __ranking_scatter(df, net_data, outcome_direction[out_idx1], outcome_direction[out_idx2], out_idx1, out_idx2, outcomes)
+        fig2 = __ranking_scatter(df, net_data, outcome_direction[out_idx1], outcome_direction[out_idx2], out_idx1, out_idx2, outcomes2)
 
     return fig, fig2
 
