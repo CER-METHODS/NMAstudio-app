@@ -948,7 +948,7 @@ CONT = '/assets/icons/contrain.png'
 VISIT = '/assets/icons/visit.png'
 COST = '/assets/icons/cost.png'
 RANK = '/assets/ranking.png'
-from tools.functions_chatbot import render_chatbot
+# from tools.functions_chatbot import render_chatbot
 
 
 model_skt_compare_simple = dbc.Modal(
@@ -1184,7 +1184,7 @@ def skt_nonexpert():
                                                                             stylesheet=skt_stylesheet()), 
                                                                             style={'border-right': '3px solid #B85042',
                                                                                     'width': '50%'}),
-                                                                            dbc.Col(render_chatbot(), style={'width':'50%','justify-items': 'center',"height": "500px"})
+                                                                            # dbc.Col(render_chatbot(), style={'width':'50%','justify-items': 'center',"height": "500px"})
                                                                             # dbc.Col([
                                                                             #     # html.Span('Interventions practical issues',className='skt_span1', 
                                                                             #     #               style={'color': '#B85042', 'font-weight': 'bold'}),
