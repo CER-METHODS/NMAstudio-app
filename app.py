@@ -88,7 +88,7 @@ def get_new_layout():
                         #  'background-color':'#5c7780'
                          }),
                      dcc.Store(id='consts_STORAGE',  data={'today': TODAY, 'session_ID': SESSION_ID},
-                               storage_type='memory',
+                               storage_type='local',
                                ),
                      ])
 server = app.server
@@ -1825,6 +1825,26 @@ def results_display(selected):
         return [style_no_display]*6 + [style_display]*2 + [style_no_display]+['consis_tab']+['funnel_tab']
 
 
+## -------------------------------------------- INFOBOXES CALLBACKS ----------------------------------------------- ##
+
+### -------------------------------------------- FUNNEL CALLBACKS ----------------------------------------------- ###
+
+@app.callback(
+    Output("modal-body-funnel", "is_open"),
+    [
+        Input("open-body-funnel", "n_clicks"),
+        Input("close-body-funnel", "n_clicks"),
+    ],
+    [State("modal-body-funnel", "is_open")],
+)
+def toggle_modal_funnel(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+## -------------------------------------------- END INFOBOXES CALLBACKS ----------------------------------------------- ##
+
+
    
 
 ####################################################################
@@ -2390,7 +2410,9 @@ if __name__ == '__main__':
     # app.title = 'NMAstudio' #TODO: title works fine locally, does not on Heroku
     # context = generate_ssl_perm_and_key(cert_name='cert.pem', key_name='key.pem')
     # app.run_server(debug=False, ssl_context=context)
-    app.run_server(port=8080, debug=True) #change port or remove if needed
+    app.run_server(port=8080, debug=False) #change port or remove if needed
+    # app.run_server(host="macas.lan", port=8080, debug=True) #change port or remove if needed
+
 
 
 
